@@ -293,6 +293,25 @@
 /* ── Ranking list ── */
 .mk-ranking-list { display: flex; flex-direction: column; gap: 0; }
 
+/* Scrollable ranking — max 8 rows visible, rest scrollable */
+.mk-ranking-list.mk-ranking-scroll {
+  max-height: 380px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  padding-right: 4px;
+}
+.mk-ranking-list.mk-ranking-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.mk-ranking-list.mk-ranking-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.mk-ranking-list.mk-ranking-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
 .mk-rank-row {
   display: grid;
   grid-template-columns: 28px 1fr 36px auto;

@@ -522,7 +522,6 @@ async function renderRankingWidget(m) {
         let name = r.title;
         if (m.group_type === "product" && r.brand_id) name = getBrandById(r.brand_id)?.name || r.title;
         const href = `marker.html?id=${encodeURIComponent(r.id)}&cat=${encodeURIComponent(activeCatId)}`;
-        // Vote button: only show for logged-in users on non-current rows
         const voteBtn = (window._mkUser && !isCurrent)
           ? `<a class="mk-rank-vote-btn" href="${href}" title="Vote">Vote</a>`
           : "";
@@ -537,57 +536,19 @@ async function renderRankingWidget(m) {
         </a>`;
       }
 
-      function renderTruncated() {
-        const rows = [];
-        // Top rows (always show first 3)
-        const topEnd = Math.min(2, resolvedIdx - WINDOW - 1);
-        for (let i = 0; i <= topEnd; i++) rows.push(buildRow(sorted[i], i));
-        if (resolvedIdx - WINDOW > 3) rows.push('<div class="mk-rank-ellipsis">⋯</div>');
-        // Window around current
-        const winStart = Math.max(3, resolvedIdx - WINDOW);
-        const winEnd   = Math.min(sorted.length - 1, resolvedIdx + WINDOW);
-        for (let i = winStart; i <= winEnd; i++) rows.push(buildRow(sorted[i], i));
-        if (winEnd < sorted.length - 1) rows.push('<div class="mk-rank-ellipsis">⋯</div>');
-        return rows.join("");
-      }
+      // Render full scrollable list — simpler and always correct
+      listEl.innerHTML = sorted.map((r, i) => buildRow(r, i)).join("");
+      listEl.classList.add("mk-ranking-scroll");
 
-      function renderFull() {
-        return sorted.map((r, i) => buildRow(r, i)).join("");
-      }
+      // Hide see-all link (not needed with scrollable list)
+      const seeAllEl = document.getElementById("mkRankingSeeAll");
+      if (seeAllEl) seeAllEl.style.display = "none";
 
-      let expanded = showAll;
-      function renderList() {
-        listEl.innerHTML = expanded ? renderFull() : renderTruncated();
-        // See all / Collapse link
-        const seeAllEl = document.getElementById("mkRankingSeeAll");
-        if (seeAllEl && !showAll) {
-          seeAllEl.textContent = expanded ? "Show less" : `See all ${sorted.length} →`;
-          seeAllEl.onclick = (e) => { e.preventDefault(); expanded = !expanded; renderList(); };
-        }
-        if (seeAllEl && showAll) seeAllEl.style.display = "none";
-        // Scroll current into view
-        setTimeout(() => {
-          const row = document.getElementById("mkCurrentRankRow");
-          if (row) row.scrollIntoView({ block: "nearest", behavior: "smooth" });
-        }, 100);
-      }
-      renderList();
-
-      // Wire up see-all link (in section head)
-      const seeAllLink = document.getElementById("mkRankingSeeAll");
-      if (!seeAllLink && !showAll) {
-        // Create it if not in HTML
-        const head = document.querySelector("#mkRankingSection .mk-section-head");
-        if (head) {
-          const a = document.createElement("a");
-          a.id = "mkRankingSeeAll";
-          a.href = "#";
-          a.className = "mk-section-link";
-          a.textContent = `See all ${sorted.length} →`;
-          head.appendChild(a);
-          a.onclick = (e) => { e.preventDefault(); expanded = !expanded; renderList(); };
-        }
-      }
+      // Scroll current row into view after render
+      setTimeout(() => {
+        const row = document.getElementById("mkCurrentRankRow");
+        if (row) row.scrollIntoView({ block: "center", behavior: "smooth" });
+      }, 150);
     }
   }
 
