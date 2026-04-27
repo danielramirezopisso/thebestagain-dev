@@ -352,7 +352,7 @@ body.map-page{
 ══════════════════════════════ */
 .map-search-wrap {
   position: relative;
-  z-index: 600;
+  z-index: 1100; /* above toolbar siblings so dropdown covers Filters button */
   margin: 0 0 6px;
 }
 
