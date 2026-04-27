@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>The Best Again — Top rated products by category</title>
+  <meta name="description" content="Discover the highest-rated food products ranked by the community. Croissants, pizza, tiramisu and more." />
+  <meta property="og:title" content="The Best Again — Top rated products by category" />
+  <meta property="og:description" content="Discover the highest-rated food products ranked by the community. Croissants, pizza, tiramisu and more." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <!-- Google Analytics 4 — replace G-VYVTQPBTPC with your Measurement ID -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-VYVTQPBTPC");
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="products.css" />
+  <link rel="stylesheet" href="traction.css" />
+</head>
+
+<body class="products-page" onload="initProductsMasonryPage()">
+    <header class="topbar topbar-sticky">
+    <a class="brand" href="index.html">The Best Again</a>
+    <nav class="nav" id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="map.html">Map</a>
+      <a class="active" href="products.html">Products</a>
+      <a href="rutas.html">Rutas</a>
+      <a href="ranking.html">Rankings</a>
+      <a href="battles.html">Battles</a>
+    </nav>
+    <div class="nav-right">
+      <span id="authStatus" class="auth-pill"></span>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    </div>
+  </header>
+
+  <main class="products-shell">
+    <!-- TOP TOOLBAR -->
+    <section class="products-toolbar">
+      <button class="filter-toggle-btn" id="prodFilterToggle" style="display:none;">
+        Filters <span class="filter-toggle-arrow">▼</span>
+      </button>
+      <div class="filter-collapsible open" id="prodFilterBody">
+      <div class="toolbar-left">
+        <div class="toolbar-block">
+          <div class="toolbar-label">Category</div>
+          <div class="toolbar-inline">
+            <div id="catQuick" class="chip-row"></div>
+
+            <select id="catMore" class="select-compact" onchange="onCategoryMoreChanged()">
+              <option value="">More…</option>
+            </select>
+
+            <button id="btnClearFilters" class="chip chip-clear" style="display:none;" onclick="clearFilters()">✕ Clear</button>
+          </div>
+        </div>
+
+        <div class="toolbar-block">
+          <div class="toolbar-label">Rating</div>
+          <div id="ratingSeg" class="seg-row"></div>
+        </div>
+      </div>
+
+      <div class="toolbar-right">
+        <span id="pageStatus" class="muted"></span>
+
+        <div class="toolbar-suggest">
+          <span class="request-link" onclick="openTraction('requestCategory', null)">💡 Suggest category</span>
+          <span class="request-link" onclick="openTraction('requestBrand', null)">🏷️ Suggest brand</span>
+        </div>
+      </div>
+    </section>
+    <div class="journey-bar-centered" id="prodJourneyWrap">
+      <div class="journey-float-toggle" onclick="toggleJourneyModeProd()">
+        <span class="journey-opt journey-opt-active" id="prodJOptDiscover">🌍 Discover</span>
+        <span class="journey-divider">|</span>
+        <span class="journey-opt" id="prodJOptJourney">🧭 My Journey</span>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <section class="products-area">
+      <!-- lanes (grid, row-first) -->
+      <div id="lanes" class="lanes-grid"></div>
+
+      <!-- Floating add button + collapsible panel overlay -->
+      <button class="add-product-fab" id="addFab" onclick="toggleAddPanel()" title="Add new product">＋</button>
+
+      <aside id="addPanel" class="add-panel add-panel-collapsed">
+        <div class="add-panel-header">
+          <div class="panel-title">Add product</div>
+          <button class="add-panel-close" onclick="toggleAddPanel()">✕</button>
+        </div>
+        <div class="panel-sub muted">Category + Brand (unique). Creating also saves your vote.</div>
+
+        <div id="addPanelLoggedOut" class="muted" style="display:none; margin-top:10px;">
+          Please <a href="login.html"><b>login</b></a> to add products.
+        </div>
+
+        <div id="addPanelForm" style="margin-top:10px;">
+          <label>Category</label>
+          <select id="p_category"></select>
+
+          <label style="margin-top:10px;">Brand</label>
+          <select id="p_brand"></select>
+
+          <label style="margin-top:10px;">Product name <span class="muted" style="font-weight:400;font-size:11px;">(optional)</span></label>
+          <input id="p_product_name" placeholder="Leave blank if only one version" />
+
+          <label style="margin-top:10px;">My vote (1–10)</label>
+          <select id="p_vote"></select>
+
+          <div style="margin-top:12px; display:flex; gap:10px; align-items:center;">
+            <button class="tba-btn tba-btn-primary" onclick="saveProduct()">Save</button>
+            <span id="p_status" class="muted"></span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right drawer OVERLAY (does not steal width) -->
+      <div id="drawerOverlay" class="drawer-overlay" style="display:none;" onclick="closeDrawer()"></div>
+
+      <aside id="drawer" class="drawer drawer-slide" style="display:none;">
+        <div class="drawer-head">
+          <div class="drawer-title">
+            <span class="drawer-pill">🛒 Product</span>
+            <span id="drawerCatName">—</span>
+          </div>
+
+          <div class="drawer-actions">
+            <button class="tba-btn" id="drawerSortBtn" onclick="toggleDrawerSort()" title="Toggle sort">↓</button>
+            <button class="tba-btn" onclick="closeDrawer()">Close</button>
+          </div>
+        </div>
+
+        <div class="drawer-body" id="drawerList"></div>
+      </aside>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <script src="header-auth.js"></script>
+  <script>renderAuthHeader();</script>
+
+  <script src="wishlist-btn.js"></script>
+  <script src="products.js?v=202"></script>
+  <script src="traction.js?v=204"></script>
+
+  <!-- ── TRACTION POPUP ── -->
+  <div class="traction-overlay" id="tractionOverlay" onclick="if(event.target===this)closeTraction()">
+    <div class="traction-popup">
+      <span class="traction-emoji" id="trEmoji">🚧</span>
+      <h2 id="trTitle"></h2>
+      <p id="trBody"></p>
+      <div class="traction-request-area" id="trRequestArea" style="display:none;">
+        <label class="tr-field-label" id="trRequestLabel">Your suggestion</label>
+        <textarea id="trRequestText" rows="2"></textarea>
+        <!-- Brand-only extras -->
+        <div id="trBrandExtras" style="display:none;">
+          <label class="tr-field-label" style="margin-top:10px;">Category <span class="tr-field-note">(which category does this brand belong to?)</span></label>
+          <select id="trCategorySelect">
+            <option value="">— Select existing category —</option>
+          </select>
+          <div class="tr-or-row"><span>or suggest a new one</span></div>
+          <input type="text" id="trNewCategory" placeholder="New category name (optional)" />
+        </div>
+      </div>
+      <div class="traction-email-area" id="trEmailArea">
+        <input type="email" id="trEmail" placeholder="Your email address" />
+      </div>
+      <div class="traction-actions">
+        <button class="tba-btn tba-btn-primary" id="trSubmitBtn" onclick="submitTraction()">Notify me</button>
+        <button class="tba-btn" id="trSkipBtn" onclick="closeTraction()">Maybe later</button>
+      </div>
+      <div class="traction-status" id="trStatus"></div>
+    </div>
+  </div>
+
+  <script>
+  function toggleNav() {
+    const nav = document.getElementById('mainNav');
+    const btn = document.getElementById('burgerBtn');
+    const open = nav.classList.toggle('nav-open');
+    btn.innerHTML = open ? '&#10005;' : '&#9776;';
+  }
+  // Close nav when a link is clicked
+  document.addEventListener('DOMContentLoaded', () => {
+    const nav = document.getElementById('mainNav');
+    if (nav) nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      nav.classList.remove('nav-open');
+      const btn = document.getElementById('burgerBtn');
+      if (btn) btn.innerHTML = '&#9776;';
+    }));
+  });
+  </script>
+
+  <script>
+  window.addEventListener('load', function() {
+    if (window.innerWidth > 768) return;
+    const btn = document.getElementById('prodFilterToggle');
+    const body = document.getElementById('prodFilterBody');
+    if (!btn || !body) return;
+    btn.style.display = 'flex';
+    body.classList.remove('open');
+    btn.addEventListener('click', () => {
+      const open = body.classList.toggle('open');
+      btn.classList.toggle('open', open);
+      btn.querySelector('.filter-toggle-arrow').textContent = open ? '▲' : '▼';
+    });
+  });
+  </script>
+</body>
+</html>

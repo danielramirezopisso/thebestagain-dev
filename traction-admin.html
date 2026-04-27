@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Best Again — Traction</title>
+  <link rel="stylesheet" href="base.css" />
+  <style>
+    body { background: var(--page-bg); }
+
+    .tr-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 28px 0 22px;
+      flex-wrap: wrap;
+    }
+    .tr-header h1 { margin: 0; font-size: 24px; }
+    .tr-badge {
+      background: rgba(45,74,138,0.1);
+      color: var(--accent);
+      border: 1px solid rgba(45,74,138,0.2);
+      border-radius: 99px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Stat pills ── */
+    .stat-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .stat-pill {
+      flex: 1;
+      min-width: 130px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      text-align: center;
+    }
+    .stat-pill .num {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--text);
+    }
+    .stat-pill .lbl {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Section ── */
+    .tr-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .tr-section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--rule);
+      background: var(--page-bg);
+    }
+    .tr-section-head h2 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tr-count-badge {
+      background: var(--accent-bg);
+      color: var(--accent);
+      border-radius: 99px;
+      padding: 2px 9px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* ── Table ── */
+    .tr-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .tr-table th {
+      text-align: left;
+      padding: 10px 18px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--rule);
+      background: var(--page-bg);
+    }
+    .tr-table td {
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--rule);
+      vertical-align: middle;
+    }
+    .tr-table tr:last-child td { border-bottom: none; }
+    .tr-table tr:hover td { background: var(--faint); }
+    .tr-table a { color: var(--accent); text-decoration: none; }
+    .tr-table a:hover { text-decoration: underline; }
+
+    .email-cell { font-family: monospace; font-size: 12px; color: var(--text); }
+    .time-cell  { color: var(--muted); font-size: 11px; white-space: nowrap; }
+    .type-pill  {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .pill-preorder { background: rgba(52,199,89,0.12); color: #167a2f; }
+    .pill-top5     { background: rgba(255,149,0,0.12);  color: #a05c00; }
+    .pill-claim    { background: rgba(45,74,138,0.12);  color: var(--accent); }
+    .pill-request  { background: rgba(255,59,48,0.10);  color: #c0392b; }
+
+    .empty-row td { text-align: center; color: var(--muted); padding: 28px; font-style: italic; }
+
+    .refresh-btn {
+      font-size: 12px;
+      color: var(--muted);
+      background: none;
+      border: 1px solid var(--rule);
+      border-radius: 99px;
+      padding: 4px 11px;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .refresh-btn:hover { color: var(--text); }
+
+    .req-text { max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+
+    .denied { text-align: center; padding: 80px 20px; }
+    .denied .icon { font-size: 48px; margin-bottom: 12px; }
+
+    @media (max-width: 600px) {
+      .tr-table th:nth-child(4),
+      .tr-table td:nth-child(4) { display: none; }
+    }
+  </style>
+  <!-- Google Analytics 4 — replace G-VYVTQPBTPC with your Measurement ID -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-VYVTQPBTPC");
+  </script>
+</head>
+
+<body onload="initTractionPage()">
+  <header class="topbar topbar-sticky">
+    <a class="brand" href="index.html">The Best Again</a>
+    <nav class="nav" id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="map.html">Map</a>
+      <a href="products.html">Products</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+    <div class="nav-right">
+      <span id="authStatus" class="auth-pill"></span>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <div id="accessDenied" style="display:none;">
+      <div class="denied">
+        <div class="icon">🔒</div>
+        <h2>Access Denied</h2>
+        <p class="muted">This page is restricted to administrators only.</p>
+        <a class="tba-btn tba-btn-primary" href="index.html">Go Home</a>
+      </div>
+    </div>
+
+    <div id="tractionContent" style="display:none;">
+
+      <div class="tr-header">
+        <div>
+          <h1>📊 Traction</h1>
+          <p class="muted" style="margin:4px 0 0; font-size:13px;">Live interest signals — who clicked what and when.</p>
+        </div>
+        <span class="tr-badge">Admin Only</span>
+      </div>
+
+      <!-- Stat summary pills -->
+      <div class="stat-row">
+        <div class="stat-pill">
+          <div class="num" id="statClaims">—</div>
+          <div class="lbl">🏢 Claims</div>
+        </div>
+        <div class="stat-pill">
+          <div class="num" id="statPreorders">—</div>
+          <div class="lbl">🛒 Pre-orders</div>
+        </div>
+        <div class="stat-pill">
+          <div class="num" id="statTop5">—</div>
+          <div class="lbl">🍽️ Top 5 Tastings</div>
+        </div>
+        <div class="stat-pill">
+          <div class="num" id="statRequests">—</div>
+          <div class="lbl">💬 Requests</div>
+        </div>
+      </div>
+
+      <!-- Business claims -->
+      <div class="tr-section">
+        <div class="tr-section-head">
+          <h2>🏢 Business Claims <span class="tr-count-badge" id="claimCount">0</span></h2>
+          <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+        </div>
+        <table class="tr-table">
+          <thead>
+            <tr>
+              <th>Place</th>
+              <th>Email</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="claimsBody">
+            <tr class="empty-row"><td colspan="3">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Purchase interest (pre-orders + top5) -->
+      <div class="tr-section">
+        <div class="tr-section-head">
+          <h2>🛒 Purchase Interest <span class="tr-count-badge" id="purchaseCount">0</span></h2>
+        </div>
+        <table class="tr-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Place / Category</th>
+              <th>Email</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="purchaseBody">
+            <tr class="empty-row"><td colspan="4">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Feature requests -->
+      <div class="tr-section">
+        <div class="tr-section-head">
+          <h2>💬 Feature Requests <span class="tr-count-badge" id="requestCount">0</span></h2>
+        </div>
+        <table class="tr-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Request</th>
+              <th>Email</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="requestsBody">
+            <tr class="empty-row"><td colspan="4">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- /tractionContent -->
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <script src="header-auth.js"></script>
+  <script>
+    function fmt(iso) {
+      if (!iso) return "—";
+      const d = new Date(iso);
+      return d.toLocaleDateString("en-GB", { day:"2-digit", month:"short", year:"numeric" })
+        + " " + d.toLocaleTimeString("en-GB", { hour:"2-digit", minute:"2-digit" });
+    }
+
+    function pill(type) {
+      const map = {
+        preorder: ["pill-preorder", "🛒 Pre-order"],
+        top5:     ["pill-top5",     "🍽️ Top 5"],
+        claim:    ["pill-claim",    "🏢 Claim"],
+        request:  ["pill-request",  "💬 Request"],
+        other:    ["pill-request",  "💬 Other"],
+        category: ["pill-top5",    "📂 Category"],
+        brand:    ["pill-preorder", "🏷️ Brand"],
+      };
+      const [cls, label] = map[type] || ["pill-request", type];
+      return `<span class="type-pill ${cls}">${label}</span>`;
+    }
+
+    async function loadAll() {
+      // Load reference data first (markers + categories) for name resolution
+      const [markersRes, catsRes] = await Promise.all([
+        sb.from("markers").select("id,title").eq("is_active", true),
+        sb.from("categories").select("id,name").eq("is_active", true),
+      ]);
+      const markerMap = Object.fromEntries((markersRes.data || []).map(m => [m.id, m.title]));
+      const catMap    = Object.fromEntries((catsRes.data   || []).map(c => [c.id, c.name]));
+
+      // Claims
+      const { data: claims, error: claimsErr } = await sb
+        .from("business_interest")
+        .select("email, created_at, marker_id")
+        .order("created_at", { ascending: false });
+
+      if (claimsErr) console.error("claims error:", claimsErr);
+
+      const claimsBody = document.getElementById("claimsBody");
+      document.getElementById("claimCount").textContent = claims?.length || 0;
+      document.getElementById("statClaims").textContent = claims?.length || 0;
+
+      claimsBody.innerHTML = claims?.length ? claims.map(r => `
+        <tr>
+          <td><a href="marker.html?id=${r.marker_id}" target="_blank">${markerMap[r.marker_id] || r.marker_id || "—"}</a></td>
+          <td class="email-cell">${r.email}</td>
+          <td class="time-cell">${fmt(r.created_at)}</td>
+        </tr>
+      `).join("") : `<tr class="empty-row"><td colspan="3">No claims yet.</td></tr>`;
+
+      // Purchase interest
+      const { data: purchase, error: purchaseErr } = await sb
+        .from("purchase_interest")
+        .select("type, email, created_at, marker_id, category_id")
+        .order("created_at", { ascending: false });
+
+      if (purchaseErr) console.error("purchase error:", purchaseErr);
+
+      const preorders = purchase?.filter(r => r.type === "preorder") || [];
+      const top5      = purchase?.filter(r => r.type === "top5") || [];
+
+      document.getElementById("purchaseCount").textContent = purchase?.length || 0;
+      document.getElementById("statPreorders").textContent = preorders.length;
+      document.getElementById("statTop5").textContent      = top5.length;
+
+      const purchaseBody = document.getElementById("purchaseBody");
+      purchaseBody.innerHTML = purchase?.length ? purchase.map(r => {
+        const subject = r.type === "preorder"
+          ? `<a href="marker.html?id=${r.marker_id}" target="_blank">${markerMap[r.marker_id] || r.marker_id || "—"}</a>`
+          : (catMap[r.category_id] || r.category_id || "—");
+        return `
+          <tr>
+            <td>${pill(r.type)}</td>
+            <td>${subject}</td>
+            <td class="email-cell">${r.email}</td>
+            <td class="time-cell">${fmt(r.created_at)}</td>
+          </tr>
+        `;
+      }).join("") : `<tr class="empty-row"><td colspan="4">No purchase interest yet.</td></tr>`;
+
+      // Feature requests
+      const { data: requests, error: requestsErr } = await sb
+        .from("feature_requests")
+        .select("type, text, email, created_at")
+        .order("created_at", { ascending: false });
+
+      if (requestsErr) console.error("requests error:", requestsErr);
+
+      document.getElementById("requestCount").textContent = requests?.length || 0;
+      document.getElementById("statRequests").textContent  = requests?.length || 0;
+
+      const requestsBody = document.getElementById("requestsBody");
+      requestsBody.innerHTML = requests?.length ? requests.map(r => `
+        <tr>
+          <td>${pill(r.type)}</td>
+          <td><div class="req-text" title="${r.text || ""}">${r.text || "—"}</div></td>
+          <td class="email-cell">${r.email || "—"}</td>
+          <td class="time-cell">${fmt(r.created_at)}</td>
+        </tr>
+      `).join("") : `<tr class="empty-row"><td colspan="4">No requests yet.</td></tr>`;
+    }
+
+    async function initTractionPage() {
+      const user = await maybeUser();
+      const isAdmin = user?.email?.includes("dropisso");
+
+      if (!isAdmin) {
+        document.getElementById("accessDenied").style.display = "block";
+        return;
+      }
+
+      document.getElementById("tractionContent").style.display = "block";
+      await loadAll();
+    }
+  </script>
+</body>
+</html>

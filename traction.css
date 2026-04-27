@@ -1,0 +1,211 @@
+/* traction.css — shared interest capture popup */
+
+.traction-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(26,23,20,0.5);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.traction-overlay.active {
+  display: flex;
+}
+
+.traction-popup {
+  background: var(--card);
+  border-radius: 8px;
+  padding: 36px 32px 28px;
+  max-width: 380px;
+  width: 100%;
+  box-shadow: 0 12px 40px rgba(26,23,20,0.2);
+  position: relative;
+}
+
+.traction-emoji {
+  font-size: 36px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.traction-popup h2 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.traction-popup p {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 20px;
+}
+
+.traction-request-area {
+  margin-bottom: 12px;
+}
+
+.tr-field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.traction-request-area textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 14px;
+  resize: none;
+  min-height: 68px;
+  background: var(--page-bg);
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.traction-request-area textarea:focus,
+.traction-request-area select:focus,
+.traction-request-area input[type="text"]:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.traction-request-area select,
+.traction-request-area input[type="text"] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 13px;
+  background: var(--page-bg);
+  color: var(--text);
+  box-sizing: border-box;
+  margin-top: 0;
+}
+
+.tr-or-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 6px;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.tr-or-row::before,
+.tr-or-row::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+.tr-field-note {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 10px;
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.traction-email-area {
+  margin-bottom: 16px;
+}
+
+.traction-email-area input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 14px;
+  background: var(--page-bg);
+  color: var(--text);
+}
+
+.traction-email-area input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.traction-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.traction-status {
+  font-size: 12px;
+  margin-top: 8px;
+  min-height: 16px;
+}
+
+/* ── Trigger buttons / links ── */
+
+.top5-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid rgba(45,74,138,0.3);
+  border-radius: 99px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.top5-btn:hover { background: rgba(45,74,138,0.14); }
+
+.request-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+  cursor: pointer;
+  background: var(--accent-bg);
+  border: 1px solid rgba(45,74,138,0.25);
+  border-radius: 99px;
+  padding: 5px 12px;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.request-link:hover { background: rgba(45,74,138,0.14); }
+
+/* ── Hero traction buttons (marker page, top-right) ── */
+.traction-hero-preorder {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border-color: var(--accent2) !important;
+  font-size: 12px !important;
+  padding: 6px 13px !important;
+}
+.traction-hero-preorder:hover { background: var(--accent2) !important; }
+
+.traction-hero-claim {
+  background: #fff !important;
+  color: var(--accent) !important;
+  border-color: rgba(45,74,138,0.35) !important;
+  font-size: 12px !important;
+  padding: 6px 13px !important;
+}
+.traction-hero-claim:hover { background: var(--accent-bg) !important; }
+
+/* ── Marker traction strip (legacy, kept for safety) ── */
+.traction-strip { display: none; }

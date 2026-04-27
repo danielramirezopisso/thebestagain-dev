@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Best Again</title>
+  <meta id="metaDesc" name="description" content="" />
+  <meta id="ogTitle" property="og:title" content="" />
+  <meta id="ogDesc" property="og:description" content="" />
+  <meta id="ogUrl" property="og:url" content="" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="The Best Again" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-VYVTQPBTPC");</script>
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="marker.css" />
+  <link rel="stylesheet" href="traction.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+
+<body onload="initMarkerPage()">
+
+  <header class="topbar topbar-sticky">
+    <a class="brand" href="index.html">The Best Again</a>
+    <nav class="nav" id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="map.html">Map</a>
+      <a href="products.html">Products</a>
+      <a href="rutas.html">Rutas</a>
+      <a href="ranking.html">Rankings</a>
+      <a href="battles.html">Battles</a>
+    </nav>
+    <div class="nav-right">
+      <span id="authStatus" class="auth-pill"></span>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    </div>
+  </header>
+
+  <!-- Loading state -->
+  <div id="pageLoadingState" class="mk-loading">
+    <div class="mk-loading-bar"></div>
+  </div>
+
+  <main class="mk-main" id="mkMain" style="display:none;">
+
+    <!-- ── PHOTO HERO ── -->
+    <div class="mk-photo-hero" id="mkPhotoHero">
+      <div class="mk-photo-strip" id="mkPhotoStrip">
+        <!-- Photos injected by JS, or placeholder -->
+        <div class="mk-photo-placeholder" id="mkPhotoPlaceholder">
+          <div class="mk-photo-placeholder-icon" id="mkPhotoPlaceholderIcon">🍽</div>
+        </div>
+      </div>
+      <!-- Overlay actions on photo -->
+      <div class="mk-photo-actions">
+        <label class="mk-photo-add-btn" id="mkPhotoAddBtn" style="display:none;" title="Add photo">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          <input type="file" id="photoFileInput" accept="image/*" style="display:none;" onchange="uploadPhoto(this)" />
+        </label>
+        <button class="mk-photo-share-btn" onclick="shareMarker()" title="Share">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+        </button>
+      </div>
+      <!-- Photo count pill -->
+      <div class="mk-photo-count" id="mkPhotoCount" style="display:none;"></div>
+    </div>
+
+    <!-- ── IDENTITY BLOCK ── -->
+    <div class="mk-identity" id="mkIdentity">
+      <div class="mk-identity-left">
+        <div class="mk-breadcrumb" id="mkBreadcrumb"></div>
+        <h1 class="mk-title" id="markerTitle">…</h1>
+        <div class="mk-meta" id="mkMeta"></div>
+        <!-- Ruta badge if applicable -->
+        <div class="mk-ruta-badge" id="mkRutaBadge" style="display:none;"></div>
+        <!-- Other categories -->
+        <div class="other-cat-chips" id="otherCatChips" style="display:none;"></div>
+      </div>
+      <div class="mk-score-block" id="mkScoreBlock">
+        <!-- Score injected by JS -->
+      </div>
+    </div>
+
+    <!-- ── CONTEXT LINE ── -->
+    <div class="mk-context-line" id="mkContextLine" style="display:none;">
+      <!-- "#11 of 13 Croquetas de pollo in Barcelona · Worth trying" -->
+    </div>
+
+    <!-- ── VOTE INLINE (logged in) ── -->
+    <div class="mk-vote-inline" id="mkVoteInline" style="display:none;">
+      <span class="mk-vote-label">Your vote</span>
+      <div class="mk-vote-pips" id="voteBtns"></div>
+      <div class="mk-vote-actions">
+        <button class="mk-vote-save" onclick="saveMyVote()">Save</button>
+        <button class="mk-vote-remove" id="btnClearVote" onclick="clearMyVote()" style="display:none;">Remove</button>
+      </div>
+      <span class="mk-vote-status" id="voteStatus"></span>
+    </div>
+
+    <!-- ── ADMIN ACTIONS (claimed/edit) ── -->
+    <div class="mk-admin-row" id="mkAdminRow" style="display:none;"></div>
+
+    <div class="mk-body">
+
+      <!-- ── LEFT: RANKING + MAP + DETAILS ── -->
+      <div class="mk-col-main">
+
+        <!-- Full ranking list -->
+        <section class="mk-section" id="mkRankingSection" style="display:none;">
+          <div class="mk-section-head">
+            <span class="mk-section-title" id="mkRankingTitle">The Ranking</span>
+            <a id="editVotesCatLink" href="my-votes.html" class="mk-section-link" style="display:none;">Edit my votes</a>
+          </div>
+          <div class="mk-ranking-list" id="rankingList"></div>
+        </section>
+
+        <!-- Brand variants (products) -->
+        <section class="mk-section" id="moreBrandCard" style="display:none;">
+          <div class="mk-section-head">
+            <span class="mk-section-title" id="moreBrandHead">More from this brand</span>
+          </div>
+          <div class="mk-ranking-list" id="moreBrandList"></div>
+        </section>
+
+        <!-- Chain locations (places) -->
+        <section class="mk-section" id="moreChainCard" style="display:none;">
+          <div class="mk-section-head">
+            <span class="mk-section-title" id="moreChainHead">Other locations</span>
+          </div>
+          <div class="mk-ranking-list" id="moreChainList"></div>
+        </section>
+
+        <!-- Also worth trying -->
+        <section class="mk-section" id="alsoSection" style="display:none;">
+          <div class="mk-section-head">
+            <span class="mk-section-title">Also worth trying</span>
+            <a id="alsoSeeAllLink" href="#" class="mk-section-link">See all →</a>
+          </div>
+          <div class="mk-also-grid" id="alsoGrid"></div>
+        </section>
+
+        <!-- Comments -->
+        <section class="mk-section" id="commentsCard">
+          <div class="mk-section-head">
+            <span class="mk-section-title">Comments</span>
+            <span id="commentsCount" class="mk-section-count"></span>
+          </div>
+          <div id="commentWriteArea" style="display:none;">
+            <textarea id="newCommentInput" class="mk-comment-input" placeholder="Share your thoughts…" rows="2" maxlength="500"></textarea>
+            <div class="mk-comment-foot">
+              <span id="newCommentCharCount" class="mk-comment-chars">0 / 500</span>
+              <button class="mk-comment-post" onclick="postComment()">Post</button>
+            </div>
+          </div>
+          <div id="commentLoginPrompt" class="mk-comment-login" style="display:none;">
+            <a href="login.html">Login</a> to leave a comment.
+          </div>
+          <div id="commentsList"></div>
+        </section>
+
+      </div>
+
+      <!-- ── RIGHT: MAP + DETAILS ── -->
+      <div class="mk-col-side">
+
+        <!-- Mini map -->
+        <section class="mk-section mk-section-map" id="miniMapCard" style="display:none;">
+          <div id="miniMap" class="mk-mini-map"></div>
+          <div id="miniMapAddress" class="mk-map-address"></div>
+        </section>
+
+        <!-- Details -->
+        <section class="mk-section mk-section-details">
+          <div class="mk-section-head">
+            <span class="mk-section-title">Details</span>
+          </div>
+          <div id="detailsContent" class="mk-details"></div>
+        </section>
+
+        <!-- Wishlist / Claim -->
+        <div class="mk-side-actions" id="mkSideActions"></div>
+
+      </div>
+
+    </div><!-- /.mk-body -->
+
+    <!-- Status (errors) -->
+    <p id="pageStatus" class="muted" style="margin:10px 20px;"></p>
+
+    <!-- Edit form (hidden) -->
+    <div class="mk-edit-panel" id="editCard" style="display:none;">
+      <div class="mk-section-head"><span class="mk-section-title">Edit marker</span></div>
+      <div class="edit-grid">
+        <div class="edit-field"><label>Title</label><input id="e_title" /></div>
+        <div class="edit-field"><label>Type</label>
+          <select id="e_group_type" onchange="onEditGroupChanged()">
+            <option value="place">Place</option>
+            <option value="product">Product</option>
+          </select>
+        </div>
+        <div class="edit-field"><label>Category</label><select id="e_category"></select></div>
+        <div class="edit-field" id="brandRow" style="display:none;"><label>Brand</label><select id="e_brand"></select></div>
+        <div class="edit-field" id="productNameRow" style="display:none;"><label>Product name</label><input id="e_product_name" /></div>
+        <div class="edit-field" id="chainRow" style="display:none;"><label>Chain</label><select id="e_chain_id"></select></div>
+        <div class="edit-field"><label>Address</label><input id="e_address" /></div>
+        <div class="edit-field"><label>Lat</label><input id="e_lat" /></div>
+        <div class="edit-field"><label>Lon</label><input id="e_lon" /></div>
+      </div>
+      <div class="edit-foot">
+        <span id="editStatus" class="muted"></span>
+        <div style="display:flex;gap:10px;">
+          <button onclick="cancelEdits()">Cancel</button>
+          <button class="tba-btn tba-btn-primary" onclick="saveEdits()">Save changes</button>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /.mk-main -->
+
+  <!-- Photo lightbox -->
+  <div id="photoLightbox" class="lightbox-overlay" style="display:none;" onclick="if(event.target===this)closeLightbox()">
+    <div class="lightbox-inner">
+      <div class="lightbox-thumbs" id="lightboxThumbs"></div>
+      <div class="lightbox-main">
+        <button class="lightbox-close" onclick="closeLightbox()">&#10005;</button>
+        <button class="lightbox-nav lightbox-prev" id="lightboxPrev" onclick="lightboxNav(-1)">&#8592;</button>
+        <div class="lightbox-img-wrap"><img id="lightboxImg" src="" alt="" /></div>
+        <button class="lightbox-nav lightbox-next" id="lightboxNext" onclick="lightboxNav(1)">&#8594;</button>
+        <div class="lightbox-dots" id="lightboxDots"></div>
+        <div class="lightbox-caption" id="lightboxCaption"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Traction popup -->
+  <div class="traction-overlay" id="tractionOverlay" onclick="if(event.target===this)closeTraction()">
+    <div class="traction-popup">
+      <span class="traction-emoji" id="trEmoji">🚧</span>
+      <h2 id="trTitle"></h2>
+      <p id="trBody"></p>
+      <div class="traction-request-area" id="trRequestArea" style="display:none;">
+        <label class="tr-field-label" id="trRequestLabel">Your suggestion</label>
+        <textarea id="trRequestText" rows="2"></textarea>
+        <div id="trBrandExtras" style="display:none;">
+          <label class="tr-field-label" style="margin-top:10px;">Category</label>
+          <select id="trCategorySelect"><option value="">— Select existing category —</option></select>
+          <div class="tr-or-row"><span>or suggest a new one</span></div>
+          <input type="text" id="trNewCategory" placeholder="New category name (optional)" />
+        </div>
+      </div>
+      <div class="traction-email-area" id="trEmailArea">
+        <input type="email" id="trEmail" placeholder="Your email address" />
+      </div>
+      <div class="traction-actions">
+        <button class="tba-btn tba-btn-primary" id="trSubmitBtn" onclick="submitTraction()">Notify me</button>
+        <button class="tba-btn" id="trSkipBtn" onclick="closeTraction()">Maybe later</button>
+      </div>
+      <div class="traction-status" id="trStatus"></div>
+    </div>
+  </div>
+
+  <!-- Share panel fallback -->
+  <div class="share-panel" id="sharePanel" style="display:none;">
+    <a class="share-btn share-whatsapp" href="#" onclick="event.preventDefault();window.open('https://wa.me/?text='+encodeURIComponent(document.title.replace(' — The Best Again','')+' '+location.href),'_blank')">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp
+    </a>
+    <button class="share-btn share-copy" id="shareCopyBtn" onclick="copyMarkerLink()">🔗 Copy link</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="auth.js"></script>
+  <script src="header-auth.js"></script>
+  <script>renderAuthHeader();</script>
+  <script src="wishlist-btn.js"></script>
+  <script src="marker.js?v=8"></script>
+  <script src="traction.js?v=204"></script>
+
+  <script>
+  function toggleNav() {
+    const nav = document.getElementById('mainNav');
+    const btn = document.getElementById('burgerBtn');
+    const open = nav.classList.toggle('nav-open');
+    btn.innerHTML = open ? '&#10005;' : '&#9776;';
+    btn.setAttribute('aria-expanded', open);
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.nav a').forEach(a => a.addEventListener('click', () => {
+      document.getElementById('mainNav')?.classList.remove('nav-open');
+      const btn = document.getElementById('burgerBtn');
+      if (btn) { btn.innerHTML = '&#9776;'; btn.setAttribute('aria-expanded', false); }
+    }));
+  });
+  </script>
+
+</body>
+</html>

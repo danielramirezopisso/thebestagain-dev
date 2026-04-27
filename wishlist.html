@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Wishlist — The Best Again</title>
+  <meta name="description" content="A wishlist of places and products on The Best Again." />
+  <meta property="og:title" content="Wishlist — The Best Again" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-VYVTQPBTPC");
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="wishlist.css" />
+</head>
+
+<body onload="initWishlistPage()">
+  <header class="topbar topbar-sticky">
+    <a class="brand" href="index.html">The Best Again</a>
+    <nav class="nav" id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="map.html">Map</a>
+      <a href="products.html">Products</a>
+    </nav>
+    <div class="nav-right">
+      <span id="authStatus" class="auth-pill"></span>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <div class="wishlist-page-header">
+      <div class="wishlist-page-avatar" id="wlAvatar">♥</div>
+      <div>
+        <h1 id="wlHeading">Wishlist</h1>
+        <p class="muted" id="wlSubheading">Loading…</p>
+      </div>
+    </div>
+
+    <div id="wlContent"></div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <script src="header-auth.js"></script>
+  <script src="wishlist-btn.js"></script>
+  <script src="wishlist.js"></script>
+</body>
+</html>

@@ -1,0 +1,581 @@
+/* ══════════════════════════════════════
+   RUTAS PAGE v2
+══════════════════════════════════════ */
+
+.rutas-page { background: var(--bg, #fafaf8); min-height: 100dvh; }
+
+.rutas-main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 24px 100px;
+}
+
+/* ── Hero ── */
+.rutas-hero {
+  text-align: center;
+  margin-bottom: 36px;
+  padding-top: 8px;
+}
+.rutas-hero-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent, #e0355b);
+  margin-bottom: 8px;
+}
+.rutas-hero-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(44px, 8vw, 72px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--text, #111);
+  margin: 0 0 14px;
+}
+.rutas-hero-desc {
+  font-size: 14px;
+  color: var(--muted, #888);
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── City tabs ── */
+.rutas-city-section { margin-bottom: 32px; }
+.rutas-city-tabs {
+  display: inline-flex;
+  gap: 0;
+  border: 1.5px solid var(--rule, #e5e5e5);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface, #fff);
+}
+.city-tab {
+  padding: 9px 24px;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  color: var(--muted, #888);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.city-tab + .city-tab { border-left: 1.5px solid var(--rule, #e5e5e5); }
+.city-tab-active { background: var(--accent, #e0355b); color: #fff; }
+.city-tab-disabled { opacity: 0.4; cursor: not-allowed; }
+.city-tab-soon {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--rule, #e5e5e5);
+  color: var(--muted, #999);
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+/* ── Section label ── */
+.rutas-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted, #888);
+  margin-bottom: 14px;
+}
+
+/* ── Category cards grid ── */
+.rutas-cat-section { margin-bottom: 32px; animation: fadeUp 0.25s ease; }
+.rutas-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.rutas-cat-card {
+  position: relative;
+  padding: 20px 14px 14px;
+  border-radius: 14px;
+  border: 2px solid var(--rule, #e5e5e5);
+  background: var(--surface, #fff);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
+  overflow: hidden;
+}
+.rutas-cat-card:hover {
+  border-color: var(--accent, #e0355b);
+  box-shadow: 0 4px 16px rgba(224,53,91,0.1);
+  transform: translateY(-2px);
+}
+.rutas-cat-card.active {
+  border-color: var(--accent, #e0355b);
+  background: #fff8f9;
+}
+.rutas-cat-card img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+.rutas-cat-card-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text, #111);
+  line-height: 1.3;
+}
+.rutas-cat-card-count {
+  font-size: 11px;
+  color: var(--muted, #aaa);
+  font-weight: 500;
+}
+
+/* Progress border on category card — fills left to right */
+.rutas-cat-card-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--accent, #e0355b);
+  border-radius: 0 0 0 12px;
+  transition: width 0.4s ease;
+}
+.rutas-cat-card-progress.complete { background: #0f9d58; border-radius: 0 0 12px 12px; }
+
+/* ── Back button ── */
+.ruta-back-btn {
+  background: none;
+  border: none;
+  color: var(--muted, #888);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.12s;
+}
+.ruta-back-btn:hover { color: var(--text, #111); }
+
+/* ── Ruta title block ── */
+.ruta-title-block { margin-bottom: 24px; }
+.ruta-title-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent, #e0355b);
+  margin-bottom: 4px;
+}
+.ruta-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(22px, 4vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text, #111);
+  margin: 0 0 14px;
+}
+.ruta-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ruta-progress-track {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--rule, #e5e5e5);
+  overflow: hidden;
+}
+.ruta-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent, #e0355b);
+  transition: width 0.5s ease;
+  width: 0%;
+}
+.ruta-progress-fill.complete { background: #0f9d58; }
+.ruta-progress-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted, #888);
+  white-space: nowrap;
+}
+
+/* ── Ruta layout: grid + map ── */
+.ruta-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  grid-template-rows: auto auto;
+  gap: 20px;
+  align-items: start;
+}
+.ruta-map-toggle { display: none; } /* hidden on desktop */
+.ruta-map-wrap {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  position: sticky;
+  top: 80px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1.5px solid var(--rule, #e5e5e5);
+  height: 460px;
+}
+#rutaMap { width: 100%; height: 100%; }
+.ruta-grid-wrap { grid-column: 1; }
+
+/* ── Ruta grid 3 columns ── */
+.ruta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* ── Ruta item card ── */
+.ruta-item {
+  position: relative;
+  border-radius: 12px;
+  border: 1.5px solid var(--rule, #e5e5e5);
+  background: var(--surface, #fff);
+  padding: 12px 10px 10px;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
+  min-height: 110px;
+  animation: fadeUp 0.2s ease both;
+}
+.ruta-item:hover { border-color: var(--accent,#e0355b); box-shadow: 0 4px 14px rgba(224,53,91,.1); transform: translateY(-2px); text-decoration: none; }
+.ruta-item-voted { border-color: var(--accent,#e0355b); background: #fff8f9; }
+.ruta-item-inactive { opacity: 0.35; filter: grayscale(1); pointer-events: none; cursor: default; }
+
+/* Card pop animation on vote */
+@keyframes cardPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.07); }
+  100% { transform: scale(1); }
+}
+.ruta-item-popping { animation: cardPop 0.3s ease forwards; }
+
+.ruta-item-num {
+  position: absolute;
+  top: 7px; left: 9px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--muted, #ccc);
+}
+.ruta-item-check {
+  position: absolute;
+  top: 7px; right: 7px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--accent, #e0355b);
+  color: #fff;
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+.ruta-item-icon {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 4px;
+}
+.ruta-item-icon img { width: 24px; height: 24px; object-fit: contain; }
+.ruta-item-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text, #111);
+  line-height: 1.3;
+  word-break: break-word;
+}
+.ruta-item-score {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  color: #fff;
+  margin-top: auto;
+}
+.ruta-item-closed {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted, #aaa);
+  font-weight: 600;
+  margin-top: auto;
+}
+
+/* ── Vote chip on card ── */
+.ruta-vote-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  border: 1.5px solid var(--rule, #e5e5e5);
+  background: var(--surface, #fff);
+  color: var(--muted, #999);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: auto;
+  transition: border-color 0.12s, color 0.12s;
+  white-space: nowrap;
+}
+.ruta-vote-chip:hover { border-color: var(--accent,#e0355b); color: var(--accent,#e0355b); }
+.ruta-vote-btns {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  width: 100%;
+  margin-top: 4px;
+}
+.ruta-vote-btn {
+  padding: 4px 0;
+  font-size: 10px;
+  font-weight: 700;
+  border: 1px solid var(--rule, #e5e5e5);
+  border-radius: 4px;
+  background: var(--surface, #fff);
+  color: var(--text, #111);
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+}
+.ruta-vote-btn:hover { border-color: var(--accent,#e0355b); background: #fff0f3; color: var(--accent,#e0355b); }
+
+/* ── Tier 2 teaser ── */
+.ruta-tier-teaser {
+  border: 2px dashed var(--rule, #e5e5e5);
+  border-radius: 14px;
+  padding: 24px 20px;
+  text-align: center;
+  margin-top: 8px;
+  animation: fadeUp 0.3s ease;
+}
+.ruta-tier-teaser-inner { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ruta-tier-teaser-icon { font-size: 28px; }
+.ruta-tier-teaser-title { font-weight: 700; font-size: 14px; color: var(--text, #111); }
+.ruta-tier-teaser-sub { font-size: 12px; color: var(--muted, #888); line-height: 1.5; max-width: 280px; }
+
+/* ── Logged-out overlay ── */
+.ruta-loggedout-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(250,250,248,0.92);
+  backdrop-filter: blur(6px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.ruta-loggedout-box {
+  background: var(--surface, #fff);
+  border: 1.5px solid var(--rule, #e5e5e5);
+  border-radius: 20px;
+  padding: 36px 32px;
+  text-align: center;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+}
+.ruta-loggedout-icon { font-size: 40px; }
+.ruta-loggedout-box h3 { margin: 0; font-size: 18px; }
+.ruta-loggedout-box p { margin: 0; font-size: 13px; color: var(--muted,#888); line-height: 1.5; }
+
+/* ── Completion overlay ── */
+.ruta-complete-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.ruta-complete-box {
+  background: var(--surface, #fff);
+  border-radius: 24px;
+  padding: 40px 32px 32px;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  position: relative;
+  overflow: hidden;
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.ruta-complete-confetti {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 8px;
+  background: linear-gradient(90deg, #e0355b, #ffd60a, #0f9d58, #e0355b, #ffd60a);
+  background-size: 200% 100%;
+  animation: confettiSlide 1.5s linear infinite;
+}
+@keyframes confettiSlide { 0% { background-position: 0% 0%; } 100% { background-position: 200% 0%; } }
+.ruta-complete-icon { font-size: 52px; margin-top: 8px; animation: bounce 0.6s ease 0.3s both; }
+@keyframes bounce { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-12px); } 70% { transform: translateY(-6px); } }
+.ruta-complete-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--text, #111);
+  margin: 0;
+}
+.ruta-complete-sub { font-size: 14px; color: var(--muted,#888); margin: 0; line-height: 1.5; }
+
+.ruta-complete-top3 {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin: 4px 0;
+}
+.ruta-top3-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--faint, #f5f5f3);
+  font-size: 13px;
+}
+.ruta-top3-pos { font-weight: 700; color: var(--muted,#aaa); width: 20px; }
+.ruta-top3-name { font-weight: 600; color: var(--text,#111); flex: 1; text-align: left; margin-left: 8px; }
+.ruta-top3-score {
+  font-size: 12px; font-weight: 700; padding: 2px 8px;
+  border-radius: 8px; color: #fff;
+}
+
+/* Share card inside completion */
+.ruta-complete-share-card {
+  width: 100%;
+  border: 1.5px solid var(--rule, #e5e5e5);
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: var(--faint, #f5f5f3);
+  font-size: 12px;
+  color: var(--muted, #888);
+  line-height: 1.5;
+  text-align: left;
+}
+.ruta-complete-share-title { font-weight: 700; color: var(--text,#111); font-size: 13px; margin-bottom: 2px; }
+
+.ruta-complete-actions { display: flex; gap: 8px; width: 100%; }
+.ruta-complete-actions .tba-btn { flex: 1; justify-content: center; }
+
+/* ── Sticky bar ── */
+.ruta-sticky-bar {
+  position: sticky;
+  top: 56px;
+  z-index: 40;
+  background: var(--surface, #fff);
+  border-bottom: 1px solid var(--rule, #e5e5e5);
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+.ruta-sticky-name { font-weight: 700; color: var(--text,#111); white-space: nowrap; }
+.ruta-sticky-count { font-weight: 600; color: var(--muted,#888); white-space: nowrap; }
+.ruta-sticky-progress {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--rule, #e5e5e5);
+  overflow: hidden;
+}
+.ruta-sticky-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--accent,#e0355b);
+  transition: width 0.4s ease;
+}
+.ruta-sticky-fill.complete { background: #0f9d58; }
+
+/* ── Rating score colors ── */
+.ruta-score-9-10 { background: #0f9d58; }
+.ruta-score-7-8  { background: #34c759; }
+.ruta-score-5-6  { background: #ffd60a; color: #111 !important; }
+.ruta-score-3-4  { background: #ff8a00; }
+.ruta-score-1-2  { background: #ff3b30; }
+.ruta-score-none { background: var(--rule,#e5e5e5); color: var(--muted,#999) !important; }
+
+/* ── Animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .rutas-main { padding: 20px 14px 80px; }
+  .rutas-hero { margin-bottom: 24px; }
+  .rutas-cat-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* On mobile: single column layout, map toggleable */
+  .ruta-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  .ruta-map-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--rule,#e5e5e5);
+    background: var(--surface,#fff);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text,#111);
+    cursor: pointer;
+    margin-bottom: 12px;
+    width: fit-content;
+  }
+  .ruta-map-wrap {
+    grid-column: 1;
+    grid-row: auto;
+    position: static;
+    height: 220px;
+    margin-bottom: 16px;
+  }
+  .ruta-grid { grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .ruta-item { padding: 9px 7px 9px; min-height: 95px; gap: 5px; }
+  .ruta-item-icon { width: 26px; height: 26px; }
+  .ruta-item-icon img { width: 18px; height: 18px; }
+  .ruta-item-name { font-size: 10px; }
+  .ruta-vote-chip { font-size: 9px; padding: 2px 6px; }
+  .ruta-sticky-bar { padding: 7px 14px; top: 52px; }
+}

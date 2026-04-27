@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Best Again — My Votes</title>
+  <script>window.location.replace("user.html?tab=votes");</script>
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="votes.css" />
+  <!-- Google Analytics 4 — replace G-VYVTQPBTPC with your Measurement ID -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-VYVTQPBTPC");
+  </script>
+</head>
+
+<script>window.location.replace("user.html?tab=votes");</script>
+<body onload="initVotesPage()">
+    <header class="topbar topbar-sticky">
+    <a class="brand" href="index.html">The Best Again</a>
+    <nav class="nav" id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="map.html">Map</a>
+      <a href="products.html">Products</a>
+      <a class="active" href="my-votes.html">My Votes</a>
+      <a href="admin.html" id="adminNavLink" style="display:none;">Admin</a>
+    </nav>
+    <div class="nav-right">
+      <span id="authStatus" class="auth-pill"></span>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ── NORMAL VIEW ── -->
+    <div id="normalView">
+      <div class="votes-header">
+        <div>
+          <h1>My Votes</h1>
+          <p class="muted">Your personal rankings, grouped by category.</p>
+        </div>
+        <button class="tba-btn tba-btn-primary" onclick="enterEditMode()">✏️ Edit Mode</button>
+      </div>
+      <div id="votesStatus" class="muted" style="margin-bottom:12px;"></div>
+      <div id="votesByCategory"></div>
+    </div>
+
+    <!-- ── EDIT MODE ── -->
+    <div id="editView" style="display:none;">
+      <div class="votes-header">
+        <div>
+          <h1>Edit Votes</h1>
+          <p class="muted">Select a category, adjust scores, save.</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button class="tba-btn" onclick="exitEditMode()">← Back</button>
+          <button class="tba-btn tba-btn-primary" id="btnSaveVotes" onclick="saveVotes()" disabled>Save changes</button>
+        </div>
+      </div>
+
+      <!-- Two-column layout: sidebar + cards -->
+      <div class="edit-layout">
+
+        <!-- LEFT: category sidebar -->
+        <div class="edit-sidebar">
+          <div class="edit-sidebar-head">Categories</div>
+          <div id="editCatList"></div>
+        </div>
+
+        <!-- RIGHT: vote cards -->
+        <div class="edit-main">
+
+          <!-- Distribute tool -->
+          <div class="distribute-bar" id="distributeBar" style="display:none;">
+            <span class="distribute-label">Distribute evenly:</span>
+            <div class="distribute-inputs">
+              <input id="distTop" type="number" min="1" max="10" step="0.1" placeholder="Top" class="dist-input" />
+              <span class="muted">→</span>
+              <input id="distBottom" type="number" min="1" max="10" step="0.1" placeholder="Bottom" class="dist-input" />
+            </div>
+            <button class="tba-btn" onclick="distributeScores()">Distribute</button>
+            <span id="distributeStatus" class="muted" style="font-size:12px;"></span>
+          </div>
+
+          <!-- Vote cards list -->
+          <div id="editCardsList"></div>
+
+          <div id="editEmptyState" style="display:none;" class="edit-empty">
+            Select a category on the left to start editing.
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <script src="header-auth.js"></script>
+  <script>renderAuthHeader();</script>
+  <script src="votes.js?v=3"></script>
+
+  <script>
+  function toggleNav() {
+    const nav = document.getElementById('mainNav');
+    const btn = document.getElementById('burgerBtn');
+    const open = nav.classList.toggle('nav-open');
+    btn.innerHTML = open ? '&#10005;' : '&#9776;';
+  }
+  // Close nav when a link is clicked
+  document.addEventListener('DOMContentLoaded', () => {
+    const nav = document.getElementById('mainNav');
+    if (nav) nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      nav.classList.remove('nav-open');
+      const btn = document.getElementById('burgerBtn');
+      if (btn) btn.innerHTML = '&#9776;';
+    }));
+  });
+  </script>
+</body>
+</html>

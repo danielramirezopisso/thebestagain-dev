@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Claim your place — The Best Again</title>
+  <meta name="description" content="Own or manage a place on The Best Again? Take control of your listing, manage your presence, and connect with food lovers." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900&display=swap" rel="stylesheet" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-VYVTQPBTPC");</script>
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="claim.css" />
+</head>
+<body onload="initClaimPage()">
+
+  <header class="topbar topbar-sticky">
+    <a class="brand" href="index.html">The Best Again</a>
+    <nav class="nav" id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="map.html">Map</a>
+      <a href="products.html">Products</a>
+      <a href="rutas.html">Rutas</a>
+      <a href="ranking.html">Rankings</a>
+      <a href="battles.html">Battles</a>
+    </nav>
+    <div class="nav-right">
+      <div id="authHeaderSlot"></div>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu">&#9776;</button>
+    </div>
+  </header>
+
+  <main class="claim-main">
+
+    <!-- CONTEXTUAL HEADER (populated by JS if marker ID present) -->
+    <div class="claim-marker-context" id="claimContext" style="display:none;">
+      <div class="claim-context-inner">
+        <div class="claim-context-photo" id="claimContextPhoto"></div>
+        <div class="claim-context-info">
+          <div class="claim-context-eyebrow">You are claiming</div>
+          <div class="claim-context-name" id="claimContextName"></div>
+          <div class="claim-context-meta" id="claimContextMeta"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="claim-hero">
+      <div class="claim-hero-eyebrow">For business owners</div>
+      <h1 class="claim-hero-title" id="claimHeroTitle">Claim your place.</h1>
+      <p class="claim-hero-sub" id="claimHeroSub">Take control of your presence on The Best Again. Be recognised as the best in your category. Connect with the food lovers who are already looking for you.</p>
+    </section>
+
+    <!-- BENEFITS -->
+    <section class="claim-benefits">
+      <div class="claim-benefit">
+        <div class="claim-benefit-icon">🏆</div>
+        <div class="claim-benefit-title">Be recognised as the best</div>
+        <div class="claim-benefit-desc">Appear in La Selección and annual rankings. A badge that tells your customers you've been recognised as one of the best for your dish in the city.</div>
+      </div>
+      <div class="claim-benefit">
+        <div class="claim-benefit-icon">📸</div>
+        <div class="claim-benefit-title">Control your presence</div>
+        <div class="claim-benefit-desc">Choose your featured photo, write your own description, add links to your website, menu and reservations. Your page, your way.</div>
+      </div>
+      <div class="claim-benefit">
+        <div class="claim-benefit-icon">🎯</div>
+        <div class="claim-benefit-title">Reach people who are looking</div>
+        <div class="claim-benefit-desc">Every visitor to your page is actively searching for the best [dish] in town. Not random impressions — real intent.</div>
+      </div>
+      <div class="claim-benefit">
+        <div class="claim-benefit-icon">📱</div>
+        <div class="claim-benefit-title">Your QR code for offers</div>
+        <div class="claim-benefit-desc">A unique QR code for your venue. Customers scan it to vote, leave comments, and access your exclusive offer. Put it on every table.</div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section class="claim-pricing">
+      <div class="claim-pricing-inner">
+        <div class="claim-pricing-badge">🚀 Launch offer</div>
+        <div class="claim-pricing-price">€29 <span class="claim-pricing-period">/month</span></div>
+        <div class="claim-pricing-desc">Everything included. Cancel anytime.</div>
+        <ul class="claim-pricing-list">
+          <li>✓ Verified badge on your marker page</li>
+          <li>✓ Featured photo &amp; custom description</li>
+          <li>✓ Links to website, menu &amp; reservations</li>
+          <li>✓ Active offer / promotion</li>
+          <li>✓ QR code for your venue</li>
+          <li>✓ Respond to customer comments</li>
+          <li>✓ Page view analytics</li>
+          <li>✓ Priority inclusion in Rutas &amp; Rankings</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- CLAIM FORM -->
+    <section class="claim-form-section" id="claimFormSection">
+      <h2 class="claim-form-title">Get started</h2>
+      <p class="claim-form-sub muted">Fill in your details and we'll be in touch within 48 hours to set everything up.</p>
+
+      <form class="claim-form" onsubmit="return false;">
+        <input type="hidden" id="claimMarkerId" />
+        <input type="hidden" id="claimMarkerName" />
+
+        <div class="claim-form-row">
+          <label>Your name</label>
+          <input id="claimName" type="text" placeholder="e.g. Maria García" autocomplete="name" />
+        </div>
+        <div class="claim-form-row">
+          <label>Business name</label>
+          <input id="claimBusiness" type="text" placeholder="e.g. Bar Tomás" />
+        </div>
+        <div class="claim-form-row">
+          <label>Email</label>
+          <input id="claimEmail" type="email" placeholder="you@yourbusiness.com" autocomplete="email" />
+        </div>
+        <div class="claim-form-row">
+          <label>Phone <span class="muted" style="font-weight:400;">(optional)</span></label>
+          <input id="claimPhone" type="tel" placeholder="+34 6xx xxx xxx" autocomplete="tel" />
+        </div>
+        <div class="claim-form-row">
+          <label>Anything to add? <span class="muted" style="font-weight:400;">(optional)</span></label>
+          <textarea id="claimMessage" rows="3" placeholder="e.g. I own 3 locations, I'd like to claim all of them..."></textarea>
+        </div>
+
+        <button class="tba-btn tba-btn-primary claim-submit-btn" onclick="submitClaim()">
+          Send my claim request
+        </button>
+        <div class="claim-status muted" id="claimStatus"></div>
+      </form>
+
+      <!-- Thank you state (hidden until submit) -->
+      <div class="claim-thanks" id="claimThanks" style="display:none;">
+        <div class="claim-thanks-icon">🎉</div>
+        <h3>Request received!</h3>
+        <p>We'll be in touch within 48 hours to get you set up. Check your email — including spam just in case.</p>
+        <a href="index.html" class="tba-btn">Back to home</a>
+      </div>
+    </section>
+
+    <!-- CAN'T FIND YOUR PLACE -->
+    <section class="claim-notfound">
+      <div class="claim-notfound-inner">
+        <div class="claim-notfound-title">Can't find your place?</div>
+        <p class="claim-notfound-desc muted">If your venue isn't on The Best Again yet, tell us about it and we'll add it.</p>
+        <div id="addPlaceFormWrap">
+          <form class="claim-form claim-form-sm" onsubmit="return false;">
+            <div class="claim-form-row-inline">
+              <input id="addPlaceName" type="text" placeholder="Restaurant name" />
+              <input id="addPlaceAddress" type="text" placeholder="Address" />
+              <input id="addPlaceEmail" type="email" placeholder="Your email" />
+              <button class="tba-btn tba-btn-primary" onclick="submitAddPlace()">Send</button>
+            </div>
+            <div class="claim-status muted" id="addPlaceStatus"></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <script src="header-auth.js"></script>
+  <script>renderAuthHeader();</script>
+  <script src="claim.js"></script>
+  <script>
+  function toggleNav() {
+    const nav = document.getElementById('mainNav');
+    const btn = document.getElementById('burgerBtn');
+    const open = nav.classList.toggle('nav-open');
+    btn.innerHTML = open ? '&#10005;' : '&#9776;';
+    btn.setAttribute('aria-expanded', open);
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const nav = document.getElementById('mainNav');
+    if (nav) nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      nav.classList.remove('nav-open');
+      const btn = document.getElementById('burgerBtn');
+      if (btn) btn.innerHTML = '&#9776;';
+    }));
+  });
+  </script>
+
+</body>
+</html>

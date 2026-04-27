@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Rutas — The Best Again</title>
+  <meta name="description" content="Curated food discovery routes in Barcelona and Madrid." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-VYVTQPBTPC");</script>
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="rutas.css" />
+</head>
+<body class="rutas-page" onload="initRutasPage()">
+
+  <header class="topbar topbar-sticky">
+    <a class="brand" href="index.html">The Best Again</a>
+    <nav class="nav" id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="map.html">Map</a>
+      <a href="products.html">Products</a>
+      <a class="active" href="rutas.html">Rutas</a>
+      <a href="ranking.html">Rankings</a>
+      <a href="battles.html">Battles</a>
+    </nav>
+    <div class="nav-right"><button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button><div id="authHeaderSlot"></div></div>
+  </header>
+
+  <!-- Sticky progress bar -->
+  <div class="ruta-sticky-bar" id="rutaStickyBar" style="display:none;">
+    <span class="ruta-sticky-name" id="rutaStickyName"></span>
+    <span class="ruta-sticky-count" id="rutaStickyCount"></span>
+    <div class="ruta-sticky-progress"><div class="ruta-sticky-fill" id="rutaStickyFill"></div></div>
+  </div>
+
+  <main class="rutas-main">
+
+    <!-- HERO -->
+    <section class="rutas-hero">
+      <div class="rutas-hero-eyebrow">Curated food discovery</div>
+      <h1 class="rutas-hero-title">Rutas</h1>
+      <p class="rutas-hero-desc">12 hand-picked places per category. Try them all, rate each one, and build your personal ranking of the city — one dish at a time.</p>
+    </section>
+
+    <!-- CITY TABS -->
+    <section class="rutas-city-section">
+      <div class="rutas-city-tabs">
+        <button class="city-tab city-tab-active" id="cityBCN" onclick="selectCity('BCN')">Barcelona</button>
+        <button class="city-tab" id="cityMAD" onclick="selectCity('MAD')">Madrid</button>
+      </div>
+    </section>
+
+    <!-- CATEGORY CARDS -->
+    <section class="rutas-cat-section" id="catSection" style="display:none;">
+      <div class="rutas-section-label">Choose a category</div>
+      <div class="rutas-cat-grid" id="rutasCatGrid"></div>
+    </section>
+
+    <!-- RUTA VIEW -->
+    <section class="rutas-ruta-section" id="rutaSection" style="display:none;">
+      <button class="ruta-back-btn" onclick="closeRuta()">← Back to categories</button>
+      <div class="ruta-title-block">
+        <div class="ruta-title-label" id="rutaTitleLabel"></div>
+        <h2 class="ruta-title" id="rutaTitle"></h2>
+        <div class="ruta-progress-row">
+          <div class="ruta-progress-track"><div class="ruta-progress-fill" id="rutaProgressFill"></div></div>
+          <span class="ruta-progress-text" id="rutaProgressText"></span>
+        </div>
+      </div>
+
+      <div class="ruta-layout">
+        <button class="ruta-map-toggle" id="rutaMapToggle" onclick="toggleRutaMap()">🗺 Show on map</button>
+        <div class="ruta-map-wrap" id="rutaMapWrap" style="display:none;"><div id="rutaMap"></div></div>
+        <div class="ruta-grid-wrap">
+          <div class="ruta-grid" id="rutaGrid"></div>
+          <div class="ruta-tier-teaser" id="rutaTierTeaser" style="display:none;">
+            <div class="ruta-tier-teaser-inner">
+              <div class="ruta-tier-teaser-icon">🔒</div>
+              <div class="ruta-tier-teaser-title">More coming</div>
+              <div class="ruta-tier-teaser-sub">A deeper selection of hidden gems and local favourites is on its way. Finish this ruta to be the first to know.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Logged-out overlay -->
+    <div class="ruta-loggedout-overlay" id="rutaLoggedOutOverlay" style="display:none;">
+      <div class="ruta-loggedout-box">
+        <div class="ruta-loggedout-icon">🗺️</div>
+        <h3>Track your progress</h3>
+        <p>Log in to vote on each place and track how many you've tried.</p>
+        <a href="#" onclick="window.location.href='login.html?redirect='+encodeURIComponent(window.location.href)" class="tba-btn tba-btn-primary">Log in</a>
+        <a href="#" onclick="window.location.href='login.html?mode=signup&redirect='+encodeURIComponent(window.location.href)" class="tba-btn" style="margin-top:8px;">Create account</a>
+      </div>
+    </div>
+
+    <!-- Completion overlay -->
+    <div class="ruta-complete-overlay" id="rutaCompleteOverlay" style="display:none;">
+      <div class="ruta-complete-box">
+        <div class="ruta-complete-confetti" id="rutaConfetti"></div>
+        <div class="ruta-complete-icon">🏆</div>
+        <h2 class="ruta-complete-title">Ruta completa!</h2>
+        <p class="ruta-complete-sub" id="rutaCompleteSub"></p>
+        <div class="ruta-complete-top3" id="rutaCompleteTop3"></div>
+        <div class="ruta-complete-share-card" id="rutaCompleteShareCard"></div>
+        <div class="ruta-complete-actions">
+          <button class="tba-btn tba-btn-primary" onclick="closeCompletion()">Continue</button>
+          <button class="tba-btn" onclick="shareRutaCompletion()">↗ Share</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="auth.js"></script>
+  <script src="header-auth.js"></script>
+  <script>renderAuthHeader();</script>
+  <script src="wishlist-btn.js"></script>
+  <script src="rutas.js"></script>
+
+  <script>
+  function toggleNav() {
+    const nav = document.getElementById('mainNav');
+    const btn = document.getElementById('burgerBtn');
+    const open = nav.classList.toggle('nav-open');
+    btn.innerHTML = open ? '&#10005;' : '&#9776;';
+    btn.setAttribute('aria-expanded', open);
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const nav = document.getElementById('mainNav');
+    if (nav) nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      nav.classList.remove('nav-open');
+      const btn = document.getElementById('burgerBtn');
+      if (btn) { btn.innerHTML = '&#9776;'; btn.setAttribute('aria-expanded', false); }
+    }));
+  });
+  </script>
+</body>
+</html>

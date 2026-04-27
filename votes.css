@@ -1,0 +1,443 @@
+/* votes.css — My Votes page: normal view + edit mode */
+
+.votes-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 18px 0 14px;
+}
+.votes-header h1 { margin: 0; }
+
+/* ── NORMAL VIEW: per-category tables ── */
+.cat-block {
+  margin-bottom: 16px;
+}
+
+.cat-block-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.cat-block-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--rule);
+  display: grid;
+  place-items: center;
+  background: #fff;
+  box-shadow: var(--shadow);
+  flex: 0 0 auto;
+}
+.cat-block-icon img { width: 18px; height: 18px; object-fit: contain; }
+
+.cat-block-name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.cat-block-count {
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: 4px;
+}
+
+.votes-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+/* Fixed column widths — identical across all tables */
+.votes-table col.col-rank  { width: 48px; }
+.votes-table col.col-title { width: auto; }
+.votes-table col.col-score { width: 90px; }
+
+.votes-table th {
+  padding: 9px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  background: rgba(0,0,0,0.03);
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+}
+.votes-table th:last-child,
+.votes-table td:last-child { text-align: right; }
+
+.votes-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: middle;
+}
+.votes-table tbody tr:last-child td { border-bottom: none; }
+.votes-table tbody tr {
+  cursor: pointer;
+  transition: background .08s ease;
+}
+.votes-table tbody tr:hover td { background: var(--accent-bg); }
+
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(0,0,0,0.06);
+  color: var(--muted);
+  border: 1px solid var(--rule);
+}
+
+.score-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding: 4px 8px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 14px;
+  border: 1px solid transparent;
+}
+
+
+/* ══════════════════════════════════
+   EDIT MODE — new layout
+══════════════════════════════════ */
+
+/* Two-column layout */
+.edit-layout {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: 14px;
+  align-items: start;
+  margin-top: 4px;
+}
+@media (max-width: 700px) {
+  .edit-layout { grid-template-columns: 1fr; }
+}
+
+/* ── LEFT SIDEBAR ── */
+.edit-sidebar {
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  position: sticky;
+  top: 70px;
+}
+.edit-sidebar-head {
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  background: rgba(0,0,0,0.03);
+  border-bottom: 1px solid var(--rule);
+}
+.edit-cat-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  border-radius: 0;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: none;
+  transition: background .08s;
+  font-size: 13px;
+  font-weight: 700;
+}
+.edit-cat-item:last-child { border-bottom: none; }
+.edit-cat-item:hover { background: var(--accent-bg); transform: none; box-shadow: none; }
+.edit-cat-item.active { background: var(--text); color: #fff; }
+.edit-cat-item.active .edit-cat-count { background: rgba(255,255,255,0.20); color: #fff; }
+
+.edit-cat-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex: 0 0 auto;
+  border-radius: 4px;
+}
+.edit-cat-icon-fallback { font-size: 16px; flex: 0 0 auto; }
+.edit-cat-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.edit-cat-count {
+  flex: 0 0 auto;
+  background: var(--rule);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  color: var(--muted);
+}
+
+/* ── RIGHT MAIN ── */
+.edit-main { display: flex; flex-direction: column; gap: 10px; }
+
+/* Distribute bar */
+.distribute-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.distribute-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.distribute-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dist-input {
+  width: 70px !important;
+  padding: 7px 10px;
+  text-align: center;
+  font-weight: 700;
+}
+
+/* Empty state */
+.edit-empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+/* ── VOTE CARDS ── */
+.edit-vote-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: border-color .10s, box-shadow .10s;
+}
+.edit-vote-card.is-pending {
+  border-color: rgba(245,158,11,0.50);
+  background: rgba(245,158,11,0.04);
+  box-shadow: 0 4px 14px rgba(245,158,11,0.12);
+}
+
+/* Top row: rank + title + score */
+.edit-vote-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.edit-vote-rank {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.06);
+  border: 1px solid var(--rule);
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+
+.edit-vote-title {
+  flex: 1;
+  font-weight: 700;
+  font-size: 14px;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Score badge — colored pill */
+.edit-vote-score {
+  flex: 0 0 auto;
+  min-width: 40px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+  text-align: center;
+  border: 2px solid transparent;
+}
+.edit-vote-score.rating-9-10 { background: rgba(15,157,88,0.12);  border-color: rgba(15,157,88,0.35);  color: #0b7a3e; }
+.edit-vote-score.rating-7-8  { background: rgba(52,199,89,0.12);  border-color: rgba(52,199,89,0.35);  color: #1a7a35; }
+.edit-vote-score.rating-5-6  { background: rgba(255,214,10,0.15); border-color: rgba(255,214,10,0.50); color: #7a6000; }
+.edit-vote-score.rating-3-4  { background: rgba(255,138,0,0.12);  border-color: rgba(255,138,0,0.40);  color: #a85500; }
+.edit-vote-score.rating-1-2  { background: rgba(255,59,48,0.10);  border-color: rgba(255,59,48,0.35);  color: #cc1a10; }
+.edit-vote-score.rating-none { background: rgba(0,0,0,0.05);      border-color: rgba(0,0,0,0.15);      color: #999;    }
+
+/* Bottom row: buttons always get full width, never wrap */
+.edit-vote-btns {
+  display: flex;
+  gap: 4px;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+.edit-vote-btn {
+  flex: 1;          /* equal width, fill the row */
+  min-width: 0;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background .07s, transform .07s;
+  box-shadow: var(--shadow);
+}
+.edit-vote-btn:hover { background: var(--accent-bg); box-shadow: var(--shadow); }
+.edit-vote-btn.selected {
+  background: var(--text);
+  color: #fff;
+  border-color: var(--text);
+  transform: scale(1.08);
+  box-shadow: var(--shadow);
+}
+
+/* ══════════════════════════════
+   MOBILE — votes.css
+══════════════════════════════ */
+@media (max-width: 768px) {
+  .edit-layout {
+    grid-template-columns: 1fr;
+    gap: 0;
+    overflow: visible;
+  }
+
+  .edit-sidebar {
+    position: static;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .edit-panel { overflow: visible; height: auto; }
+
+  /* Vote buttons: still nowrap on mobile — flex:1 handles it */
+  .edit-vote-btns {
+    gap: 3px;
+  }
+  .edit-vote-btn {
+    height: 28px;
+    font-size: 11px;
+  }
+
+  /* Distribute tool */
+  .distribute-tool { flex-wrap: wrap; gap: 8px; }
+}
+@media (max-width: 480px) {
+  .edit-vote-btn { width: 27px; height: 27px; font-size: 11px; }
+}
+
+/* ── Edit vote button ── */
+
+/* ══════════════════════════════════════════
+   EDIT VOTES LAYOUT (injected into user.html panel)
+══════════════════════════════════════════ */
+.edit-votes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0 16px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 16px;
+}
+
+.edit-votes-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 16px;
+  min-height: 400px;
+}
+
+.edit-votes-sidebar {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  overflow: hidden;
+  height: fit-content;
+}
+
+.edit-sidebar-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 10px 14px 6px;
+}
+
+.edit-votes-main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.edit-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.edit-votes-foot {
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.edit-empty-state {
+  padding: 32px 20px;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .edit-votes-layout {
+    grid-template-columns: 1fr;
+  }
+  .edit-votes-sidebar {
+    height: auto;
+  }
+}

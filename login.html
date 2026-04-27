@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login — The Best Again</title>
+  <meta name="description" content="Sign in to vote, add places and track your favourites on The Best Again." />
+  <meta property="og:title" content="Login — The Best Again" />
+  <meta property="og:description" content="Sign in to vote, add places and track your favourites on The Best Again." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <!-- Google Analytics 4 — replace G-VYVTQPBTPC with your Measurement ID -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-VYVTQPBTPC");
+  </script>
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="login.css" />
+</head>
+
+<body class="login-bg" onload="checkAlreadyLoggedIn()">
+    <header class="topbar topbar-sticky">
+    <a class="brand" href="index.html">The Best Again</a>
+    <nav class="nav" id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="map.html">Map</a>
+      <a href="products.html">Products</a>
+      <a href="rutas.html">Rutas</a>
+      <a href="ranking.html">Rankings</a>
+      <a href="battles.html">Battles</a>
+    </nav>
+    <div class="nav-right">
+      <span id="authStatus" class="auth-pill"></span>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    </div>
+  </header>
+
+  <div class="login-main">
+    <div class="login-box">
+
+      <div class="login-brand">
+        <h1>The Best Again</h1>
+        <p class="login-sub">Track your favourite places &amp; products.</p>
+      </div>
+
+      <!-- Tab switcher -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="showTab('login')">Sign in</button>
+        <button class="auth-tab" id="tabRegister" onclick="showTab('register')">Create account</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="loginForm">
+        <div class="field">
+          <label class="field-label">Email</label>
+          <input class="field-input" id="l_email" type="email" placeholder="you@email.com" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label class="field-label">Password</label>
+          <input class="field-input" id="l_password" type="password" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <button class="auth-btn" onclick="doLogin()">Sign in</button>
+        <p id="loginStatus" class="auth-status"></p>
+        <p class="auth-hint">Press <b>Enter</b> to sign in. &nbsp;·&nbsp; <a href="#" onclick="showForgot(); return false;" style="color:var(--accent); font-weight:500;">Forgot password?</a></p>
+
+        <!-- FORGOT PASSWORD (inline, hidden by default) -->
+        <div id="forgotSection" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--rule);">
+          <p style="font-size:13px; color:var(--muted); margin:0 0 10px;">Enter your email and we'll send a reset link.</p>
+          <div class="field">
+            <label class="field-label">Email</label>
+            <input class="field-input" id="f_email" type="email" placeholder="you@email.com" autocomplete="email" />
+          </div>
+          <button class="auth-btn" onclick="doForgot()">Send reset link</button>
+          <p id="forgotStatus" class="auth-status"></p>
+        </div>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="registerForm" style="display:none;">
+        <div class="field">
+          <label class="field-label">Display name</label>
+          <input class="field-input" id="r_name" type="text" placeholder="Your name" autocomplete="name" />
+        </div>
+        <div class="field">
+          <label class="field-label">Email</label>
+          <input class="field-input" id="r_email" type="email" placeholder="you@email.com" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label class="field-label">Password</label>
+          <input class="field-input" id="r_password" type="password" placeholder="At least 6 characters" autocomplete="new-password" />
+        </div>
+        <div class="field">
+          <label class="field-label">Confirm password</label>
+          <input class="field-input" id="r_password2" type="password" placeholder="Repeat password" autocomplete="new-password" />
+        </div>
+        <button class="auth-btn" onclick="doRegister()">Create account</button>
+        <p id="registerStatus" class="auth-status"></p>
+      </div>
+
+      <!-- EMAIL CONFIRMATION SENT -->
+      <div id="confirmSent" style="display:none;" class="confirm-sent">
+        <div class="confirm-icon">📬</div>
+        <h2>Check your email</h2>
+        <p class="login-sub">We sent a confirmation link to <b id="confirmEmail"></b>. Click it to activate your account, then come back to sign in.</p>
+        <button class="auth-btn" onclick="showTab('login')">Back to sign in</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <script src="header-auth.js"></script>
+  <script>renderAuthHeader();</script>
+  <script src="login.js"></script>
+
+  <script>
+  function toggleNav() {
+    const nav = document.getElementById('mainNav');
+    const btn = document.getElementById('burgerBtn');
+    const open = nav.classList.toggle('nav-open');
+    btn.innerHTML = open ? '&#10005;' : '&#9776;';
+  }
+  // Close nav when a link is clicked
+  document.addEventListener('DOMContentLoaded', () => {
+    const nav = document.getElementById('mainNav');
+    if (nav) nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      nav.classList.remove('nav-open');
+      const btn = document.getElementById('burgerBtn');
+      if (btn) btn.innerHTML = '&#9776;';
+    }));
+  });
+  </script>
+</body>
+</html>

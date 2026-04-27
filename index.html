@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Best Again — Find the best food in town</title>
+  <meta name="description" content="Discover the best pizza, tortilla, bravas and more. Curated Rutas, honest rankings, real places." />
+  <meta property="og:title" content="The Best Again — Find the best food in town" />
+  <meta property="og:description" content="Curated Rutas, honest rankings. Find the best pizza, tortilla, bravas and more." />
+  <meta property="og:type" content="website" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-VYVTQPBTPC");</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="home.css" />
+</head>
+<body onload="initHomePage()">
+
+  <!-- Header hidden until scroll -->
+  <header class="topbar topbar-sticky home-header" id="siteHeader">
+    <a class="brand" href="index.html">The Best Again</a>
+    <nav class="nav" id="mainNav">
+      <a class="active" href="index.html">Home</a>
+      <a href="map.html">Map</a>
+      <a href="products.html">Products</a>
+      <a href="rutas.html">Rutas</a>
+      <a href="ranking.html">Rankings</a>
+      <a href="battles.html">Battles</a>
+    </nav>
+    <div class="nav-right">
+      <span id="authStatus" class="auth-pill"></span>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    </div>
+  </header>
+
+  <main class="container home-main">
+
+    <!-- ══ HERO — full viewport ══ -->
+    <section class="home-hero">
+      <div class="home-hero-left">
+        <h1 class="home-hero-brand">The Best Again</h1>
+        <div class="home-hero-tagline">
+          <span class="home-hero-verb">Find the best</span>
+          <span class="home-hero-rotating-wrap">
+            <span class="home-hero-rotating" id="heroRotating"></span>
+          </span>
+          <span class="home-hero-verb">in town.</span>
+        </div>
+        <div class="home-hero-actions">
+          <a class="tba-btn tba-btn-primary" href="map.html">🗺 Explore the map</a>
+          <a class="tba-btn" href="rutas.html">Start a Ruta →</a>
+        </div>
+        <div class="home-hero-stat" id="heroStat"></div>
+      </div>
+      <div class="home-hero-right">
+        <div class="home-hero-map-wrap">
+          <div id="homeMap"></div>
+          <a href="map.html" class="home-map-pill">Open full map →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ RUTAS — full viewport ══ -->
+    <section class="home-section home-rutas">
+      <div class="home-section-label">Curated journeys</div>
+      <div class="home-section-header">
+        <h2 class="home-section-title">Rutas</h2>
+        <a href="rutas.html" class="home-section-more">See all →</a>
+      </div>
+      <p class="home-section-sub">12 hand-picked places per category. Complete the Ruta, discover the city.</p>
+      <div class="home-rutas-grid" id="homeRutasGrid">
+        <div class="home-ruta-skel"></div>
+        <div class="home-ruta-skel"></div>
+        <div class="home-ruta-skel"></div>
+      </div>
+    </section>
+
+    <!-- ══ RANKINGS — full viewport ══ -->
+    <section class="home-section home-rankings">
+      <div class="home-section-label">The Best Again 2025</div>
+      <div class="home-section-header">
+        <h2 class="home-section-title">Rankings</h2>
+        <a href="ranking.html" class="home-section-more">Full rankings →</a>
+      </div>
+      <p class="home-section-sub">The definitive annual selection — curated, frozen, worth arguing about.</p>
+      <div class="home-rankings-list" id="homeRankingPreview">
+        <div class="home-rank-skel"></div>
+        <div class="home-rank-skel"></div>
+        <div class="home-rank-skel"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="auth.js"></script>
+  <script src="header-auth.js"></script>
+  <script>renderAuthHeader();</script>
+  <script src="home.js?v=5"></script>
+  <script>
+  window.addEventListener('scroll', () => {
+    document.getElementById('siteHeader')
+      if (window.scrollY > 60) document.getElementById('siteHeader').classList.add('home-header-visible');
+  }, { passive: true });
+
+  function toggleNav() {
+    const nav = document.getElementById('mainNav');
+    const btn = document.getElementById('burgerBtn');
+    const open = nav.classList.toggle('nav-open');
+    btn.innerHTML = open ? '&#10005;' : '&#9776;';
+    btn.setAttribute('aria-expanded', open);
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const nav = document.getElementById('mainNav');
+    if (nav) nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      nav.classList.remove('nav-open');
+      const btn = document.getElementById('burgerBtn');
+      if (btn) { btn.innerHTML = '&#9776;'; btn.setAttribute('aria-expanded', false); }
+    }));
+  });
+  </script>
+
+</body>
+</html>

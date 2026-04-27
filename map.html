@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>The Best Again — Map of the best local spots</title>
+  <meta name="description" content="Explore the best food spots and products on an interactive map. Community-voted, always fresh." />
+  <meta property="og:title" content="The Best Again — Map of the best local spots" />
+  <meta property="og:description" content="Explore the best food spots and products on an interactive map. Community-voted, always fresh." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <!-- Google Analytics 4 — replace G-VYVTQPBTPC with your Measurement ID -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-VYVTQPBTPC");
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="map.css" />
+  <link rel="stylesheet" href="traction.css" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+
+<body class="map-page" onload="initMap()">
+    <header class="topbar topbar-sticky">
+    <a class="brand" href="index.html">The Best Again</a>
+    <nav class="nav" id="mainNav">
+      <a href="index.html">Home</a>
+      <a class="active" href="map.html">Map</a>
+      <a href="products.html">Products</a>
+      <a href="rutas.html">Rutas</a>
+      <a href="ranking.html">Rankings</a>
+      <a href="battles.html">Battles</a>
+    </nav>
+    <div class="nav-right">
+      <span id="authStatus" class="auth-pill"></span>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    </div>
+  </header>
+
+  <main class="map-shell">
+    <!-- FILTER DRAWER OVERLAY (fixed, outside map-area is fine for overlay) -->
+    <div class="map-filter-overlay" id="mapFilterOverlay" onclick="closeFilterDrawer()"></div>
+
+    <!-- LOCATION SEARCH -->
+    <div class="map-search-wrap" id="mapSearchWrap">
+      <div class="map-search-box">
+        <span class="map-search-icon">🔍</span>
+        <input
+          id="mapSearchInput"
+          class="map-search-input"
+          type="text"
+          placeholder="Search a place or address… e.g. Dry Milano"
+          autocomplete="off"
+          oninput="onMapSearchInput()"
+          onkeydown="onMapSearchKey(event)"
+        />
+        <button class="map-search-clear" id="mapSearchClear" style="display:none;" onclick="clearMapSearch()">&#10005;</button>
+      </div>
+      <div class="map-search-results" id="mapSearchResults" style="display:none;"></div>
+    </div>
+
+    <!-- MAP AREA -->
+    <section class="map-area">
+      <!-- Floating filter pill — inside the map -->
+      <button class="map-filter-pill" id="mapFilterPill" onclick="openFilterDrawer(event)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+        <span id="filterPillLabel">Filters</span>
+        <span class="map-filter-badge" id="filterActiveBadge" style="display:none;"></span>
+      </button>
+
+      <!-- Filter drawer — inside map-area so absolute positioning works on desktop -->
+    <div class="map-filter-drawer" id="mapFilterDrawer">
+      <div class="map-drawer-head">
+        <span class="map-drawer-title">Filters</span>
+        <div class="map-drawer-actions">
+          <button class="map-drawer-clear" id="drawerClearBtn" onclick="clearFilters()" style="display:none;">Clear all</button>
+          <button class="map-drawer-close" onclick="closeFilterDrawer()">✕</button>
+        </div>
+      </div>
+
+      <div class="map-drawer-section">
+        <div class="map-drawer-label">Category</div>
+        <div id="catQuick" class="chip-row map-drawer-chips"></div>
+        <select id="catMore" class="select-compact map-drawer-more" onchange="onCategoryMoreChanged()">
+          <option value="">More categories…</option>
+        </select>
+      </div>
+
+      <div class="map-drawer-section">
+        <div class="map-drawer-label">Rating</div>
+        <div class="map-rating-row" id="ratingSeg"></div>
+      </div>
+
+      <div class="map-drawer-section map-drawer-section-row">
+        <label class="map-drawer-label">Chains</label>
+        <label class="map-chain-toggle">
+          <input type="checkbox" id="chainToggle" checked onchange="onChainToggleChanged()" />
+          <span class="map-chain-slider"></span>
+        </label>
+      </div>
+
+      <div class="map-drawer-footer">
+        <span id="mapStatus" class="muted" style="font-size:12px;"></span>
+        <button class="map-drawer-suggest" onclick="openTraction('requestCategory', null); closeFilterDrawer();">
+          Missing a category? Suggest one →
+        </button>
+      </div>
+    </div>
+
+
+      <!-- Floating journey toggle — shown only when logged in -->
+      <div class="journey-float-wrap" id="journeyFloatWrap">
+        <div class="journey-float-toggle" id="journeyToggleBtn" onclick="toggleJourneyMode()">
+          <span class="journey-opt" id="jOptDiscover">🌍 Discover</span>
+          <span class="journey-divider">|</span>
+          <span class="journey-opt" id="jOptJourney">🧭 My Journey</span>
+        </div>
+      </div>
+      <!-- FAB: Add a place -->
+      <button class="map-add-fab" id="mapAddFab" onclick="toggleAddPanel()" title="Add a place">＋</button>
+
+      <!-- Add panel (popup overlay) -->
+      <div class="map-panel map-panel-add map-panel-collapsed" id="addPanel">
+        <div class="map-panel-header">
+          <div class="panel-title">Add a place</div>
+          <button class="map-panel-close" onclick="toggleAddPanel()">✕</button>
+        </div>
+        <div class="panel-sub muted">Enable adding mode, then click anywhere on the map to drop a pin.</div>
+
+        <button id="toggleAdd" class="tba-btn add-toggle-btn" onclick="toggleAddMode()" style="margin-top:12px; width:100%;">
+          ＋ Start adding
+        </button>
+
+        <div id="addForm" style="display:none; margin-top:14px;">
+          <label>Title</label>
+          <input id="m_title" placeholder="e.g., Best croissant at XYZ" />
+
+          <div class="row2">
+            <div>
+              <label>Category</label>
+              <select id="m_category"></select>
+            </div>
+            <div>
+              <label>My vote</label>
+              <select id="m_rating"></select>
+            </div>
+          </div>
+
+          <label style="margin-top:10px;">Address</label>
+          <input id="m_address" placeholder="Auto-filled (optional)" />
+
+          <div class="row2">
+            <div>
+              <label>Lat</label>
+              <input id="m_lat" disabled />
+            </div>
+            <div>
+              <label>Lon</label>
+              <input id="m_lon" disabled />
+            </div>
+          </div>
+
+          <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+            <button class="tba-btn tba-btn-primary" onclick="saveMapMarker()">Save</button>
+            <span id="saveStatus" class="muted"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected marker panel -->
+      <div class="map-panel map-panel-selected" id="selPanel" style="display:none;">
+        <div class="sel-header">
+          <div class="panel-title">Selected</div>
+          <button class="sel-close-btn" onclick="clearSelection()" title="Close">✕</button>
+        </div>
+        <div class="panel-sub muted" id="selSub"></div>
+
+        <div id="selPhoto" class="sel-photo" style="display:none;"><img id="selPhotoImg" src="" alt="" /></div>
+        <div class="sel-main">
+          <div id="selIcon" class="mini-marker rating-none">
+            <img src="icons/default.svg" alt="" />
+          </div>
+          <div class="sel-text">
+            <div id="selTitle" class="sel-title">—</div>
+            <div id="selMeta" class="muted sel-meta">—</div>
+          </div>
+        </div>
+
+        <!-- Quick vote -->
+        <div class="sel-vote-section">
+          <div id="selVoteWrap"></div>
+        </div>
+
+        <div class="sel-actions">
+          <a id="selOpen" class="tba-btn tba-btn-primary" href="#">Open</a>
+          <span id="selWlBtn"></span>
+        </div>
+      </div>
+
+      <div id="map"></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <script src="header-auth.js"></script>
+  <script>renderAuthHeader();</script>
+
+  <script src="wishlist-btn.js"></script>
+  <script src="map.js?v=11"></script>
+  <script src="traction.js?v=204"></script>
+
+  <!-- ── TRACTION POPUP ── -->
+  <div class="traction-overlay" id="tractionOverlay" onclick="if(event.target===this)closeTraction()">
+    <div class="traction-popup">
+      <span class="traction-emoji" id="trEmoji">🚧</span>
+      <h2 id="trTitle"></h2>
+      <p id="trBody"></p>
+      <div class="traction-request-area" id="trRequestArea" style="display:none;">
+        <label class="tr-field-label" id="trRequestLabel">Your suggestion</label>
+        <textarea id="trRequestText" rows="2"></textarea>
+        <!-- Brand-only extras -->
+        <div id="trBrandExtras" style="display:none;">
+          <label class="tr-field-label" style="margin-top:10px;">Category <span class="tr-field-note">(which category does this brand belong to?)</span></label>
+          <select id="trCategorySelect">
+            <option value="">— Select existing category —</option>
+          </select>
+          <div class="tr-or-row"><span>or suggest a new one</span></div>
+          <input type="text" id="trNewCategory" placeholder="New category name (optional)" />
+        </div>
+      </div>
+      <div class="traction-email-area" id="trEmailArea">
+        <input type="email" id="trEmail" placeholder="Your email address" />
+      </div>
+      <div class="traction-actions">
+        <button class="tba-btn tba-btn-primary" id="trSubmitBtn" onclick="submitTraction()">Notify me</button>
+        <button class="tba-btn" id="trSkipBtn" onclick="closeTraction()">Maybe later</button>
+      </div>
+      <div class="traction-status" id="trStatus"></div>
+    </div>
+  </div>
+
+  <script>
+  function toggleNav() {
+    const nav = document.getElementById('mainNav');
+    const btn = document.getElementById('burgerBtn');
+    const open = nav.classList.toggle('nav-open');
+    btn.innerHTML = open ? '&#10005;' : '&#9776;';
+  }
+  // Close nav when a link is clicked
+  document.addEventListener('DOMContentLoaded', () => {
+    const nav = document.getElementById('mainNav');
+    if (nav) nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      nav.classList.remove('nav-open');
+      const btn = document.getElementById('burgerBtn');
+      if (btn) btn.innerHTML = '&#9776;';
+    }));
+  });
+  </script>
+
+  <script>
+  function openFilterDrawer(e) {
+    if (e) e.stopPropagation();
+    const drawer = document.getElementById('mapFilterDrawer');
+    const overlay = document.getElementById('mapFilterOverlay');
+    const isOpen = drawer.classList.contains('open');
+    drawer.classList.toggle('open', !isOpen);
+    overlay.classList.toggle('open', !isOpen);
+  }
+  function closeFilterDrawer() {
+    document.getElementById('mapFilterDrawer').classList.remove('open');
+    document.getElementById('mapFilterOverlay').classList.remove('open');
+  }
+  </script>
+</body>
+</html>

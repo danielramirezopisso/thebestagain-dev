@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>The Best Again 2025 — Barcelona's Top Rated Food</title>
+  <meta name="description" content="The definitive ranking of Barcelona's best food spots in 2025 — voted by real people, curated by The Best Again." />
+  <meta property="og:title" content="The Best Again 2025 — Barcelona Rankings" />
+  <meta property="og:description" content="The definitive ranking of Barcelona's best food spots, voted by real people." />
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet" />
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-VYVTQPBTPC");</script>
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="ranking.css" />
+
+  <!-- Schema.org JSON-LD injected by ranking.js -->
+</head>
+<body class="ranking-page" onload="initRankingPage()">
+
+  <header class="topbar topbar-sticky">
+    <a class="brand" href="index.html">The Best Again</a>
+    <nav class="nav" id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="map.html">Map</a>
+      <a href="products.html">Products</a>
+      <a href="rutas.html">Rutas</a>
+      <a class="active" href="ranking.html">Rankings</a>
+      <a href="battles.html">Battles</a>
+    </nav>
+    <div class="nav-right"><button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button><div id="authHeaderSlot"></div></div>
+  </header>
+
+  <main class="ranking-main">
+
+    <!-- HERO -->
+    <section class="ranking-hero">
+      <div class="ranking-hero-year">2025</div>
+      <h1 class="ranking-hero-title">The Best Again</h1>
+      <p class="ranking-hero-sub">The definitive ranking of Barcelona's finest — curated from real votes, real visits, real opinions. Updated once a year.</p>
+    </section>
+
+    <!-- CITY TABS -->
+    <div class="ranking-city-tabs">
+      <button class="ranking-city-tab ranking-city-active" id="rankCityBCN" onclick="selectRankCity('BCN')">Barcelona</button>
+      <button class="ranking-city-tab ranking-city-disabled" disabled>Madrid <span class="ranking-city-soon">soon</span></button>
+    </div>
+
+    <!-- CATEGORY CHIPS -->
+    <div class="ranking-cat-chips" id="rankingCatChips"></div>
+
+    <!-- RANKING CONTENT -->
+    <section class="ranking-content" id="rankingContent">
+      <!-- Skeleton shown while loading -->
+      <div class="ranking-skeleton" id="rankingSkeleton">
+        <div class="ranking-podium-skeleton">
+          <div class="skeleton-card skeleton-card-sm"></div>
+          <div class="skeleton-card skeleton-card-lg"></div>
+          <div class="skeleton-card skeleton-card-sm"></div>
+        </div>
+        <div class="ranking-grid-skeleton">
+          ${Array(8).fill('<div class="skeleton-card skeleton-card-grid"></div>').join('')}
+        </div>
+      </div>
+
+      <!-- Real content injected here -->
+      <div id="rankingCards" style="display:none;"></div>
+    </section>
+
+    <!-- Empty state -->
+    <div class="ranking-empty" id="rankingEmpty" style="display:none;">
+      <div class="ranking-empty-icon">🏆</div>
+      <h3>Rankings coming soon</h3>
+      <p class="muted">The 2025 rankings for this category will be published shortly. Check back soon.</p>
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <script src="header-auth.js"></script>
+  <script>renderAuthHeader();</script>
+  <script src="ranking.js"></script>
+
+
+  <script>
+  function toggleNav() {
+    const nav = document.getElementById('mainNav');
+    const btn = document.getElementById('burgerBtn');
+    const open = nav.classList.toggle('nav-open');
+    btn.innerHTML = open ? '&#10005;' : '&#9776;';
+    btn.setAttribute('aria-expanded', open);
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const nav = document.getElementById('mainNav');
+    if (nav) nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      nav.classList.remove('nav-open');
+      const btn = document.getElementById('burgerBtn');
+      if (btn) { btn.innerHTML = '&#9776;'; btn.setAttribute('aria-expanded', false); }
+    }));
+  });
+  </script>
+</body>
+</html>

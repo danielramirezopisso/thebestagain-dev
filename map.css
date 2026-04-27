@@ -1,0 +1,936 @@
+/* Map page: one-screen layout, compact toolbar, panels, marker hover */
+
+body.map-page{
+  height:100vh;
+  height:100dvh;
+  overflow:hidden;
+}
+
+.map-shell{
+  height: calc(100vh - 54px);
+  height: calc(100dvh - 54px);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:8px 20px 12px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+.map-toolbar{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--card);
+  padding:10px 14px;
+  box-shadow:none;
+}
+
+/* Suggest links — visually separated from filter controls */
+.toolbar-suggest {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 12px;
+  margin-left: 4px;
+  border-left: 1px solid var(--rule);
+}
+
+/* Chip container: allow horizontal scroll without expanding parent */
+.toolbar-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.select-compact{
+  width:160px;
+  padding:8px 10px;
+}
+
+/* Map area */
+.map-area{
+  position:relative;
+  flex:1;
+  min-height:0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  background:#fff;
+}
+#map{ width:100%; height:100%; }
+
+/* Panels */
+.map-panel{
+  position:absolute;
+  top:12px;
+  width:320px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:0 4px 20px rgba(26,23,20,0.12);
+  padding:14px;
+  z-index:500;
+}
+.map-panel-add{
+  right: 12px; left: auto;
+  bottom: 88px; top: auto;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.map-panel-collapsed {
+  opacity: 0; pointer-events: none;
+  transform: translateY(10px) scale(0.97);
+}
+.map-panel-open {
+  opacity: 1; pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+.map-panel-header {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 4px;
+}
+.map-panel-close {
+  background: none; border: none; box-shadow: none;
+  font-size: 15px; color: var(--muted); cursor: pointer;
+  padding: 2px 6px; border-radius: 4px;
+}
+.map-panel-close:hover { background: var(--faint); transform: none; box-shadow: none; }
+
+/* FAB button */
+.map-add-fab {
+  position: absolute;
+  bottom: 28px; right: 12px;
+  width: 44px; height: 44px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 22px;
+  border: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s, box-shadow 0.15s;
+  line-height: 1;
+}
+.map-add-fab:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  background: var(--accent);
+}
+.map-panel-selected{
+  right:12px; left:auto;
+  top:auto; bottom:12px;
+  width:340px;
+}
+
+.panel-title{ font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 15px; letter-spacing: -0.02em; margin-bottom:2px; }
+.panel-sub{ font-size:12px; margin-bottom:8px; }
+
+.row2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+
+/* Chips */
+
+/* Rating segmented buttons */
+
+/* Selected panel */
+.sel-main{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-top:10px;
+}
+.sel-title{ font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 15px; letter-spacing: -0.02em; }
+.sel-meta{ font-size:12px; margin-top:2px; }
+.sel-actions{ margin-top:12px; display:flex; gap:10px; align-items:center; }
+
+/* Mini marker */
+.mini-marker{
+  width:34px;
+  height:34px;
+  border-radius:8px;
+  border:2px solid rgba(255,255,255,0.92);
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  box-shadow: var(--shadow);
+}
+.mini-marker img{ width:18px; height:18px; }
+
+/* Leaflet hover animation (applied by JS as .tba-hover on the marker element) */
+.tba-marker{
+  transition: transform .12s ease, box-shadow .12s ease !important;
+}
+.tba-marker.tba-hover{
+  transform: translateY(-2px) scale(1.06);
+  box-shadow:0 18px 34px var(--border) !important;
+}
+
+/* ══════════════════════════════
+   JOURNEY FLOAT TOGGLE — map
+══════════════════════════════ */
+.journey-float-wrap {
+  position: absolute;
+  bottom: calc(28px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 800;
+  pointer-events: none;
+}
+.journey-float-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  padding: 5px 6px;
+  cursor: pointer;
+  pointer-events: all;
+  user-select: none;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  transition: box-shadow 0.15s;
+}
+.journey-float-toggle:hover {
+  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+}
+.journey-opt {
+  padding: 4px 12px;
+  border-radius: 99px;
+  color: var(--muted);
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.journey-opt-active {
+  background: var(--text);
+  color: var(--page-bg);
+}
+.journey-divider {
+  color: var(--rule);
+  font-size: 11px;
+  padding: 0 2px;
+  pointer-events: none;
+}
+
+/* Greyed-out unvisited marker in journey mode — soft, still tappable */
+.tba-marker.journey-unvisited {
+  opacity: 0.55;
+  filter: grayscale(1) brightness(1.15);
+}
+.tba-marker.journey-unvisited:hover {
+  opacity: 0.8;
+  filter: grayscale(0.4) brightness(1.05);
+  transform: scale(1.06);
+}
+
+/* Mobile: move journey toggle up slightly from bottom nav */
+@media (max-width: 768px) {
+  .journey-float-wrap {
+    bottom: 18px;
+  }
+  .journey-float-toggle {
+    font-size: 12px;
+  }
+  .journey-opt {
+    padding: 4px 9px;
+  }
+  /* Hide add-place panel on mobile — too fiddly on small screens */
+  #addPanel {
+    display: none !important;
+  }
+}
+
+/* ══════════════════════════════
+   MOBILE — map.css
+══════════════════════════════ */
+@media (max-width: 768px) {
+  body.map-page { height: 100vh; height: 100dvh; overflow: hidden; }
+  .map-shell { height: calc(100dvh - 52px); padding: 6px 8px 8px; padding-bottom: max(8px, env(safe-area-inset-bottom)); gap: 6px; }
+
+  .journey-float-wrap {
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    z-index: 750; /* below the selection panel at 800 so panel slides over it */
+  }
+  .map-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 10px;
+    gap: 0;
+    overflow: visible;
+  }
+  .toolbar-right { width: 100%; justify-content: flex-end; margin-top: 6px; }
+
+  /* Chip rows: horizontal scroll, never overflow */
+  .chip-row {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+    padding-bottom: 3px;
+    scrollbar-width: none;
+  }
+  .chip-row::-webkit-scrollbar { display: none; }
+
+  /* Toolbar left: constrain to screen width so chips don't overflow */
+  .toolbar-left {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .toolbar-inline {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  /* Suggest link: remove the left border divider and left-align when alone on its row */
+  .toolbar-suggest {
+    border-left: none;
+    padding-left: 0;
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+  .toolbar-right {
+    justify-content: flex-start;
+    margin-top: 4px;
+  }
+
+  .select-compact { width: 120px; }
+
+  /* Panels: slide up from bottom */
+  .map-panel {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    border-radius: var(--radius) var(--radius) 0 0;
+    max-height: 55vh;
+    overflow-y: auto;
+    z-index: 800;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ══════════════════════════════
+   MAP SELECTED PANEL — photo
+══════════════════════════════ */
+.sel-photo {
+  width: 100%;
+  height: 130px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 10px;
+  background: var(--faint);
+}
+.sel-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .sel-photo { height: 110px; }
+}
+
+/* ══════════════════════════════
+   LOCATION SEARCH BAR
+══════════════════════════════ */
+.map-search-wrap {
+  position: relative;
+  z-index: 600;
+  margin: 0 0 6px;
+}
+
+.map-search-box {
+  display: flex;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 10px;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(26,23,20,0.08);
+}
+
+.map-search-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.map-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 9px 0;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+}
+.map-search-input::placeholder { color: var(--muted); }
+
+.map-search-clear {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  color: var(--muted);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  line-height: 1;
+}
+.map-search-clear:hover { background: var(--faint); color: var(--text); transform: none; box-shadow: none; }
+
+/* Dropdown results */
+.map-search-results {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0; right: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(26,23,20,0.12);
+  overflow: hidden;
+  z-index: 700;
+}
+
+.map-search-result {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 9px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--rule);
+  transition: background .08s;
+}
+.map-search-result:last-child { border-bottom: none; }
+.map-search-result:hover,
+.map-search-result.active { background: var(--accent-bg); }
+
+.map-sr-main {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.map-sr-sub {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.map-search-loading,
+.map-search-empty {
+  padding: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Search pin on map */
+.search-pin {
+  font-size: 28px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  animation: pinDrop .2s ease;
+}
+@keyframes pinDrop {
+  from { transform: translateY(-8px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .map-search-input { font-size: 16px; } /* prevent iOS zoom on focus */
+}
+
+/* ── Multi-category chips in selection panel ── */
+.sel-cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 4px;
+}
+
+.sel-cat-chip {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s, border-color 0.15s;
+  background: var(--surface, #fff);
+}
+
+.sel-cat-chip img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.sel-cat-chip.sel-cat-chip-active {
+  border-color: var(--text, #111);
+  transform: scale(1.15);
+}
+
+.sel-cat-chip.rating-9-10 { background: #d4edda; }
+.sel-cat-chip.rating-7-8  { background: #d4edda; }
+.sel-cat-chip.rating-5-6  { background: #fff3cd; }
+.sel-cat-chip.rating-3-4  { background: #ffe0b2; }
+.sel-cat-chip.rating-1-2  { background: #fde8e8; }
+.sel-cat-chip.rating-none { background: var(--rule, #eee); }
+
+.sel-cat-chip:hover { transform: scale(1.1); }
+.sel-cat-chip.sel-cat-chip-active:hover { transform: scale(1.2); }
+
+/* Sparkle marker pulse */
+.tba-marker-sparkle .tba-marker-inner {
+  animation: sparkle-pulse 2s ease-in-out infinite;
+}
+
+@keyframes sparkle-pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.1); }
+}
+
+/* ── Quick vote in drawer ── */
+.sel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.sel-close-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--muted, #888);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  line-height: 1;
+  transition: background 0.15s;
+}
+.sel-close-btn:hover { background: var(--rule, #eee); color: var(--text, #111); }
+
+.sel-vote-section {
+  margin: 8px 0 4px;
+}
+
+/* The vote chip — collapsed state */
+.sel-vote-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--rule, #e5e5e5);
+  background: var(--surface, #fff);
+  color: var(--text, #111);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.sel-vote-chip:hover {
+  border-color: var(--accent, #e0355b);
+  background: #fff0f3;
+}
+
+/* Chip when user has already voted */
+.sel-vote-chip-voted {
+  border-color: var(--accent, #e0355b);
+  color: var(--accent, #e0355b);
+  background: #fff0f3;
+}
+
+/* Expanded 1–10 buttons */
+.sel-vote-btns {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+  margin-top: 8px;
+}
+
+.sel-vote-btn {
+  padding: 6px 0;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1.5px solid var(--rule, #e5e5e5);
+  border-radius: 6px;
+  background: var(--surface, #fff);
+  color: var(--text, #111);
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.12s, border-color 0.12s, transform 0.1s;
+}
+.sel-vote-btn:hover {
+  border-color: var(--accent, #e0355b);
+  background: #fff0f3;
+  transform: scale(1.08);
+}
+.sel-vote-selected {
+  background: var(--accent, #e0355b) !important;
+  color: #fff !important;
+  border-color: var(--accent, #e0355b) !important;
+}
+
+/* ── Mobile add-place hint button ── */
+.mobile-add-hint {
+  display: none; /* hidden on desktop */
+}
+
+@media (max-width: 768px) {
+  .mobile-add-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--rule, #e5e5e5);
+    background: var(--surface, #fff);
+    color: var(--muted, #888);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 600;
+  }
+  .mobile-add-hint:hover {
+    border-color: var(--accent, #e0355b);
+    color: var(--accent, #e0355b);
+  }
+}
+
+/* ── Chain toggle in toolbar ── */
+.chain-toggle-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted, #888);
+  white-space: nowrap;
+  user-select: none;
+}
+.chain-toggle-wrap input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent, #e0355b);
+  cursor: pointer;
+}
+.chain-toggle-label { cursor: pointer; }
+
+/* ══════════════════════════════════════
+   FLOATING FILTER PILL + DRAWER
+══════════════════════════════════════ */
+
+/* Floating pill button */
+.map-filter-pill {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 700; /* inside map-area, above markers (400) but below panels */
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid var(--rule);
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(26,23,20,0.12);
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+  font-family: inherit;
+}
+.map-filter-pill:hover {
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(26,23,20,0.15);
+  transform: translateY(-1px);
+}
+.map-filter-pill svg { flex-shrink: 0; color: var(--accent); }
+
+/* Active filter count badge */
+.map-filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Overlay */
+.map-filter-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(26,23,20,0.25);
+  z-index: 1400; /* above topbar (900) */
+  backdrop-filter: blur(1px);
+}
+.map-filter-overlay.open { display: block; }
+
+/* Drawer */
+.map-filter-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1500; /* above overlay */
+  background: var(--card);
+  border-radius: 20px 20px 0 0;
+  border-top: 1.5px solid var(--rule);
+  box-shadow: 0 -8px 40px rgba(26,23,20,0.15);
+  padding: 0 0 env(safe-area-inset-bottom, 0);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.map-filter-drawer.open { transform: translateY(0); }
+
+/* On desktop: drawer becomes a side panel */
+@media (min-width: 640px) {
+  /* On desktop: no overlay needed — drawer sits inside map */
+  .map-filter-overlay {
+    display: none !important; /* never show overlay on desktop */
+  }
+  /* Drawer: absolutely positioned inside map-area */
+  .map-filter-drawer {
+    position: absolute;
+    top: 58px;
+    left: 14px;
+    right: auto;
+    bottom: auto;
+    border-radius: 16px;
+    border: 1.5px solid var(--rule);
+    width: 280px;
+    max-height: calc(100% - 80px);
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(26,23,20,0.15);
+    transform: scale(0.96) translateY(-8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    z-index: 750; /* above map markers, below Leaflet controls */
+  }
+  .map-filter-drawer.open {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* Drawer internals */
+.map-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  background: var(--card);
+  z-index: 1;
+}
+
+.map-drawer-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.map-drawer-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.map-drawer-clear {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+  font-family: inherit;
+  box-shadow: none;
+}
+.map-drawer-clear:hover { text-decoration: underline; transform: none; box-shadow: none; }
+
+.map-drawer-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--faint);
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: none;
+}
+.map-drawer-close:hover { background: var(--rule); color: var(--text); transform: none; box-shadow: none; }
+
+.map-drawer-section {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--rule);
+}
+.map-drawer-section:last-of-type { border-bottom: none; }
+
+.map-drawer-section-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.map-drawer-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.map-drawer-section-row .map-drawer-label { margin-bottom: 0; }
+
+/* Chips inside drawer */
+.map-drawer-chips {
+  flex-wrap: wrap !important;
+  overflow: visible !important;
+  gap: 7px !important;
+}
+
+.map-drawer-more {
+  margin-top: 10px;
+  width: 100%;
+}
+
+/* Rating row in drawer */
+.map-rating-row {
+  display: flex;
+  gap: 8px;
+}
+/* seg-btn base styles in base.css; just make them flex:1 in drawer */
+.map-rating-row .seg-btn {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 10px;
+  text-align: center;
+  justify-content: center;
+}
+
+/* Chain toggle — iOS style switch */
+.map-chain-toggle {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  cursor: pointer;
+}
+.map-chain-toggle input { opacity: 0; width: 0; height: 0; }
+.map-chain-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--rule);
+  border-radius: 24px;
+  transition: background 0.2s;
+}
+.map-chain-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.map-chain-toggle input:checked + .map-chain-slider { background: var(--accent); }
+.map-chain-toggle input:checked + .map-chain-slider::before { transform: translateX(18px); }
+
+/* Footer */
+.map-drawer-footer {
+  padding: 14px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+.map-drawer-suggest {
+  font-size: 12px;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  padding: 0;
+  box-shadow: none;
+  transition: color 0.12s;
+}
+.map-drawer-suggest:hover { color: var(--accent); transform: none; box-shadow: none; }
+
+/* Journey toggle — keep as is, adjust position slightly */
+/* Journey toggle — bottom center, prominent */
+.journey-float-wrap {
+  bottom: calc(24px + env(safe-area-inset-bottom)) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  top: auto !important;
+  right: auto !important;
+}
+.journey-float-toggle {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  padding: 8px 8px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.18) !important;
+  border: 1.5px solid var(--rule) !important;
+}
+.journey-opt {
+  padding: 6px 16px !important;
+}

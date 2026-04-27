@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta http-equiv="refresh" content="0; url=map.html" />
+  <meta charset="utf-8" />
+  <title>The Best Again — Full list of rated places &amp; products</title>
+  <meta name="description" content="Browse every community-rated place and product on The Best Again. Filter by category and rating." />
+  <meta property="og:title" content="The Best Again — Full list of rated places &amp; products" />
+  <meta property="og:description" content="Browse every community-rated place and product on The Best Again. Filter by category and rating." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <!-- Google Analytics 4 — replace G-VYVTQPBTPC with your Measurement ID -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-VYVTQPBTPC");
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="list.css" />
+</head>
+
+<body onload="initListPage()">
+    <header class="topbar topbar-sticky">
+    <a class="brand" href="index.html">The Best Again</a>
+    <nav class="nav" id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="map.html">Map</a>
+      <a href="products.html">Products</a>
+      <a href="rutas.html">Rutas</a>
+      <a href="ranking.html">Rankings</a>
+      <a href="battles.html">Battles</a>
+    </nav>
+    <div class="nav-right">
+      <span id="authStatus" class="auth-pill"></span>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <div class="list-header">
+      <div>
+        <h1>List</h1>
+        <p class="muted">All places &amp; products.</p>
+      </div>
+      <span id="listCount" class="list-count muted"></span>
+    </div>
+
+    <!-- FILTERS — two-row bar -->
+    <div id="listFilterWrap" class="list-filter-bar">
+      <!-- Row 1: search + type + journey -->
+      <div class="list-filter-row list-filter-row--top">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input id="searchInput" class="search-input" placeholder="Search…" oninput="applyListFilters()" />
+        </div>
+        <div class="type-toggle">
+          <button class="type-btn active" data-type="" onclick="setTypeFilter(this, '')">All</button>
+          <button class="type-btn" data-type="place" onclick="setTypeFilter(this, 'place')">📍 Places</button>
+          <button class="type-btn" data-type="product" onclick="setTypeFilter(this, 'product')">🛒 Products</button>
+        </div>
+        <div class="list-filter-spacer"></div>
+        <label class="map-chain-toggle" title="Show/hide chain restaurants" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
+          <span style="font-size:12px;font-weight:600;color:var(--muted);">Chains</span>
+          <span style="position:relative;display:inline-block;width:38px;height:22px;">
+            <input type="checkbox" id="chainToggleList" checked onchange="onListChainToggleChanged()" style="opacity:0;width:0;height:0;position:absolute;" />
+            <span class="map-chain-slider"></span>
+          </span>
+        </label>
+
+      </div>
+      <!-- Row 2: category chips + more + rating + clear -->
+      <div class="list-filter-row list-filter-row--bottom">
+        <div id="catChips" class="chip-row list-cat-chips"></div>
+        <select id="catMore" class="select-compact" onchange="onCatMoreChanged()">
+          <option value="">More…</option>
+        </select>
+        <div id="ratingSeg" class="seg-row"></div>
+        <button id="btnClearFilters" class="chip chip-clear" style="display:none;" onclick="clearListFilters()">✕ Clear</button>
+      </div>
+    </div>
+
+    <!-- JOURNEY TOGGLE -->
+    <div class="journey-bar-centered" id="listJourneyWrap">
+      <div class="journey-float-toggle" onclick="toggleJourneyModeList()">
+        <span class="journey-opt journey-opt-active" id="listJOptDiscover">🌍 Discover</span>
+        <span class="journey-divider">|</span>
+        <span class="journey-opt" id="listJOptJourney">🧭 My Journey</span>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <section class="card table-card">
+      <div id="listWrap"></div>
+    </section>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <script src="header-auth.js"></script>
+  <script>renderAuthHeader();</script>
+  <script src="wishlist-btn.js"></script>
+  <script src="list.js?v=3"></script>
+
+  <script>
+  function toggleNav() {
+    const nav = document.getElementById('mainNav');
+    const btn = document.getElementById('burgerBtn');
+    const open = nav.classList.toggle('nav-open');
+    btn.innerHTML = open ? '&#10005;' : '&#9776;';
+  }
+  // Close nav when a link is clicked
+  document.addEventListener('DOMContentLoaded', () => {
+    const nav = document.getElementById('mainNav');
+    if (nav) nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      nav.classList.remove('nav-open');
+      const btn = document.getElementById('burgerBtn');
+      if (btn) btn.innerHTML = '&#9776;';
+    }));
+  });
+  </script>
+
+  <script>
+  // Collapsible filters on mobile
+  function initFilterToggle() {
+    if (window.innerWidth > 768) return;
+    document.querySelectorAll('.filter-collapsible-wrap').forEach(wrap => {
+      const btn = wrap.querySelector('.filter-toggle-btn');
+      const body = wrap.querySelector('.filter-collapsible');
+      if (!btn || !body) return;
+      btn.addEventListener('click', () => {
+        const open = body.classList.toggle('open');
+        btn.classList.toggle('open', open);
+        btn.querySelector('.filter-toggle-arrow').textContent = open ? '▲' : '▼';
+      });
+    });
+  }
+  window.addEventListener('load', () => {
+    initFilterToggle();
+    if (window.innerWidth <= 768) {
+      const btn = document.getElementById('filterToggleBtn');
+      if (btn) btn.style.display = 'flex';
+    }
+  });
+  window.addEventListener('resize', initFilterToggle);
+  </script>
+</body>
+</html>
