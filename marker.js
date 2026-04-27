@@ -1535,6 +1535,12 @@ async function initMarkerPage() {
   if (m.group_type === "place") {
     renderMiniMap(m);
     await renderRutaBadge(m); // rutas only for places
+    // Move ruta badge to sidebar above map
+    const rutaBadgeEl = document.getElementById("mkRutaBadge");
+    const mapCard = document.getElementById("miniMapCard");
+    if (rutaBadgeEl && mapCard && rutaBadgeEl.style.display !== "none") {
+      mapCard.parentNode.insertBefore(rutaBadgeEl, mapCard);
+    }
   } else {
     // Products: hide map and ruta badge
     const mapCard = document.getElementById("miniMapCard");
@@ -1591,10 +1597,9 @@ async function renderRutaBadge(m) {
 
     const rutaUrl = `rutas.html?ruta=${encodeURIComponent(ruta.id)}`;
     badge.innerHTML = `
-      <div class="mk-ruta-label">Ruta</div>
       <a class="mk-ruta-badge" href="${rutaUrl}">
         <span class="mk-ruta-badge-icon">🗺</span>
-        <span>${escapeHtml(ruta.name)}</span>
+        <span class="mk-ruta-badge-name">${escapeHtml(ruta.name)}</span>
         <span class="mk-ruta-badge-stops">Stop ${stopPos} of ${count || "?"}</span>
       </a>`;
     badge.style.display = "block";

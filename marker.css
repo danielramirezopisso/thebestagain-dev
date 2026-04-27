@@ -123,22 +123,38 @@
 }
 .mk-meta a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
 
-/* Ruta badge */
-.mk-ruta-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  margin-top: 10px;
-  background: var(--faint);
-  border: 1px solid var(--border);
-  border-radius: 8px; padding: 6px 12px;
-  font-size: 12px; font-weight: 600; color: var(--text);
-  cursor: pointer; transition: background 0.15s;
-  text-decoration: none;
+/* Ruta badge — sidebar version, above map */
+#mkRutaBadge {
+  margin-bottom: 12px;
 }
-.mk-ruta-badge:hover { background: rgba(45,74,138,0.06); }
-.mk-ruta-badge-icon { font-size: 14px; }
+.mk-ruta-label {
+  display: none; /* hide old label, title context is enough */
+}
+.mk-ruta-badge {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: rgba(184, 134, 11, 0.06);
+  border: 1px solid rgba(184, 134, 11, 0.25);
+  border-left: 3px solid #b8860b;
+  border-radius: 8px;
+  font-size: 12px; font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.mk-ruta-badge:hover {
+  background: rgba(184, 134, 11, 0.1);
+}
+.mk-ruta-badge-icon { font-size: 15px; flex-shrink: 0; }
+.mk-ruta-badge-name { flex: 1; }
 .mk-ruta-badge-stops {
-  font-size: 11px; color: var(--muted); font-weight: 400;
-  padding-left: 8px; border-left: 1px solid var(--rule); margin-left: 4px;
+  font-size: 11px;
+  color: #b8860b;
+  font-weight: 600;
+  white-space: nowrap;
+  padding-left: 8px;
+  border-left: 1px solid rgba(184, 134, 11, 0.2);
+  margin-left: 2px;
 }
 
 /* ── Score block ── */
