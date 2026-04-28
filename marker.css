@@ -403,7 +403,7 @@
   align-items: center;
   gap: 8px;
   padding: 16px 20px;
-  background: var(--faint);
+  background: rgba(26,23,20,0.07);
   border: none;
   border-radius: 12px;
   text-decoration: none;
@@ -415,7 +415,7 @@
   position: relative;
 }
 .mk-also-pill:hover {
-  background: rgba(45,74,138,0.07);
+  background: rgba(26,23,20,0.12);
   transform: translateY(-1px);
 }
 .mk-also-pill-icon {
