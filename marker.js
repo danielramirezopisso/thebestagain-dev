@@ -353,8 +353,16 @@ function renderVoteButtons() {
     wrap.appendChild(btn);
   }
 
+  // Label changes based on whether user has voted
+  const label = document.querySelector(".mk-vote-label");
+  if (label) label.textContent = CURRENT_VOTE !== null ? "Your vote:" : "Rate:";
+
   const removeBtn = document.getElementById("btnClearVote");
   if (removeBtn) removeBtn.style.display = CURRENT_VOTE !== null ? "inline-flex" : "none";
+
+  // Hide save button when no pending change
+  const saveBtn = document.querySelector(".mk-vote-save");
+  if (saveBtn) saveBtn.style.display = CURRENT_VOTE !== null ? "inline" : "none";
 }
 
 function selectVote(v) {
