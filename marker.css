@@ -200,58 +200,68 @@
 .mk-context-sep { opacity: 0.3; }
 
 /* ── Vote inline ── */
+/* ── Vote widget — inline, no grey box ── */
 .mk-vote-inline {
-  margin: 16px 28px 0;
-  padding: 14px 16px;
-  background: var(--faint);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  margin: 14px 28px 0;
+  padding: 10px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
   display: flex; align-items: center;
-  gap: 12px; flex-wrap: wrap;
+  gap: 10px;
+  background: none;
+  flex-wrap: nowrap; /* never wrap — fits on one line */
 }
 .mk-vote-label {
-  font-size: 12px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--muted); white-space: nowrap;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--muted); white-space: nowrap; flex-shrink: 0;
 }
 .mk-vote-pips {
-  display: flex; gap: 4px; flex-wrap: wrap;
+  display: flex; gap: 3px; flex-wrap: nowrap; flex: 1;
 }
-/* Vote pip buttons (1-10) */
+/* Vote pip buttons — compact, no border by default */
 .vote-btn {
-  width: 32px; height: 32px;
-  border-radius: 6px;
-  border: 1.5px solid var(--border);
-  background: var(--card);
-  font-size: 12px; font-weight: 700;
-  color: var(--text); cursor: pointer;
-  transition: background 0.1s, border-color 0.1s;
+  width: 28px; height: 28px;
+  border-radius: 5px;
+  border: 1.5px solid transparent;
+  background: none;
+  font-size: 12px; font-weight: 600;
+  color: var(--muted); cursor: pointer;
+  transition: color 0.1s, background 0.1s, border-color 0.1s;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: none;
+  box-shadow: none; flex-shrink: 0;
 }
 .vote-btn:hover {
-  background: var(--faint); border-color: var(--accent);
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(45,74,138,0.05);
   transform: none; box-shadow: none;
 }
 .vote-btn.selected {
-  background: var(--accent); border-color: var(--accent);
-  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff; font-weight: 800;
 }
-.mk-vote-actions { display: flex; gap: 8px; margin-left: auto; }
+/* Save/Remove as minimal text links */
+.mk-vote-actions {
+  display: flex; gap: 8px; align-items: center;
+  flex-shrink: 0; margin-left: auto;
+}
 .mk-vote-save {
-  background: var(--accent); color: #fff;
-  border: none; border-radius: 6px; padding: 7px 16px;
+  background: none; color: var(--accent);
+  border: none; padding: 0;
   font-size: 12px; font-weight: 700; cursor: pointer;
-  box-shadow: none;
+  box-shadow: none; text-decoration: underline;
+  text-underline-offset: 3px;
 }
-.mk-vote-save:hover { opacity: 0.9; transform: none; box-shadow: none; }
+.mk-vote-save:hover { opacity: 0.75; transform: none; box-shadow: none; }
 .mk-vote-remove {
   background: none; color: var(--muted);
-  border: 1px solid var(--border); border-radius: 6px; padding: 7px 12px;
+  border: none; padding: 0;
   font-size: 12px; font-weight: 600; cursor: pointer;
   box-shadow: none;
 }
-.mk-vote-remove:hover { color: #e05252; border-color: #e05252; transform: none; box-shadow: none; }
+.mk-vote-remove:hover { color: #e05252; transform: none; box-shadow: none; }
 .mk-vote-status { font-size: 11px; color: var(--muted); }
 
 /* ── Admin row ── */
@@ -600,7 +610,11 @@
   .mk-score-my-vote { flex-direction: row; align-items: center; }
 
   .mk-context-line { padding: 8px 16px 0; }
-  .mk-vote-inline { margin: 12px 16px 0; gap: 8px; }
+  .mk-vote-inline {
+    margin: 10px 16px 0;
+    gap: 6px;
+  }
+  .vote-btn { width: 26px; height: 26px; font-size: 11px; }
   .mk-admin-row { padding: 8px 16px 0; }
 
   .mk-body {
