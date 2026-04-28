@@ -206,7 +206,7 @@ function showRutaSection(ruta) {
 
 function closeRuta() {
   document.getElementById('rutaSection').style.display = 'none';
-  document.getElementById('rutaStickyBar').style.display = 'none';
+  // sticky bar removed
   document.getElementById('rutaLoggedOutOverlay').style.display = 'none';
   ACTIVE_RUTA = null;
   RUTA_ITEMS = [];
@@ -244,23 +244,8 @@ function updateProgress(ruta) {
   updateCatCardProgress();
 }
 
-function updateStickyBar(ruta, voted, total, pct, complete) {
-  const cat = CATEGORIES_MAP[ruta?.category_id];
-  const bar = document.getElementById('rutaStickyBar');
-  if (!bar) return;
-  bar.style.display = 'flex';
-
-  if (voted === undefined) {
-    voted = countVoted(ruta);
-    total = RUTA_ITEMS.filter(ri => ri.markers?.is_active).length;
-    pct = total ? Math.round((voted / total) * 100) : 0;
-    complete = voted === total && total > 0;
-  }
-
-  document.getElementById('rutaStickyName').textContent = cat?.name || '';
-  document.getElementById('rutaStickyCount').textContent = `${voted}/${total}`;
-  const fill = document.getElementById('rutaStickyFill');
-  if (fill) { fill.style.width = `${pct}%`; fill.classList.toggle('complete', complete); }
+function updateStickyBar() {
+  // Sticky bar removed — progress shown in static bar on page
 }
 
 /* ══════════════════════════════
