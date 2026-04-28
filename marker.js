@@ -113,10 +113,10 @@ function renderHero(m, user) {
       if (brand) parts.push(escapeHtml(brand.name));
     }
     if (!isPlace && m.product_name) parts.push(escapeHtml(m.product_name));
-    if (isPlace && m.address) {
-      // Just neighbourhood/city snippet
-      const addrParts = m.address.split(",");
-      if (addrParts.length > 1) parts.push(escapeHtml(addrParts[addrParts.length - 1].trim()));
+    if (isPlace && m.city) {
+      // Use the city code nicely
+      const cityLabel = m.city === "BCN" ? "Barcelona" : m.city === "MAD" ? "Madrid" : m.city;
+      parts.push(escapeHtml(cityLabel));
     }
     if (isPlace && m.chain_id) {
       const chain = CHAINS_ALL.find(ch => ch.id === m.chain_id);
@@ -136,13 +136,14 @@ function renderHero(m, user) {
   // Side actions (wishlist, claim, edit)
   const sideActions = document.getElementById("mkSideActions");
   if (sideActions) {
-    let btns = `<button class="mk-side-action-btn" onclick="shareMarker()">↗ Share</button>`;
-    btns += `<span class="mk-wl-wrap">${wlBtnHtml(m.id)}</span>`;
+    let btns = "";
     if (isPlace) {
-      btns += `<a class="mk-side-action-btn" href="claim.html?id=${encodeURIComponent(MARKER_ID)}">🏢 Claim this place</a>`;
+      btns += `<a class="mk-side-action-btn mk-side-action-primary" href="claim.html?id=${encodeURIComponent(MARKER_ID)}">🏢 Claim this place</a>`;
     }
+    btns += `<button class="mk-side-action-btn mk-side-action-ghost" onclick="shareMarker()">↗ Share</button>`;
+    btns += `<span class="mk-wl-wrap">${wlBtnHtml(m.id)}</span>`;
     if (isCreator) {
-      btns += `<button class="mk-side-action-btn" onclick="enterEditMode()">✏️ Edit marker</button>`;
+      btns += `<button class="mk-side-action-btn mk-side-action-subtle" onclick="enterEditMode()">✏️ Edit</button>`;
     }
     sideActions.innerHTML = btns;
   }
