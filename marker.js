@@ -731,6 +731,67 @@ async function renderAlsoAtThisPlace(m) {
 }
 
 /* ══════════════════════════════
+   NEARBY TOP PICKS
+══════════════════════════════ */
+async function renderNearbyTopPicks(m) {
+  const section = document.getElementById("nearbySection");
+  if (!section) return;
+
+  // Only for places with a city
+  const city = markerCity(m);
+  if (!city || m.group_type !== "place") {
+    section.style.display = "none";
+    return;
+  }
+
+  const activeCatId = ACTIVE_CATEGORY_ID || m.category_id;
+
+  // Top 5 rated places in same city, excluding current category + current marker
+  const { data, error } = await sb
+    .from("markers")
+    .select("id,title,rating_avg,rating_count,category_id,city")
+    .eq("is_active", true)
+    .eq("group_type", "place")
+    .eq("city", city)
+    .neq("id", MARKER_ID)
+    .neq("category_id", activeCatId)
+    .gt("rating_count", 0)          // only rated places
+    .order("rating_avg", { ascending: false })
+    .limit(5);
+
+  if (error || !data?.length) { section.style.display = "none"; return; }
+
+  const listEl = document.getElementById("nearbyList");
+  if (!listEl) return;
+
+  const cityLabel = city === "BCN" ? "Barcelona" : city === "MAD" ? "Madrid" : city;
+  const headEl = document.getElementById("nearbyHead");
+  if (headEl) headEl.textContent = `Top picks in ${cityLabel}`;
+
+  listEl.className = "mk-also-scroll";
+  listEl.innerHTML = data.map(r => {
+    const avg = Number(r.rating_avg ?? 0);
+    const score = avg.toFixed(1);
+    const cat = getCategoryById(r.category_id);
+    const catName = cat ? cat.name : "";
+    const iconUrl = cat?.icon_url
+      ? (cat.icon_url.startsWith("http") ? cat.icon_url
+          : window.location.href.replace(/\/[^/]*(\?.*)?$/, "/") + cat.icon_url)
+      : "";
+    const href = `marker.html?id=${encodeURIComponent(r.id)}&cat=${r.category_id}`;
+    return `
+      <a class="mk-also-pill mk-nearby-pill" href="${href}">
+        ${iconUrl ? `<img class="mk-also-pill-icon" src="${escapeHtml(iconUrl)}" alt="" onerror="this.style.display='none'" />` : ""}
+        <span class="mk-also-pill-name">${escapeHtml(r.title)}</span>
+        <span class="mk-nearby-pill-cat">${escapeHtml(catName)}</span>
+        <span class="mk-also-pill-score">${escapeHtml(score)}</span>
+      </a>`;
+  }).join("");
+
+  section.style.display = "block";
+}
+
+/* ══════════════════════════════
    VOTE ACTIONS
 ══════════════════════════════ */
 async function loadMyVote(user) {
@@ -1571,6 +1632,7 @@ async function initMarkerPage() {
   await renderMoreFromBrand(m);
   await renderOthersFromChain(m);
   await renderAlsoAtThisPlace(m);
+  await renderNearbyTopPicks(m);
   await initComments(user);
 
   // Load photos into new hero strip
