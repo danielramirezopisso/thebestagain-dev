@@ -439,6 +439,20 @@
   font-size: 13px; color: var(--muted); font-weight: 400;
 }
 
+/* ── Chain pill variant (shows address instead of icon) ── */
+.mk-chain-pill {
+  min-width: 120px;
+  justify-content: center;
+}
+.mk-chain-pill-addr {
+  font-size: 11px; font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+  line-height: 1.3;
+}
+
 /* ── Map ── */
 .mk-section-map { padding: 0; overflow: hidden; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
 .mk-mini-map { height: 180px; width: 100%; display: block; }

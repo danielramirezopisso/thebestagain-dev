@@ -606,56 +606,51 @@ async function renderMoreFromBrand(m) {
    OTHERS FROM THIS CHAIN
 ══════════════════════════════ */
 async function renderOthersFromChain(m) {
-  const card = document.getElementById("moreChainCard");
-  if (!card || m.group_type !== "place" || !m.chain_id) return;
+  const section = document.getElementById("moreChainCard");
+  if (!section || m.group_type !== "place" || !m.chain_id) return;
 
   const chain = CHAINS_ALL.find(c => c.id === m.chain_id);
   if (!chain) return;
 
   const activeCatId = ACTIVE_CATEGORY_ID || m.category_id;
 
-  // Load all active places from same chain in the same category, excluding current
-  const { data: mcData } = await sb
-    .from("marker_categories")
-    .select("marker_id")
-    .eq("category_id", activeCatId)
-    .eq("is_active", true);
-
-  const catMarkerIds = (mcData || []).map(r => r.marker_id);
-  if (!catMarkerIds.length) return;
-
+  // All locations from same chain, excluding current marker
   const { data, error } = await sb
     .from("markers")
-    .select("id,title,rating_avg,rating_count,address")
+    .select("id,title,rating_avg,rating_count,address,city")
     .eq("is_active", true)
     .eq("group_type", "place")
     .eq("chain_id", m.chain_id)
-    .in("id", catMarkerIds)
     .neq("id", MARKER_ID)
     .order("rating_avg", { ascending: false });
 
-  if (error || !data?.length) return;
+  if (error || !data?.length) { section.style.display = "none"; return; }
 
-  document.getElementById("moreChainHead").textContent = `Others from ${chain.name}`;
+  // Update title
+  const headEl = document.getElementById("moreChainHead");
+  if (headEl) headEl.textContent = `Other ${chain.name} locations`;
 
-  document.getElementById("moreChainList").innerHTML = data.map(r => {
+  // Render as horizontal scroll pills — same style as "Also here for"
+  const listEl = document.getElementById("moreChainList");
+  if (!listEl) return;
+
+  listEl.className = "mk-also-scroll";
+  listEl.innerHTML = data.map(r => {
     const avg = Number(r.rating_avg ?? 0);
     const cnt = Number(r.rating_count ?? 0);
-    const cls = colorClass(avg, cnt);
-    const scoreText = cnt ? avg.toFixed(1) : "—";
-    const shortAddr = r.address ? r.address.split(",").slice(0, 2).join(",") : "";
+    const score = cnt ? avg.toFixed(1) : "—";
+    // Short address: just street name
+    const street = r.address ? r.address.split(",")[0].trim() : "";
+    const cityLabel = r.city === "BCN" ? "Barcelona" : r.city === "MAD" ? "Madrid" : (r.city || "");
     const href = `marker.html?id=${encodeURIComponent(r.id)}&cat=${activeCatId}`;
     return `
-      <a class="rank-row" href="${href}">
-        <div class="rank-name">
-          ${escapeHtml(r.title)}
-          ${shortAddr ? `<div class="rank-sub-addr">${escapeHtml(shortAddr)}</div>` : ""}
-        </div>
-        <div class="rank-score ${cls}">${escapeHtml(scoreText)}</div>
+      <a class="mk-also-pill mk-chain-pill" href="${href}">
+        <span class="mk-chain-pill-addr">${escapeHtml(street || cityLabel)}</span>
+        <span class="mk-also-pill-score">${escapeHtml(score)}</span>
       </a>`;
   }).join("");
 
-  card.style.display = "block";
+  section.style.display = "block";
 }
 
 /* ══════════════════════════════
