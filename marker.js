@@ -662,33 +662,50 @@ async function renderOthersFromChain(m) {
    ALSO WORTH TRYING
 ══════════════════════════════ */
 async function renderAlsoAtThisPlace(m) {
-  // Show other categories this same marker appears in
-  // e.g. Colmado Wilmot is in Croqueta AND Vermut → show both
   const activeCatId = ACTIVE_CATEGORY_ID || m.category_id;
   const otherCats = MARKER_CATEGORIES.filter(mc => mc.category_id !== activeCatId && mc.is_active);
-  
+
   const section = document.getElementById("alsoSection");
   if (!section) return;
 
-  // Hide if no other categories
-  if (!otherCats.length) {
-    section.style.display = "none";
-    return;
-  }
+  if (!otherCats.length) { section.style.display = "none"; return; }
 
-  // Get category details for each
+  // Fetch actual per-category ratings from votes table
+  const catIds = otherCats.map(mc => mc.category_id);
+  const { data: voteData } = await sb.from("votes")
+    .select("category_id, vote")
+    .eq("marker_id", MARKER_ID)
+    .in("category_id", catIds)
+    .eq("is_active", true);
+
+  // Build avg per category from votes
+  const votesMap = {};
+  (voteData || []).forEach(v => {
+    if (!votesMap[v.category_id]) votesMap[v.category_id] = { sum: 0, cnt: 0 };
+    votesMap[v.category_id].sum += Number(v.vote);
+    votesMap[v.category_id].cnt++;
+  });
+
+  // Fall back to marker_categories rating if votes not available
+  const getScore = (catId) => {
+    const vm = votesMap[catId];
+    if (vm && vm.cnt > 0) return (vm.sum / vm.cnt).toFixed(1);
+    const mc = MARKER_CATEGORIES.find(x => x.category_id === catId);
+    const avg = Number(mc?.rating_avg ?? 0);
+    const cnt = Number(mc?.rating_count ?? 0);
+    return cnt ? avg.toFixed(1) : "—";
+  };
+
   const items = otherCats.map(mc => {
     const cat = getCategoryById(mc.category_id);
     if (!cat) return null;
-    const avg = Number(mc.rating_avg ?? 0);
-    const cnt = Number(mc.rating_count ?? 0);
-    const score = cnt ? avg.toFixed(1) : "—";
+    const score = getScore(mc.category_id);
     const href = `marker.html?id=${encodeURIComponent(m.id)}&cat=${mc.category_id}`;
     const iconUrl = cat.icon_url
       ? (cat.icon_url.startsWith("http") ? cat.icon_url
           : window.location.href.replace(/\/[^/]*(\?.*)?$/, "/") + cat.icon_url)
       : "";
-    return { cat, score, cnt, href, iconUrl };
+    return { cat, score, href, iconUrl };
   }).filter(Boolean);
 
   if (!items.length) {
