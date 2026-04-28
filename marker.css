@@ -722,17 +722,14 @@
   .mk-col-main { order: 1; min-width: 0; }
   .mk-col-side  { order: 2; min-width: 0; }
 
-  /* ── Sidebar: flex column with explicit order ──
-     Side actions → chain → nearby → ruta → map */
-  .mk-col-side {
-    display: flex;
-    flex-direction: column;
+  /* Sidebar: flex column, DOM order controls display order */
+  .mk-col-side { display: flex; flex-direction: column; }
+  #mkRutaBadge { margin: 12px 0 0; }
+
+  /* Side actions moved into main col via JS on mobile — add spacing */
+  #mkSideActions {
+    margin: 12px 0;
   }
-  .mk-side-actions { order: 1; margin-top: 8px; }
-  #moreChainCard   { order: 2; }
-  #nearbySection   { order: 3; }
-  #mkRutaBadge     { order: 4; margin: 12px 0 0; }
-  #miniMapCard     { order: 5; }
 
   /* ── Side actions: 2-col grid ── */
   .mk-side-actions {

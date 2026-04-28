@@ -1632,6 +1632,16 @@ async function initMarkerPage() {
   if (loading) loading.style.display = "none";
   if (main) main.style.display = "block";
 
+  // On mobile: physically move side actions into main column
+  // after alsoSection so order is: ranking → also → actions → comments
+  if (window.innerWidth <= 720) {
+    const sideActions = document.getElementById("mkSideActions");
+    const commentsCard = document.getElementById("commentsCard");
+    if (sideActions && commentsCard && commentsCard.parentNode) {
+      commentsCard.parentNode.insertBefore(sideActions, commentsCard);
+    }
+  }
+
   renderHero(m, user);
   renderRating(m);
   renderDetails(m, creatorName);
