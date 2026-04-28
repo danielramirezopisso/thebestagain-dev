@@ -695,9 +695,31 @@
     padding: 16px 16px 0;
     gap: 0;
   }
-  /* On mobile: map/details go above ranking */
-  .mk-col-side { order: -1; }
-  .mk-section-map { margin-bottom: 16px; }
+  /* On mobile: main content first, sidebar (map/buttons) after */
+  .mk-col-main { order: 1; }
+  .mk-col-side  { order: 2; }
+
+  /* Ruta badge: pull it up above the ranking on mobile */
+  #mkRutaBadge {
+    order: 0;
+    margin: 12px 16px 0;
+  }
+
+  .mk-section-map { margin-bottom: 16px; margin-top: 8px; }
+
+  /* Side actions horizontal on mobile */
+  .mk-side-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .mk-side-actions .mk-side-action-btn,
+  .mk-side-actions .mk-wl-wrap,
+  .mk-side-actions .mk-wl-wrap .wl-btn {
+    flex: 1 !important;
+    min-width: 100px !important;
+  }
 
   .mk-also-grid { grid-template-columns: 1fr; }
   .mk-photo-actions { top: 10px; right: 10px; }
