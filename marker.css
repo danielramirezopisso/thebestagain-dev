@@ -283,12 +283,12 @@
   /* Desktop: two columns */
   grid-template-columns: 1fr 300px;
   grid-template-areas:
+    "ranking  ruta"
     "ranking  map"
-    "ruta     map"
-    "actions  map"
-    "also     chain"
+    "also     actions"
+    "comments chain"
     "comments nearby"
-    "brand    nearby";
+    "brand    .";
 }
 
 /* Assign grid areas */
@@ -530,6 +530,7 @@
 .mk-side-actions {
   display: flex; flex-direction: column; gap: 8px;
   margin-top: 4px;
+  /* On desktop: contained in right column (300px) */
 }
 .mk-side-action-btn {
   display: flex; align-items: center; justify-content: center; gap: 8px;
