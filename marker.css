@@ -387,32 +387,49 @@
   font-size: 13px; color: var(--muted); font-weight: 400;
 }
 
-/* ── Also worth trying grid ── */
-.mk-also-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+/* ── Also at this place — horizontal scroll pills ── */
+.mk-also-scroll {
+  display: flex;
   gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none; /* hide scrollbar on Firefox */
 }
-.mk-also-card {
-  background: var(--faint);
-  border: 1px solid var(--border);
-  border-radius: 10px; padding: 12px;
-  text-decoration: none; color: inherit;
-  transition: background 0.12s;
+.mk-also-scroll::-webkit-scrollbar { display: none; }
+
+.mk-also-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 18px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  flex-shrink: 0;
+  min-width: 110px;
+  transition: border-color 0.15s, background 0.15s;
   cursor: pointer;
 }
-.mk-also-card:hover { background: rgba(45,74,138,0.04); border-color: rgba(45,74,138,0.2); }
-.mk-also-name {
-  font-size: 13px; font-weight: 700; color: var(--text);
-  margin-bottom: 2px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+.mk-also-pill:hover {
+  border-color: var(--accent);
+  background: rgba(45,74,138,0.04);
 }
-.mk-also-addr { font-size: 11px; color: var(--muted); }
-.mk-also-score {
-  margin-top: 8px;
-  font-size: 18px; font-weight: 800;
+.mk-also-pill-icon {
+  width: 32px; height: 32px;
+  object-fit: contain;
+}
+.mk-also-pill-name {
+  font-size: 12px; font-weight: 600;
+  color: var(--text); text-align: center;
+  line-height: 1.3;
+}
+.mk-also-pill-score {
   font-family: 'Playfair Display', Georgia, serif;
-  color: var(--text);
+  font-size: 20px; font-weight: 900;
+  color: var(--text); line-height: 1;
 }
 
 /* ── Map ── */

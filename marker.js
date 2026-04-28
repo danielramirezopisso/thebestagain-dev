@@ -151,8 +151,6 @@ function renderHero(m, user) {
   // Admin/creator edit button goes in side actions (#18 - single edit button)
   // (no separate admin row needed)
 
-  // Other category chips
-  renderOtherCategoryChips(m, activeCatId);
 }
 
 // Get rating for the active category, fall back to overall marker rating
@@ -663,56 +661,61 @@ async function renderOthersFromChain(m) {
 /* ══════════════════════════════
    ALSO WORTH TRYING
 ══════════════════════════════ */
-async function renderAlsoWorthTrying(m) {
-  // Only for places, only if there are others in same category
+async function renderAlsoAtThisPlace(m) {
+  // Show other categories this same marker appears in
+  // e.g. Colmado Wilmot is in Croqueta AND Vermut → show both
   const activeCatId = ACTIVE_CATEGORY_ID || m.category_id;
+  const otherCats = MARKER_CATEGORIES.filter(mc => mc.category_id !== activeCatId && mc.is_active);
+  
+  const section = document.getElementById("alsoSection");
+  if (!section) return;
 
-  // Get top 4 others in same category via marker_categories
-  const { data: mcData } = await sb.from("marker_categories")
-    .select("marker_id").eq("category_id", activeCatId).eq("is_active", true);
+  // Hide if no other categories
+  if (!otherCats.length) {
+    section.style.display = "none";
+    return;
+  }
 
-  const catIds = (mcData || []).map(r => r.marker_id).filter(id => id !== MARKER_ID);
-  if (!catIds.length) return;
-
-  let alsoQ = sb.from("markers")
-    .select("id,title,rating_avg,rating_count,address,city")
-    .eq("is_active", true)
-    .in("id", catIds)
-    .order("rating_avg", { ascending: false });
-  if (markerCity(m)) alsoQ = alsoQ.eq("city", markerCity(m));
-  const { data, error } = await alsoQ.limit(6);
-
-  if (error || !data?.length) return;
-
-  // Filter by city if it's a place (products have no city)
-  const currentCity = markerCity(m);
-  const filtered = currentCity
-    ? data.filter(r => r.city === currentCity)
-    : data;
-  if (!filtered.length) return;
-
-  const alsoSection = document.getElementById("alsoSection");
-  const alsoGrid = document.getElementById("alsoGrid");
-  const alsoLink = document.getElementById("alsoSeeAllLink");
-  if (!alsoSection || !alsoGrid) return;
-
-  if (alsoLink) alsoLink.href = `map.html?category=${encodeURIComponent(activeCatId)}`;
-
-  alsoGrid.innerHTML = filtered.map(r => {
-    const avg = Number(r.rating_avg ?? 0);
-    const cnt = Number(r.rating_count ?? 0);
+  // Get category details for each
+  const items = otherCats.map(mc => {
+    const cat = getCategoryById(mc.category_id);
+    if (!cat) return null;
+    const avg = Number(mc.rating_avg ?? 0);
+    const cnt = Number(mc.rating_count ?? 0);
     const score = cnt ? avg.toFixed(1) : "—";
-    const addr = r.address ? r.address.split(",").slice(0,2).join(",") : "";
-    const href = `marker.html?id=${encodeURIComponent(r.id)}&cat=${activeCatId}`;
-    return `
-      <a class="mk-also-card" href="${href}">
-        <div class="mk-also-name">${escapeHtml(r.title)}</div>
-        ${addr ? `<div class="mk-also-addr">${escapeHtml(addr)}</div>` : ""}
-        <div class="mk-also-score">${escapeHtml(score)}</div>
-      </a>`;
-  }).join("");
+    const href = `marker.html?id=${encodeURIComponent(m.id)}&cat=${mc.category_id}`;
+    const iconUrl = cat.icon_url
+      ? (cat.icon_url.startsWith("http") ? cat.icon_url
+          : window.location.href.replace(/\/[^/]*(\?.*)?$/, "/") + cat.icon_url)
+      : "";
+    return { cat, score, cnt, href, iconUrl };
+  }).filter(Boolean);
 
-  alsoSection.style.display = "block";
+  if (!items.length) {
+    section.style.display = "none";
+    return;
+  }
+
+  // Update section title
+  const titleEl = section.querySelector(".mk-section-title");
+  if (titleEl) titleEl.textContent = "Also here for";
+
+  // Hide see all link — not relevant for this section
+  const seeAll = document.getElementById("alsoSeeAllLink");
+  if (seeAll) seeAll.style.display = "none";
+
+  const grid = document.getElementById("alsoGrid");
+  if (!grid) return;
+
+  grid.className = "mk-also-scroll"; // horizontal scroll
+  grid.innerHTML = items.map(({ cat, score, cnt, href, iconUrl }) => `
+    <a class="mk-also-pill" href="${href}">
+      ${iconUrl ? `<img class="mk-also-pill-icon" src="${escapeHtml(iconUrl)}" alt="" onerror="this.style.display='none'" />` : ""}
+      <span class="mk-also-pill-name">${escapeHtml(cat.name)}</span>
+      <span class="mk-also-pill-score">${escapeHtml(score)}</span>
+    </a>`).join("");
+
+  section.style.display = "block";
 }
 
 /* ══════════════════════════════
@@ -1555,7 +1558,7 @@ async function initMarkerPage() {
   await renderRankingWidget(m);
   await renderMoreFromBrand(m);
   await renderOthersFromChain(m);
-  await renderAlsoWorthTrying(m);
+  await renderAlsoAtThisPlace(m);
   await initComments(user);
 
   // Load photos into new hero strip
