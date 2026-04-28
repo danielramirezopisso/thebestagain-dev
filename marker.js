@@ -733,45 +733,68 @@ async function renderAlsoAtThisPlace(m) {
 /* ══════════════════════════════
    NEARBY TOP PICKS
 ══════════════════════════════ */
+// Haversine distance in km between two lat/lon points
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2)
+          + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180)
+          * Math.sin(dLon/2) * Math.sin(dLon/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
 async function renderNearbyTopPicks(m) {
   const section = document.getElementById("nearbySection");
   if (!section) return;
 
-  // Only for places with a city
-  const city = markerCity(m);
-  if (!city || m.group_type !== "place") {
+  // Only for places with coordinates
+  if (m.group_type !== "place" || !m.lat || !m.lon) {
     section.style.display = "none";
     return;
   }
 
   const activeCatId = ACTIVE_CATEGORY_ID || m.category_id;
+  const city = markerCity(m);
 
-  // Top 5 rated places in same city, excluding current category + current marker
+  // Fetch all rated places in same city (small dataset — fine to filter in JS)
   const { data, error } = await sb
     .from("markers")
-    .select("id,title,rating_avg,rating_count,category_id,city")
+    .select("id,title,rating_avg,rating_count,category_id,lat,lon")
     .eq("is_active", true)
     .eq("group_type", "place")
     .eq("city", city)
     .neq("id", MARKER_ID)
-    .neq("category_id", activeCatId)
-    .gt("rating_count", 0)          // only rated places
-    .order("rating_avg", { ascending: false })
-    .limit(5);
+    .gt("rating_count", 0)
+    .order("rating_avg", { ascending: false });
 
   if (error || !data?.length) { section.style.display = "none"; return; }
 
+  // Calculate distance and filter — try 2km first, expand to 5km if < 3 results
+  const withDist = data.map(r => ({
+    ...r,
+    distKm: haversineKm(m.lat, m.lon, Number(r.lat), Number(r.lon))
+  }));
+
+  let nearby = withDist.filter(r => r.distKm <= 2);
+  if (nearby.length < 3) nearby = withDist.filter(r => r.distKm <= 5);
+  if (!nearby.length) { section.style.display = "none"; return; }
+
+  // Sort by rating desc (already sorted from DB), take top 5
+  nearby = nearby.slice(0, 5);
+
   const listEl = document.getElementById("nearbyList");
+  const headEl = document.getElementById("nearbyHead");
   if (!listEl) return;
 
-  const cityLabel = city === "BCN" ? "Barcelona" : city === "MAD" ? "Madrid" : city;
-  const headEl = document.getElementById("nearbyHead");
-  if (headEl) headEl.textContent = `Top picks in ${cityLabel}`;
+  if (headEl) headEl.textContent = "Nearby top picks";
 
   listEl.className = "mk-also-scroll";
-  listEl.innerHTML = data.map(r => {
-    const avg = Number(r.rating_avg ?? 0);
-    const score = avg.toFixed(1);
+  listEl.innerHTML = nearby.map(r => {
+    const score = Number(r.rating_avg).toFixed(1);
+    const distText = r.distKm < 1
+      ? `${Math.round(r.distKm * 1000)}m`
+      : `${r.distKm.toFixed(1)}km`;
     const cat = getCategoryById(r.category_id);
     const catName = cat ? cat.name : "";
     const iconUrl = cat?.icon_url
@@ -785,6 +808,7 @@ async function renderNearbyTopPicks(m) {
         <span class="mk-also-pill-name">${escapeHtml(r.title)}</span>
         <span class="mk-nearby-pill-cat">${escapeHtml(catName)}</span>
         <span class="mk-also-pill-score">${escapeHtml(score)}</span>
+        <span class="mk-nearby-pill-dist">${escapeHtml(distText)}</span>
       </a>`;
   }).join("");
 
