@@ -407,16 +407,21 @@ function toggleRutaMap() {
   if (RUTA_MAP_INSTANCE) setTimeout(() => RUTA_MAP_INSTANCE.invalidateSize(), 50);
 }
 
+const CITY_CENTERS = {
+  BCN: [41.3888, 2.1589],
+  MAD: [40.4168, -3.7038],
+  BIL: [43.2627, -2.9253]
+};
+
 function initRutaMap(ruta) {
   if (!ruta) return;
   const mapWrap = document.getElementById('rutaMapWrap');
-  // On desktop always show map; on mobile only if toggled
   const isMobile = window.innerWidth <= 768;
   if (!isMobile) mapWrap.style.display = 'block';
 
   if (RUTA_MAP_INSTANCE) { RUTA_MAP_INSTANCE.remove(); RUTA_MAP_INSTANCE = null; }
 
-  const cityCenter = SELECTED_CITY === 'MAD' ? [40.4168, -3.7038] : [41.3888, 2.1589];
+  const cityCenter = CITY_CENTERS[SELECTED_CITY] || CITY_CENTERS.BCN;
   const markers = RUTA_ITEMS.filter(ri => ri.markers?.lat && ri.markers?.lon && ri.markers?.is_active);
 
   const catId = ruta.category_id;
@@ -445,12 +450,16 @@ function initRutaMap(ruta) {
       lMarkers.push(mk);
     });
 
-    const group = L.featureGroup(lMarkers);
-    try {
-      RUTA_MAP_INSTANCE.fitBounds(group.getBounds().pad(0.15));
-    } catch(e) {
-      const center = CITY_CENTERS[SELECTED_CITY] || [41.3888, 2.1589];
-      RUTA_MAP_INSTANCE.setView(center, 13);
+    if (lMarkers.length > 0) {
+      const group = L.featureGroup(lMarkers);
+      try {
+        RUTA_MAP_INSTANCE.fitBounds(group.getBounds().pad(0.2));
+      } catch(e) {
+        RUTA_MAP_INSTANCE.setView(cityCenter, 14);
+      }
+    } else {
+      // No markers with coordinates — use city center
+      RUTA_MAP_INSTANCE.setView(cityCenter, 14);
     }
   }, 100);
 }

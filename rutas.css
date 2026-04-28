@@ -497,15 +497,18 @@
 /* ── Sticky bar ── */
 .ruta-sticky-bar {
   position: sticky;
-  top: 56px;
-  z-index: 40;
-  background: var(--surface, #fff);
+  top: 56px; /* sits just below the topbar */
+  z-index: 200; /* above content, below modals */
+  background: var(--card, #fff);
   border-bottom: 1px solid var(--rule, #e5e5e5);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   padding: 8px 24px;
   display: flex;
   align-items: center;
   gap: 12px;
   font-size: 13px;
+  /* Prevent content bleeding through */
+  isolation: isolate;
 }
 .ruta-sticky-name { font-weight: 700; color: var(--text,#111); white-space: nowrap; }
 .ruta-sticky-count { font-weight: 600; color: var(--muted,#888); white-space: nowrap; }
@@ -577,5 +580,8 @@
   .ruta-item-icon img { width: 18px; height: 18px; }
   .ruta-item-name { font-size: 10px; }
   .ruta-vote-chip { font-size: 9px; padding: 2px 6px; }
-  .ruta-sticky-bar { padding: 7px 14px; top: 52px; }
+  .ruta-sticky-bar {
+    padding: 7px 14px;
+    top: 56px; /* match topbar height on mobile */
+  }
 }
