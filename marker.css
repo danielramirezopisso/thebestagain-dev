@@ -736,8 +736,21 @@
   .mk-score-block { text-align: left; display: flex; align-items: baseline; gap: 12px; }
   .mk-score-number { font-size: 36px; }
   .mk-context-line { padding: 8px 16px 0; }
-  .mk-vote-inline { margin: 10px 16px 0; gap: 6px; }
+  .mk-vote-inline {
+    margin: 10px 16px 0;
+    gap: 6px;
+    flex-wrap: wrap; /* allow wrapping on small screens */
+  }
+  .mk-vote-label { width: 100%; } /* label on its own line */
+  .mk-vote-pips { flex: 1; }
   .vote-btn { width: 26px; height: 26px; font-size: 11px; }
+  .mk-vote-actions {
+    width: 100%; /* Save/Remove on their own line below the numbers */
+    margin-left: 0;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  .mk-vote-status { width: 100%; }
   .mk-admin-row { padding: 8px 16px 0; }
 
   /* Map: not sticky on mobile */
