@@ -287,7 +287,8 @@
     "ranking  map"
     "ranking  actions"
     "also     chain"
-    "comments nearby"
+    "also     nearby"
+    "comments ."
     "brand    .";
 }
 
@@ -496,7 +497,7 @@
 }
 
 /* ── Map ── */
-.mk-section-map { padding: 0; overflow: hidden; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 0; position: sticky; top: 80px; }
+.mk-section-map { padding: 0; overflow: hidden; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 16px; }
 .mk-mini-map { height: 180px; width: 100%; display: block; }
 .mk-map-address {
   padding: 10px 12px;
@@ -754,6 +755,8 @@
   .mk-side-actions .mk-wl-wrap .wl-btn {
     width: auto !important;
     min-width: unset !important;
+    padding: 10px 14px !important;
+    min-height: 44px !important;
   }
 
   /* ── Misc ── */
@@ -901,7 +904,7 @@
   justify-content: center !important;
   align-items: center !important;
   gap: 6px !important;
-  padding: 9px 14px !important;
+  padding: 10px 14px !important;
   background: var(--card) !important;
   border: 1px solid var(--border) !important;
   border-radius: 8px !important;
