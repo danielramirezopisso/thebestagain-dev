@@ -695,30 +695,38 @@
     padding: 16px 16px 0;
     gap: 0;
   }
-  /* On mobile: main content first, sidebar (map/buttons) after */
+  /* Mobile order via CSS order property */
   .mk-col-main { order: 1; }
   .mk-col-side  { order: 2; }
 
-  /* Ruta badge: pull it up above the ranking on mobile */
-  #mkRutaBadge {
-    order: 0;
-    margin: 12px 16px 0;
-  }
+  /* Ruta badge: moved between ranking and also-here-for via JS on mobile */
+  #mkRutaBadge { margin: 12px 0 0; }
 
-  .mk-section-map { margin-bottom: 16px; margin-top: 8px; }
+  .mk-section-map { margin-bottom: 16px; margin-top: 0; }
 
-  /* Side actions horizontal on mobile */
+  /* Within sidebar on mobile: actions → chain → nearby → map */
+  .mk-col-side { display: flex; flex-direction: column; }
+  .mk-side-actions  { order: 1; }
+  #moreChainCard    { order: 2; }
+  #nearbySection    { order: 3; }
+  #miniMapCard      { order: 4; }
+
+  /* Side actions: 2-column grid, not full width */
   .mk-side-actions {
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
     margin-bottom: 8px;
   }
-  .mk-side-actions .mk-side-action-btn,
-  .mk-side-actions .mk-wl-wrap,
+  /* Claim spans full width — primary CTA */
+  .mk-side-actions .mk-side-action-primary {
+    grid-column: 1 / -1;
+  }
+  /* Wishlist button fits grid cell */
+  .mk-side-actions .mk-wl-wrap { display: contents; }
   .mk-side-actions .mk-wl-wrap .wl-btn {
-    flex: 1 !important;
-    min-width: 100px !important;
+    width: auto !important;
+    min-width: unset !important;
   }
 
   .mk-also-grid { grid-template-columns: 1fr; }
