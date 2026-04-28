@@ -299,26 +299,20 @@ function renderRating(m, rankPos, rankTotal) {
     else scoreClass = "score-low";
   }
 
-  let myVoteHtml = "";
-  if (CURRENT_VOTE !== null) {
-    myVoteHtml = `
-      <div class="mk-score-my-vote">
-        <span class="mk-score-my-vote-label">Your vote</span>
-        <span class="mk-score-my-vote-val">${Number(CURRENT_VOTE).toFixed(1)}</span>
-      </div>`;
-  }
-
   const scoreBlock = document.getElementById("mkScoreBlock");
   if (scoreBlock) {
-    const votePrompt = (!window._mkUser && cnt >= 0)
-      ? `<a class="mk-score-vote-prompt" href="login.html?redirect=${encodeURIComponent(location.href)}">Vote →</a>`
-      : "";
+    // Sub-line: votes count + your vote on same line if voted, or login prompt if not
+    let subLine = "";
+    if (CURRENT_VOTE !== null) {
+      subLine = `<div class="mk-score-sub">${cnt} vote${cnt !== 1 ? "s" : ""} · Your vote: <strong>${Number(CURRENT_VOTE).toFixed(1)}</strong></div>`;
+    } else if (!window._mkUser) {
+      subLine = `<div class="mk-score-sub">${cnt} vote${cnt !== 1 ? "s" : ""} · <a class="mk-score-vote-prompt" href="login.html?redirect=${encodeURIComponent(location.href)}">Vote →</a></div>`;
+    } else {
+      subLine = `<div class="mk-score-sub">${cnt} vote${cnt !== 1 ? "s" : ""}</div>`;
+    }
     scoreBlock.innerHTML = `
       <div class="mk-score-number ${scoreClass}">${escapeHtml(displayAvg)}</div>
-      <div class="mk-score-meta">out of 10</div>
-      <div class="mk-score-votes">${cnt} vote${cnt !== 1 ? "s" : ""}</div>
-      ${myVoteHtml}
-      ${votePrompt}
+      ${subLine}
     `;
   }
 
