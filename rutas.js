@@ -414,11 +414,16 @@ function initRutaMap(ruta) {
   const iconUrl = absIconUrl(cat?.icon_url || '');
 
   setTimeout(() => {
-    RUTA_MAP_INSTANCE = L.map('rutaMap', { zoomControl: true, scrollWheelZoom: false });
+    // Pass center+zoom to constructor so it works even when container is hidden
+    RUTA_MAP_INSTANCE = L.map('rutaMap', {
+      zoomControl: true,
+      scrollWheelZoom: false,
+      center: cityCenter,
+      zoom: 14
+    });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap', maxZoom: 18
     }).addTo(RUTA_MAP_INSTANCE);
-    RUTA_MAP_INSTANCE.setView(cityCenter, 13); // always default to city first
 
     const lMarkers = [];
     markers.forEach(ri => {
