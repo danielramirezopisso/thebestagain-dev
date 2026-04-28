@@ -285,22 +285,22 @@
   grid-template-areas:
     "ranking  ruta"
     "ranking  map"
-    "also     actions"
-    "comments chain"
+    "ranking  actions"
+    "also     chain"
     "comments nearby"
     "brand    .";
 }
 
-/* Assign grid areas */
-.mk-cell-ranking  { grid-area: ranking; }
-.mk-cell-ruta     { grid-area: ruta; }
-.mk-cell-actions  { grid-area: actions; }
-.mk-cell-also     { grid-area: also; }
-.mk-cell-comments { grid-area: comments; }
-.mk-cell-brand    { grid-area: brand; }
-.mk-cell-chain    { grid-area: chain; }
-.mk-cell-nearby   { grid-area: nearby; }
-.mk-cell-map      { grid-area: map; }
+/* Assign grid areas — use both class and ID selectors */
+.mk-cell-ranking, #mkRankingSection  { grid-area: ranking; }
+.mk-cell-ruta,    #mkRutaBadge       { grid-area: ruta; }
+.mk-cell-actions, #mkSideActions     { grid-area: actions; }
+.mk-cell-also,    #alsoSection       { grid-area: also; }
+.mk-cell-comments,#commentsCard      { grid-area: comments; }
+.mk-cell-brand,   #moreBrandCard     { grid-area: brand; }
+.mk-cell-chain,   #moreChainCard     { grid-area: chain; }
+.mk-cell-nearby,  #nearbySection     { grid-area: nearby; }
+.mk-cell-map,     #miniMapCard       { grid-area: map; }
 
 /* ── Sections ── */
 .mk-section {
@@ -711,8 +711,11 @@
   /* All cells: full width, natural DOM order */
   .mk-cell-ranking, .mk-cell-ruta, .mk-cell-actions,
   .mk-cell-also, .mk-cell-comments, .mk-cell-brand,
-  .mk-cell-chain, .mk-cell-nearby, .mk-cell-map {
-    grid-area: unset;
+  .mk-cell-chain, .mk-cell-nearby, .mk-cell-map,
+  #mkRankingSection, #mkRutaBadge, #mkSideActions,
+  #alsoSection, #commentsCard, #moreBrandCard,
+  #moreChainCard, #nearbySection, #miniMapCard {
+    grid-area: unset !important;
     min-width: 0;
   }
 
