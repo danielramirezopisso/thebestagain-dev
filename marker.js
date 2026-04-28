@@ -1640,23 +1640,13 @@ async function initMarkerPage() {
   if (m.group_type === "place") {
     renderMiniMap(m);
     await renderRutaBadge(m); // rutas only for places
-    // Position ruta badge:
-    // Desktop: above map in sidebar
-    // Mobile: between ranking section and also-here-for section
+    // Move ruta badge to sidebar — CSS order controls position per breakpoint
+    // Desktop: order not set → appears before map (default DOM order in sidebar)
+    // Mobile: order: 4 → appears after chain/nearby, before map
     const rutaBadgeEl = document.getElementById("mkRutaBadge");
-    if (rutaBadgeEl && rutaBadgeEl.style.display !== "none") {
-      if (window.innerWidth <= 720) {
-        // Mobile: insert between ranking and alsoSection in main column
-        const alsoSection = document.getElementById("alsoSection");
-        const rankSection = document.getElementById("mkRankingSection");
-        if (alsoSection && rankSection) {
-          rankSection.parentNode.insertBefore(rutaBadgeEl, alsoSection);
-        }
-      } else {
-        // Desktop: above map in sidebar
-        const mapCard = document.getElementById("miniMapCard");
-        if (mapCard) mapCard.parentNode.insertBefore(rutaBadgeEl, mapCard);
-      }
+    const mapCard = document.getElementById("miniMapCard");
+    if (rutaBadgeEl && mapCard && rutaBadgeEl.style.display !== "none") {
+      mapCard.parentNode.insertBefore(rutaBadgeEl, mapCard);
     }
   } else {
     // Products: hide map and ruta badge

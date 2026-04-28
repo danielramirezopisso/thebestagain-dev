@@ -675,63 +675,84 @@
    MOBILE
 ══════════════════════════════════════ */
 @media (max-width: 720px) {
-  .mk-photo-hero { height: 200px; }
+  /* ── Prevent horizontal overflow ── */
+  .mk-main, .mk-body, .mk-col-main, .mk-col-side {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  .mk-rank-row {
+    min-width: 0; /* allow grid children to shrink */
+  }
+  .mk-rank-info {
+    min-width: 0;
+    overflow: hidden;
+  }
+  .mk-rank-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mk-ranking-list.mk-ranking-scroll {
+    overflow-x: hidden; /* no horizontal scroll on ranking */
+  }
 
+  /* ── Photo ── */
+  .mk-photo-hero { height: 200px; }
+  .mk-photo-actions { top: 10px; right: 10px; }
+
+  /* ── Identity ── */
   .mk-identity { padding: 16px 16px 0; flex-direction: column; }
   .mk-score-block { text-align: left; display: flex; align-items: baseline; gap: 12px; }
   .mk-score-number { font-size: 36px; }
-  .mk-score-my-vote { flex-direction: row; align-items: center; }
-
   .mk-context-line { padding: 8px 16px 0; }
-  .mk-vote-inline {
-    margin: 10px 16px 0;
-    gap: 6px;
-  }
+
+  /* ── Vote widget ── */
+  .mk-vote-inline { margin: 10px 16px 0; gap: 6px; }
   .vote-btn { width: 26px; height: 26px; font-size: 11px; }
   .mk-admin-row { padding: 8px 16px 0; }
 
+  /* ── Two-column body → single column ── */
   .mk-body {
     grid-template-columns: 1fr;
     padding: 16px 16px 0;
     gap: 0;
+    overflow-x: hidden;
   }
-  /* Mobile order via CSS order property */
-  .mk-col-main { order: 1; }
-  .mk-col-side  { order: 2; }
 
-  /* Ruta badge: moved between ranking and also-here-for via JS on mobile */
-  #mkRutaBadge { margin: 12px 0 0; }
+  /* Main col first, sidebar second */
+  .mk-col-main { order: 1; min-width: 0; }
+  .mk-col-side  { order: 2; min-width: 0; }
 
-  .mk-section-map { margin-bottom: 16px; margin-top: 0; }
+  /* ── Sidebar: flex column with explicit order ──
+     Side actions → chain → nearby → ruta → map */
+  .mk-col-side {
+    display: flex;
+    flex-direction: column;
+  }
+  .mk-side-actions { order: 1; margin-top: 8px; }
+  #moreChainCard   { order: 2; }
+  #nearbySection   { order: 3; }
+  #mkRutaBadge     { order: 4; margin: 12px 0 0; }
+  #miniMapCard     { order: 5; }
 
-  /* Within sidebar on mobile: actions → chain → nearby → map */
-  .mk-col-side { display: flex; flex-direction: column; }
-  .mk-side-actions  { order: 1; }
-  #moreChainCard    { order: 2; }
-  #nearbySection    { order: 3; }
-  #miniMapCard      { order: 4; }
-
-  /* Side actions: 2-column grid, not full width */
+  /* ── Side actions: 2-col grid ── */
   .mk-side-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
   }
-  /* Claim spans full width — primary CTA */
-  .mk-side-actions .mk-side-action-primary {
-    grid-column: 1 / -1;
-  }
-  /* Wishlist button fits grid cell */
+  .mk-side-actions .mk-side-action-primary { grid-column: 1 / -1; }
   .mk-side-actions .mk-wl-wrap { display: contents; }
   .mk-side-actions .mk-wl-wrap .wl-btn {
     width: auto !important;
     min-width: unset !important;
   }
 
-  .mk-also-grid { grid-template-columns: 1fr; }
-  .mk-photo-actions { top: 10px; right: 10px; }
+  /* ── Map ── */
+  .mk-section-map { margin-bottom: 12px; }
 
+  /* ── Misc ── */
+  .mk-also-grid { grid-template-columns: 1fr; }
   .lightbox-thumbs { display: none; }
   .lightbox-img-wrap img { max-width: 95vw; }
   .lightbox-prev { left: 4px; }
