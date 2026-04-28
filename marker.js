@@ -399,7 +399,9 @@ function renderDetails(m, creatorName) {
     rows.push({ key: "Status", val: `<span style="color:#ef4444;font-weight:900;">Inactive</span>` });
   }
 
-  document.getElementById("detailsContent").innerHTML = rows.map(r => `
+  const detailsEl = document.getElementById("detailsContent");
+  if (!detailsEl) return; // section removed from HTML
+  detailsEl.innerHTML = rows.map(r => `
     <div class="mk-detail-row">
       <div class="mk-detail-label">${r.key}</div>
       <div class="mk-detail-value">${r.val}</div>
