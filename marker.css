@@ -270,14 +270,37 @@
   display: flex; gap: 8px; flex-wrap: wrap;
 }
 
-/* ── Body: two columns ── */
+/* ── Body: CSS Grid, mobile-first ──
+   Mobile: single column, natural DOM order
+   Desktop: two columns via grid-template-areas
+────────────────────────────────────────────── */
 .mk-body {
   display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 24px;
   padding: 24px 28px 0;
+  gap: 0 28px;
   align-items: start;
+
+  /* Desktop: two columns */
+  grid-template-columns: 1fr 300px;
+  grid-template-areas:
+    "ranking  map"
+    "ruta     map"
+    "actions  map"
+    "also     chain"
+    "comments nearby"
+    "brand    nearby";
 }
+
+/* Assign grid areas */
+.mk-cell-ranking  { grid-area: ranking; }
+.mk-cell-ruta     { grid-area: ruta; }
+.mk-cell-actions  { grid-area: actions; }
+.mk-cell-also     { grid-area: also; }
+.mk-cell-comments { grid-area: comments; }
+.mk-cell-brand    { grid-area: brand; }
+.mk-cell-chain    { grid-area: chain; }
+.mk-cell-nearby   { grid-area: nearby; }
+.mk-cell-map      { grid-area: map; }
 
 /* ── Sections ── */
 .mk-section {
@@ -473,7 +496,7 @@
 }
 
 /* ── Map ── */
-.mk-section-map { padding: 0; overflow: hidden; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
+.mk-section-map { padding: 0; overflow: hidden; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 0; position: sticky; top: 80px; }
 .mk-mini-map { height: 180px; width: 100%; display: block; }
 .mk-map-address {
   padding: 10px 12px;
@@ -675,25 +698,29 @@
    MOBILE
 ══════════════════════════════════════ */
 @media (max-width: 720px) {
-  /* ── Prevent horizontal overflow ── */
-  .mk-main, .mk-body, .mk-col-main, .mk-col-side {
-    max-width: 100%;
+  /* ── Single column, natural DOM order ── */
+  .mk-body {
+    grid-template-columns: 1fr;
+    grid-template-areas: none; /* cancel desktop areas */
+    padding: 12px 16px 0;
+    gap: 0;
     overflow-x: hidden;
   }
-  .mk-rank-row {
-    min-width: 0; /* allow grid children to shrink */
-  }
-  .mk-rank-info {
+
+  /* All cells: full width, natural DOM order */
+  .mk-cell-ranking, .mk-cell-ruta, .mk-cell-actions,
+  .mk-cell-also, .mk-cell-comments, .mk-cell-brand,
+  .mk-cell-chain, .mk-cell-nearby, .mk-cell-map {
+    grid-area: unset;
     min-width: 0;
-    overflow: hidden;
   }
-  .mk-rank-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .mk-ranking-list.mk-ranking-scroll {
-    overflow-x: hidden; /* no horizontal scroll on ranking */
-  }
+
+  /* ── Prevent horizontal overflow ── */
+  .mk-main, .mk-body { overflow-x: hidden; }
+  .mk-rank-row { min-width: 0; }
+  .mk-rank-info { min-width: 0; overflow: hidden; }
+  .mk-rank-name { overflow: hidden; text-overflow: ellipsis; }
+  .mk-ranking-list.mk-ranking-scroll { overflow-x: hidden; }
 
   /* ── Photo ── */
   .mk-photo-hero { height: 200px; }
@@ -704,39 +731,19 @@
   .mk-score-block { text-align: left; display: flex; align-items: baseline; gap: 12px; }
   .mk-score-number { font-size: 36px; }
   .mk-context-line { padding: 8px 16px 0; }
-
-  /* ── Vote widget ── */
   .mk-vote-inline { margin: 10px 16px 0; gap: 6px; }
   .vote-btn { width: 26px; height: 26px; font-size: 11px; }
   .mk-admin-row { padding: 8px 16px 0; }
 
-  /* ── Two-column body → single column ── */
-  .mk-body {
-    grid-template-columns: 1fr;
-    padding: 16px 16px 0;
-    gap: 0;
-    overflow-x: hidden;
-  }
-
-  /* Main col first, sidebar second */
-  .mk-col-main { order: 1; min-width: 0; }
-  .mk-col-side  { order: 2; min-width: 0; }
-
-  /* Sidebar: flex column, DOM order controls display order */
-  .mk-col-side { display: flex; flex-direction: column; }
-  #mkRutaBadge { margin: 12px 0 0; }
-
-  /* Side actions moved into main col via JS on mobile — add spacing */
-  #mkSideActions {
-    margin: 12px 0;
-  }
+  /* Map: not sticky on mobile */
+  .mk-section-map { position: static; margin-bottom: 16px; }
 
   /* ── Side actions: 2-col grid ── */
   .mk-side-actions {
-    display: grid;
+    display: grid !important;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
-    margin-bottom: 4px;
+    margin: 12px 0;
   }
   .mk-side-actions .mk-side-action-primary { grid-column: 1 / -1; }
   .mk-side-actions .mk-wl-wrap { display: contents; }
@@ -745,11 +752,7 @@
     min-width: unset !important;
   }
 
-  /* ── Map ── */
-  .mk-section-map { margin-bottom: 12px; }
-
   /* ── Misc ── */
-  .mk-also-grid { grid-template-columns: 1fr; }
   .lightbox-thumbs { display: none; }
   .lightbox-img-wrap img { max-width: 95vw; }
   .lightbox-prev { left: 4px; }

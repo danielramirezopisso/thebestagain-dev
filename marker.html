@@ -103,87 +103,80 @@
 
     <div class="mk-body">
 
-      <!-- ── LEFT: RANKING + MAP + DETAILS ── -->
-      <div class="mk-col-main">
+      <!-- Mobile-first order. Desktop layout via CSS grid-area / order -->
 
-        <!-- Full ranking list -->
-        <section class="mk-section" id="mkRankingSection" style="display:none;">
-          <div class="mk-section-head">
-            <span class="mk-section-title" id="mkRankingTitle">The Ranking</span>
-            <a id="editVotesCatLink" href="my-votes.html" class="mk-section-link" style="display:none;">Edit my votes</a>
+      <!-- 1. Ranking (main col, desktop order 1) -->
+      <section class="mk-section mk-cell-ranking" id="mkRankingSection" style="display:none;">
+        <div class="mk-section-head">
+          <span class="mk-section-title" id="mkRankingTitle">The Ranking</span>
+          <a id="editVotesCatLink" href="my-votes.html" class="mk-section-link" style="display:none;">Edit my votes</a>
+        </div>
+        <div class="mk-ranking-list" id="rankingList"></div>
+      </section>
+
+      <!-- 2. Ruta badge (main col, after ranking) -->
+      <div class="mk-cell-ruta" id="mkRutaBadge" style="display:none;"></div>
+
+      <!-- 3. Side actions: Claim / Share / Wishlist (main col) -->
+      <div class="mk-side-actions mk-cell-actions" id="mkSideActions"></div>
+
+      <!-- 4. Also here for (main col) -->
+      <section class="mk-section mk-cell-also" id="alsoSection" style="display:none;">
+        <div class="mk-section-head">
+          <span class="mk-section-title">Also here for</span>
+          <a id="alsoSeeAllLink" href="#" class="mk-section-link" style="display:none;">See all →</a>
+        </div>
+        <div class="mk-also-scroll" id="alsoGrid"></div>
+      </section>
+
+      <!-- 5. Comments (main col) -->
+      <section class="mk-section mk-cell-comments" id="commentsCard">
+        <div class="mk-section-head">
+          <span class="mk-section-title">Comments</span>
+          <span id="commentsCount" class="mk-section-count"></span>
+        </div>
+        <div id="commentWriteArea" style="display:none;">
+          <textarea id="newCommentInput" class="mk-comment-input" placeholder="Share your thoughts…" rows="2" maxlength="500"></textarea>
+          <div class="mk-comment-foot">
+            <span id="newCommentCharCount" class="mk-comment-chars">0 / 500</span>
+            <button class="mk-comment-post" onclick="postComment()">Post</button>
           </div>
-          <div class="mk-ranking-list" id="rankingList"></div>
-        </section>
+        </div>
+        <div id="commentLoginPrompt" class="mk-comment-login" style="display:none;">
+          <a href="login.html">Login</a> to leave a comment.
+        </div>
+        <div id="commentsList"></div>
+      </section>
 
-        <!-- Brand variants (products) -->
-        <section class="mk-section" id="moreBrandCard" style="display:none;">
-          <div class="mk-section-head">
-            <span class="mk-section-title" id="moreBrandHead">More from this brand</span>
-          </div>
-          <div class="mk-ranking-list" id="moreBrandList"></div>
-        </section>
+      <!-- 6. Brand variants (main col, products only) -->
+      <section class="mk-section mk-cell-brand" id="moreBrandCard" style="display:none;">
+        <div class="mk-section-head">
+          <span class="mk-section-title" id="moreBrandHead">More from this brand</span>
+        </div>
+        <div class="mk-ranking-list" id="moreBrandList"></div>
+      </section>
 
-        <!-- Chain locations (places) -->
-        <section class="mk-section" id="moreChainCard" style="display:none;">
-          <div class="mk-section-head">
-            <span class="mk-section-title" id="moreChainHead">Other locations</span>
-          </div>
-          <div class="mk-ranking-list" id="moreChainList"></div>
-        </section>
+      <!-- 7. Chain locations (sidebar on desktop, bottom on mobile) -->
+      <section class="mk-section mk-cell-chain" id="moreChainCard" style="display:none;">
+        <div class="mk-section-head">
+          <span class="mk-section-title" id="moreChainHead">Other locations</span>
+        </div>
+        <div class="mk-also-scroll" id="moreChainList"></div>
+      </section>
 
-        <!-- Also worth trying -->
-        <section class="mk-section" id="alsoSection" style="display:none;">
-          <div class="mk-section-head">
-            <span class="mk-section-title">Also worth trying</span>
-            <a id="alsoSeeAllLink" href="#" class="mk-section-link">See all →</a>
-          </div>
-          <div class="mk-also-grid" id="alsoGrid"></div>
-        </section>
+      <!-- 8. Nearby top picks (sidebar on desktop, bottom on mobile) -->
+      <section class="mk-section mk-cell-nearby" id="nearbySection" style="display:none;">
+        <div class="mk-section-head">
+          <span class="mk-section-title" id="nearbyHead">Top picks nearby</span>
+        </div>
+        <div class="mk-also-scroll" id="nearbyList"></div>
+      </section>
 
-        <!-- Nearby top picks -->
-        <section class="mk-section" id="nearbySection" style="display:none;">
-          <div class="mk-section-head">
-            <span class="mk-section-title" id="nearbyHead">Top picks nearby</span>
-          </div>
-          <div class="mk-also-scroll" id="nearbyList"></div>
-        </section>
-
-        <!-- Comments -->
-        <section class="mk-section" id="commentsCard">
-          <div class="mk-section-head">
-            <span class="mk-section-title">Comments</span>
-            <span id="commentsCount" class="mk-section-count"></span>
-          </div>
-          <div id="commentWriteArea" style="display:none;">
-            <textarea id="newCommentInput" class="mk-comment-input" placeholder="Share your thoughts…" rows="2" maxlength="500"></textarea>
-            <div class="mk-comment-foot">
-              <span id="newCommentCharCount" class="mk-comment-chars">0 / 500</span>
-              <button class="mk-comment-post" onclick="postComment()">Post</button>
-            </div>
-          </div>
-          <div id="commentLoginPrompt" class="mk-comment-login" style="display:none;">
-            <a href="login.html">Login</a> to leave a comment.
-          </div>
-          <div id="commentsList"></div>
-        </section>
-
-      </div>
-
-      <!-- ── RIGHT: MAP + DETAILS ── -->
-      <div class="mk-col-side">
-
-        <!-- Mini map -->
-        <section class="mk-section mk-section-map" id="miniMapCard" style="display:none;">
-          <div id="miniMap" class="mk-mini-map"></div>
-          <div id="miniMapAddress" class="mk-map-address"></div>
-        </section>
-
-        <!-- Details removed — info shown in meta line and map address -->
-
-        <!-- Wishlist / Claim -->
-        <div class="mk-side-actions" id="mkSideActions"></div>
-
-      </div>
+      <!-- 9. Map (sidebar on desktop, bottom on mobile) -->
+      <section class="mk-section mk-section-map mk-cell-map" id="miniMapCard" style="display:none;">
+        <div id="miniMap" class="mk-mini-map"></div>
+        <div id="miniMapAddress" class="mk-map-address"></div>
+      </section>
 
     </div><!-- /.mk-body -->
 

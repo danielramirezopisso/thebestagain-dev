@@ -1632,15 +1632,7 @@ async function initMarkerPage() {
   if (loading) loading.style.display = "none";
   if (main) main.style.display = "block";
 
-  // On mobile: physically move side actions into main column
-  // after alsoSection so order is: ranking → also → actions → comments
-  if (window.innerWidth <= 720) {
-    const sideActions = document.getElementById("mkSideActions");
-    const commentsCard = document.getElementById("commentsCard");
-    if (sideActions && commentsCard && commentsCard.parentNode) {
-      commentsCard.parentNode.insertBefore(sideActions, commentsCard);
-    }
-  }
+  // Layout handled by CSS grid-template-areas (desktop) and natural DOM order (mobile)
 
   renderHero(m, user);
   renderRating(m);
@@ -1650,14 +1642,7 @@ async function initMarkerPage() {
   if (m.group_type === "place") {
     renderMiniMap(m);
     await renderRutaBadge(m); // rutas only for places
-    // Move ruta badge to sidebar — CSS order controls position per breakpoint
-    // Desktop: order not set → appears before map (default DOM order in sidebar)
-    // Mobile: order: 4 → appears after chain/nearby, before map
-    const rutaBadgeEl = document.getElementById("mkRutaBadge");
-    const mapCard = document.getElementById("miniMapCard");
-    if (rutaBadgeEl && mapCard && rutaBadgeEl.style.display !== "none") {
-      mapCard.parentNode.insertBefore(rutaBadgeEl, mapCard);
-    }
+    // Ruta badge positioned via HTML/CSS, no JS movement needed
   } else {
     // Products: hide map and ruta badge
     const mapCard = document.getElementById("miniMapCard");
@@ -1721,6 +1706,7 @@ async function renderRutaBadge(m) {
         <span class="mk-ruta-badge-stops">Stop ${stopPos} of ${count || "?"}</span>
       </a>`;
     badge.style.display = "block";
+    // No JS movement — position controlled by HTML order + CSS grid-template-areas
   } catch(e) {
     // Silently fail
   }
