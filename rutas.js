@@ -9,6 +9,7 @@ let MY_VOTES = {};
 let CATEGORIES_MAP = {};
 let CURRENT_USER = null;
 let RUTA_MAP_INSTANCE = null;
+let RUTA_MAP_MOBILE   = null;
 let RUTA_ITEMS_BY_CAT = {}; // category_id -> ruta_items array
 let RUTA_MAP_OPEN = false;
 
@@ -400,11 +401,12 @@ const CITY_CENTERS = {
 
 function initRutaMap(ruta) {
   if (!ruta) return;
-  const mapWrap = document.getElementById('rutaMapWrap');
   const isMobile = window.innerWidth <= 768;
+  const mapWrap = document.getElementById('rutaMapWrap');
   if (!isMobile) mapWrap.style.display = 'block';
 
   if (RUTA_MAP_INSTANCE) { RUTA_MAP_INSTANCE.remove(); RUTA_MAP_INSTANCE = null; }
+  if (RUTA_MAP_MOBILE) { RUTA_MAP_MOBILE.remove(); RUTA_MAP_MOBILE = null; }
 
   const cityCenter = CITY_CENTERS[SELECTED_CITY] || CITY_CENTERS.BCN;
   const markers = RUTA_ITEMS.filter(ri => ri.markers?.lat && ri.markers?.lon && ri.markers?.is_active);
@@ -448,10 +450,53 @@ function initRutaMap(ruta) {
         RUTA_MAP_INSTANCE.setView(cityCenter, 14);
       }
     } else {
-      // No markers with coordinates — use city center
       RUTA_MAP_INSTANCE.setView(cityCenter, 14);
     }
   }, 100);
+
+  // Mobile map — always open below the grid, separate instance
+  if (isMobile) {
+    const mobileWrap = document.getElementById('rutaMapMobile');
+    if (mobileWrap) {
+      setTimeout(() => {
+        if (RUTA_MAP_MOBILE) { RUTA_MAP_MOBILE.remove(); RUTA_MAP_MOBILE = null; }
+        RUTA_MAP_MOBILE = L.map('rutaMapM', {
+          zoomControl: true,
+          scrollWheelZoom: false,
+          center: cityCenter,
+          zoom: 14
+        });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap', maxZoom: 18
+        }).addTo(RUTA_MAP_MOBILE);
+
+        const mMarkers = [];
+        markers.forEach(ri => {
+          const m = ri.markers;
+          const myVote = MY_VOTES[`${m.id}__${ruta.category_id}`];
+          const cls = myVote ? colorClassForScore(myVote.vote) : 'ruta-score-none';
+          const icon = L.divIcon({
+            className: `tba-marker ${cls}`,
+            html: `<div class="tba-marker-inner">${iconUrl ? `<img src="${escapeHtml(iconUrl)}" alt="" />` : ''}</div>`,
+            iconSize: [30, 30], iconAnchor: [15, 15]
+          });
+          L.marker([m.lat, m.lon], { icon }).addTo(RUTA_MAP_MOBILE)
+            .bindPopup(`<b>${escapeHtml(m.title)}</b>${myVote ? `<br>Your vote: ${myVote.vote}` : ''}`);
+          mMarkers.push(L.marker([m.lat, m.lon]));
+        });
+
+        if (mMarkers.length > 0) {
+          try {
+            RUTA_MAP_MOBILE.fitBounds(
+              L.featureGroup(mMarkers).getBounds().pad(0.2)
+            );
+          } catch(e) {
+            RUTA_MAP_MOBILE.setView(cityCenter, 14);
+          }
+        }
+      }, 150);
+    }
+  }
 }
 
 /* ══════════════════════════════
