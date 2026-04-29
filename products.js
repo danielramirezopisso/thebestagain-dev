@@ -421,7 +421,7 @@ function renderLane(catId, markersForCat){
     const unvisited = JOURNEY_MODE_PROD && !MY_VOTED_IDS_PROD.has(m.id); // grey only in journey mode
     return `
       <div class="item-row${unvisited ? " journey-unvisited-item" : ""}">
-        <a class="item" href="marker.html?id=${encodeURIComponent(m.id)}">
+        <a class="item" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${encodeURIComponent(catId)}">
           <div class="item-left">
             ${brandIconSlotHtml(m.brand_id)}
             <div class="item-name">${escapeHtml(displayName)}</div>
@@ -473,7 +473,7 @@ function renderDrawer(){
     const displayName = m.product_name || brand;
     return `
       <div class="item-row">
-        <a class="item" href="marker.html?id=${encodeURIComponent(m.id)}">
+        <a class="item" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${encodeURIComponent(catId)}">
           <div class="item-left">
             ${brandIconSlotHtml(m.brand_id)}
             <div class="item-name">${escapeHtml(displayName)}</div>

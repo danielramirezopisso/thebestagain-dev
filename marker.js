@@ -504,7 +504,18 @@ async function renderRankingWidget(m) {
     .eq("is_active", true);
 
   let markerIds = (mcData || []).map(r => r.marker_id);
-  if (!markerIds.length) return;
+
+  // If no marker_categories entries (e.g. products only have category_id on markers table)
+  // fall back to querying markers directly by category_id
+  if (!markerIds.length) {
+    const { data: directData } = await sb.from("markers")
+      .select("id")
+      .eq("is_active", true)
+      .eq("group_type", m.group_type)
+      .eq("category_id", activeCatId);
+    markerIds = (directData || []).map(r => r.id);
+    if (!markerIds.length) return;
+  }
 
   const currentCity = markerCity(m); // null for products → no city filter
 
