@@ -337,6 +337,49 @@ function renderRating(m, rankPos, rankTotal) {
 }
 
 /* ══════════════════════════════
+   RANKING INLINE VOTE
+══════════════════════════════ */
+function toggleRankVote(e, markerId, catId) {
+  e.preventDefault(); e.stopPropagation();
+  // Close any other open vote panels
+  document.querySelectorAll(".mk-rank-vote-btns").forEach(el => {
+    if (el.id !== "rvb-" + markerId) el.style.display = "none";
+  });
+  const btns = document.getElementById("rvb-" + markerId);
+  if (btns) btns.style.display = btns.style.display === "none" ? "flex" : "none";
+}
+
+async function castRankVote(e, value, markerId, catId) {
+  e.preventDefault(); e.stopPropagation();
+  if (!window._mkUser) return;
+
+  // Hide number buttons
+  const btns = document.getElementById("rvb-" + markerId);
+  if (btns) btns.style.display = "none";
+
+  // Save to DB
+  const { error } = await sb.from("votes").upsert(
+    [{ marker_id: markerId, user_id: window._mkUser.id, vote: value, category_id: catId, is_active: true }],
+    { onConflict: "marker_id,category_id,user_id" }
+  );
+  if (error) { console.error("Vote error:", error.message); return; }
+
+  // Update local state and re-render just the vote cell
+  const wrap = document.querySelector(`#rvb-${markerId}`)?.closest(".mk-rank-vote-wrap");
+  if (wrap) {
+    wrap.innerHTML = `<span class="mk-rank-my-vote">${value}</span>`;
+  }
+
+  // If this is the current marker, refresh the score block too
+  if (markerId === MARKER_ID) {
+    CURRENT_VOTE = value;
+    renderVoteButtons();
+    await refreshMarker();
+    renderRating(CURRENT_MARKER);
+  }
+}
+
+/* ══════════════════════════════
    RENDER VOTE BUTTONS
 ══════════════════════════════ */
 function renderVoteButtons() {
@@ -475,6 +518,18 @@ async function renderRankingWidget(m) {
   if (currentCity) markersQ = markersQ.eq("city", currentCity);
   const { data, error } = await markersQ;
 
+  // Fetch user votes for all markers in this category (for inline display)
+  const RANKING_MY_VOTES = {};
+  if (window._mkUser) {
+    const { data: uvData } = await sb.from("votes")
+      .select("marker_id, vote")
+      .eq("user_id", window._mkUser.id)
+      .eq("category_id", activeCatId)
+      .eq("is_active", true)
+      .in("marker_id", (data || []).map(r => r.id));
+    (uvData || []).forEach(v => { RANKING_MY_VOTES[v.marker_id] = Number(v.vote); });
+  }
+
   if (error || !data?.length) return;
 
   // Sort: avg desc, count as tiebreaker
@@ -528,9 +583,26 @@ async function renderRankingWidget(m) {
         let name = r.title;
         if (m.group_type === "product" && r.brand_id) name = getBrandById(r.brand_id)?.name || r.title;
         const href = `marker.html?id=${encodeURIComponent(r.id)}&cat=${encodeURIComponent(activeCatId)}`;
-        const voteBtn = (window._mkUser && !isCurrent)
-          ? `<a class="mk-rank-vote-btn" href="${href}" title="Vote">Vote</a>`
-          : "";
+
+        // My vote for this row
+        const myVote = RANKING_MY_VOTES[r.id];
+        let voteHtml = "";
+        if (window._mkUser) {
+          if (myVote !== undefined) {
+            // Already voted — show score
+            voteHtml = `<span class="mk-rank-my-vote">${myVote % 1 === 0 ? myVote : myVote.toFixed(1)}</span>`;
+          } else if (!isCurrent) {
+            // Not voted — show inline vote chip
+            voteHtml = `
+              <button class="mk-rank-vote-chip" onclick="toggleRankVote(event,'${r.id}','${activeCatId}')" title="Vote">★</button>
+              <div class="mk-rank-vote-btns" id="rvb-${r.id}" style="display:none;">
+                ${[1,2,3,4,5,6,7,8,9,10].map(n =>
+                  `<button class="mk-rank-vote-n" onclick="castRankVote(event,${n},'${r.id}','${activeCatId}')">${n}</button>`
+                ).join("")}
+              </div>`;
+          }
+        }
+
         return `<a class="mk-rank-row ${isCurrent ? "mk-rank-current" : ""}" href="${href}" id="${isCurrent ? "mkCurrentRankRow" : ""}">
           <div class="mk-rank-pos">${pos}</div>
           <div class="mk-rank-info">
@@ -538,7 +610,7 @@ async function renderRankingWidget(m) {
             <div class="mk-rank-bar-wrap"><div class="mk-rank-bar" style="width:${cnt ? pct : 0}%"></div></div>
           </div>
           <div class="mk-rank-score ${cnt ? "" : "mk-rank-score-none"}">${escapeHtml(scoreText)}</div>
-          ${voteBtn}
+          <div class="mk-rank-vote-wrap">${voteHtml}</div>
         </a>`;
       }
 
