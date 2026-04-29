@@ -501,7 +501,10 @@ async function renderRankingWidget(m) {
 
     // Title
     const titleEl = document.getElementById("mkRankingTitle");
-    if (titleEl) titleEl.textContent = `${escapeHtml(cat.name)} · ${m.group_type === "place" ? "BCN" : ""}`;
+    const cityLabel = m.group_type === "place" && m.city
+      ? ` · ${m.city === "BCN" ? "Barcelona" : m.city === "MAD" ? "Madrid" : m.city}`
+      : "";
+    if (titleEl) titleEl.textContent = `${escapeHtml(cat.name)}${cityLabel}`;
 
     // Edit link
     const editLink = document.getElementById("editVotesCatLink");
@@ -563,45 +566,54 @@ async function renderRankingWidget(m) {
    MORE FROM THIS BRAND
 ══════════════════════════════ */
 async function renderMoreFromBrand(m) {
-  const card = document.getElementById("moreBrandCard");
-  if (!card || m.group_type !== "product" || !m.brand_id) return;
+  const section = document.getElementById("moreBrandCard");
+  if (!section || m.group_type !== "product" || !m.brand_id) return;
 
   const brand = getBrandById(m.brand_id);
   if (!brand) return;
 
-  // Load all active products from same brand, excluding current marker
+  const activeCatId = ACTIVE_CATEGORY_ID || m.category_id;
+
+  // Same brand, DIFFERENT category (current category already shown in ranking)
   const { data, error } = await sb
     .from("markers")
-    .select("id,title,rating_avg,rating_count,category_id,product_name,brand_id")
+    .select("id,title,rating_avg,rating_count,category_id,brand_id")
     .eq("is_active", true)
     .eq("group_type", "product")
     .eq("brand_id", m.brand_id)
-    .neq("id", MARKER_ID)
+    .neq("category_id", activeCatId)  // exclude current category
     .order("rating_avg", { ascending: false });
 
-  if (error || !data?.length) return;
+  if (error || !data?.length) { section.style.display = "none"; return; }
 
-  document.getElementById("moreBrandHead").textContent = `More from ${brand.name}`;
+  // Update section title
+  const headEl = document.getElementById("moreBrandHead");
+  if (headEl) headEl.textContent = `More from ${escapeHtml(brand.name)}`;
 
-  const activeCatId = ACTIVE_CATEGORY_ID || m.category_id;
-  document.getElementById("moreBrandList").innerHTML = data.map(r => {
+  // Pill design — show category name + score
+  const listEl = document.getElementById("moreBrandList");
+  if (!listEl) return;
+  listEl.className = "mk-also-scroll";
+  listEl.innerHTML = data.map(r => {
     const avg = Number(r.rating_avg ?? 0);
     const cnt = Number(r.rating_count ?? 0);
-    const cls = colorClass(avg, cnt);
-    const scoreText = cnt ? avg.toFixed(1) : "—";
+    const score = cnt ? avg.toFixed(1) : "—";
     const cat = getCategoryById(r.category_id);
-    const displayName = r.product_name
-      ? `${escapeHtml(cat?.name || "")} · ${escapeHtml(r.product_name)}`
-      : escapeHtml(cat?.name || r.title);
+    const catName = cat?.name || "";
+    const iconUrl = cat?.icon_url
+      ? (cat.icon_url.startsWith("http") ? cat.icon_url
+          : window.location.href.replace(/\/[^/]*(\?.*)?$/, "/") + cat.icon_url)
+      : "";
     const href = `marker.html?id=${encodeURIComponent(r.id)}&cat=${r.category_id}`;
     return `
-      <a class="rank-row" href="${href}">
-        <div class="rank-name">${displayName}</div>
-        <div class="rank-score ${cls}">${escapeHtml(scoreText)}</div>
+      <a class="mk-also-pill mk-brand-pill" href="${href}">
+        ${iconUrl ? `<img class="mk-also-pill-icon" src="${escapeHtml(iconUrl)}" alt="" onerror="this.style.display='none'" />` : ""}
+        <span class="mk-also-pill-name">${escapeHtml(catName)}</span>
+        <span class="mk-also-pill-score">${escapeHtml(score)}</span>
       </a>`;
   }).join("");
 
-  card.style.display = "block";
+  section.style.display = "block";
 }
 
 /* ══════════════════════════════
@@ -1641,14 +1653,13 @@ async function initMarkerPage() {
 
   if (m.group_type === "place") {
     renderMiniMap(m);
-    await renderRutaBadge(m); // rutas only for places
-    // Ruta badge positioned via HTML/CSS, no JS movement needed
+    await renderRutaBadge(m);
   } else {
-    // Products: hide map and ruta badge
-    const mapCard = document.getElementById("miniMapCard");
-    if (mapCard) mapCard.style.display = "none";
-    const rutaBadge = document.getElementById("mkRutaBadge");
-    if (rutaBadge) rutaBadge.style.display = "none";
+    // Products: hide all place-specific sections
+    ["miniMapCard","mkRutaBadge","moreChainCard","nearbySection"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = "none";
+    });
   }
 
   await renderRankingWidget(m);
