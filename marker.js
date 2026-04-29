@@ -510,7 +510,7 @@ async function renderRankingWidget(m) {
 
   // Build markers query — filter by city if it's a place
   let markersQ = sb.from("markers")
-    .select("id,title,rating_avg,rating_count,brand_id,city")
+    .select("id,title,rating_avg,rating_count,brand_id,product_name,city")
     .eq("is_active", true)
     .eq("group_type", m.group_type)
     .in("id", markerIds)
@@ -542,7 +542,7 @@ async function renderRankingWidget(m) {
   const currentIdx = sorted.findIndex(r => r.id === m.id);
   // If not found (e.g. current marker filtered out), insert it at the end
   if (currentIdx === -1) {
-    sorted.push({ id: m.id, title: m.title, rating_avg: m.rating_avg, rating_count: m.rating_count, brand_id: m.brand_id, city: m.city });
+    sorted.push({ id: m.id, title: m.title, rating_avg: m.rating_avg, rating_count: m.rating_count, brand_id: m.brand_id, product_name: m.product_name, city: m.city });
   }
   const resolvedIdx = currentIdx === -1 ? sorted.length - 1 : currentIdx;
   const position = resolvedIdx + 1;
@@ -581,7 +581,12 @@ async function renderRankingWidget(m) {
         const scoreText = cnt ? avg.toFixed(1) : "—";
         const isCurrent = r.id === m.id;
         let name = r.title;
-        if (m.group_type === "product" && r.brand_id) name = getBrandById(r.brand_id)?.name || r.title;
+        if (m.group_type === "product") {
+          const brand = r.brand_id ? getBrandById(r.brand_id)?.name : null;
+          if (brand && r.product_name) name = `${brand} · ${r.product_name}`;
+          else if (brand) name = brand;
+          // else keep r.title as fallback
+        }
         const href = `marker.html?id=${encodeURIComponent(r.id)}&cat=${encodeURIComponent(activeCatId)}`;
 
         // My vote for this row
