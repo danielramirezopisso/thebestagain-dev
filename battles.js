@@ -335,11 +335,10 @@ function renderVotedGrid(battles) {
 }
 
 function buildVotedCard(battle) {
-  const myChoice = MY_VOTES[battle.id];
-  const counts   = TALLY[battle.id] || { a: 0, b: 0 };
+  const myChoice   = MY_VOTES[battle.id];
+  const counts     = TALLY[battle.id] || { a: 0, b: 0 };
   const totalVotes = (counts.a || 0) + (counts.b || 0);
 
-  // Percentages — based on actual vote counts
   let pctA = 0, pctB = 0;
   if (totalVotes > 0) {
     pctA = Math.round((counts.a / totalVotes) * 100);
@@ -348,9 +347,8 @@ function buildVotedCard(battle) {
 
   const hasBoth   = !!(battle.image_a_url && battle.image_b_url);
   const hasSingle = !!(battle.image_a_url && !battle.image_b_url);
-  // For single image: same image for both sides rendered as one wide image
-  const imgA = hasBoth ? battle.image_a_url : hasSingle ? battle.image_a_url : null;
-  const imgB = hasBoth ? battle.image_b_url : null;
+  const imgA      = hasBoth ? battle.image_a_url : hasSingle ? battle.image_a_url : null;
+  const imgB      = hasBoth ? battle.image_b_url : null;
 
   const chosenA = myChoice === 'a';
   const chosenB = myChoice === 'b';
@@ -362,15 +360,14 @@ function buildVotedCard(battle) {
   card.className = 'bv-card';
   card.id = 'voted-' + battle.id;
 
-  // ── Image area ──
-  let imageHtml;
+  // Optional image strip
+  let imageHtml = '';
   if (hasSingle) {
-    // One image spanning both sides — no duplication
     imageHtml = `
       <div class="bv-image-single" style="background-image:url('${esc(imgA)}')">
         <div class="bv-single-labels">
-          <button class="bv-single-label${chosenA ? ' chosen' : ''}" onclick="handleVotedClick('${battle.id}','a')">${chosenA ? '✓ ' : ''}${esc(battle.option_a)}</button>
-          <button class="bv-single-label${chosenB ? ' chosen' : ''}" onclick="handleVotedClick('${battle.id}','b')">${chosenB ? '✓ ' : ''}${esc(battle.option_b)}</button>
+          <button class="bv-single-label${chosenA ? ' chosen' : ''}" onclick="handleVotedClick('${battle.id}','a')">${esc(battle.option_a)}</button>
+          <button class="bv-single-label${chosenB ? ' chosen' : ''}" onclick="handleVotedClick('${battle.id}','b')">${esc(battle.option_b)}</button>
         </div>
       </div>`;
   } else if (hasBoth) {
@@ -380,51 +377,26 @@ function buildVotedCard(battle) {
         <div class="bv-img${chosenB ? ' chosen' : ' dimmed'}" style="background-image:url('${esc(imgB)}')" onclick="handleVotedClick('${battle.id}','b')"></div>
       </div>`;
   } else {
-    // No images — simple text buttons
+    // No images — inline text options
     imageHtml = `
       <div class="bv-text-options">
-        <button class="bv-text-opt${chosenA ? ' chosen' : ''}" onclick="handleVotedClick('${battle.id}','a')">${chosenA ? '✓ ' : ''}${esc(battle.option_a)}</button>
-        <span class="bv-vs">VS</span>
-        <button class="bv-text-opt${chosenB ? ' chosen' : ''}" onclick="handleVotedClick('${battle.id}','b')">${chosenB ? '✓ ' : ''}${esc(battle.option_b)}</button>
+        <button class="bv-text-opt${chosenA ? ' chosen' : ''}" onclick="handleVotedClick('${battle.id}','a')">${esc(battle.option_a)}</button>
+        <span class="bv-vs">vs</span>
+        <button class="bv-text-opt${chosenB ? ' chosen' : ''}" onclick="handleVotedClick('${battle.id}','b')">${esc(battle.option_b)}</button>
       </div>`;
   }
 
-  // ── Result rows ──
-  // Row A
-  const rowA = buildResultRow({
-    label:   battle.option_a,
-    pct:     pctA,
-    votes:   counts.a || 0,
-    chosen:  chosenA,
-    leader:  leaderA,
-    side:    'a',
-    battleId: battle.id,
-    noOp
-  });
-  // Row B
-  const rowB = buildResultRow({
-    label:   battle.option_b,
-    pct:     pctB,
-    votes:   counts.b || 0,
-    chosen:  chosenB,
-    leader:  leaderB,
-    side:    'b',
-    battleId: battle.id,
-    noOp
-  });
+  const rowA = buildResultRow({ label: battle.option_a, pct: pctA, chosen: chosenA, leader: leaderA, side: 'a', battleId: battle.id, noOp });
+  const rowB = buildResultRow({ label: battle.option_b, pct: pctB, chosen: chosenB, leader: leaderB, side: 'b', battleId: battle.id, noOp });
 
-  const votesLabel = noOp
-    ? 'No opinion'
+  const votesLabel = noOp ? 'No opinion'
     : totalVotes === 0 ? 'No votes yet'
     : `${totalVotes.toLocaleString()} vote${totalVotes !== 1 ? 's' : ''}`;
 
   card.innerHTML = `
     <div class="bv-question">${esc(battle.question)}</div>
     ${imageHtml}
-    <div class="bv-results">
-      ${rowA}
-      ${rowB}
-    </div>
+    <div class="bv-results">${rowA}${rowB}</div>
     <div class="bv-footer">
       <span class="bv-vote-count">${votesLabel}</span>
       <button class="bv-share-btn" onclick="shareBattle(event,'${battle.id}')">Share ↗</button>
@@ -433,19 +405,19 @@ function buildVotedCard(battle) {
   return card;
 }
 
-function buildResultRow({ label, pct, votes, chosen, leader, side, battleId, noOp }) {
+function buildResultRow({ label, pct, chosen, leader, side, battleId, noOp }) {
   const cls = ['bv-row'];
   if (chosen) cls.push('bv-row-chosen');
   if (leader) cls.push('bv-row-leader');
 
-  // Bar width = exactly pct% (never lies)
   return `
     <div class="${cls.join(' ')}" onclick="handleVotedClick('${battleId}','${side}')">
       <div class="bv-row-pct">${noOp ? '—' : pct + '%'}</div>
-      <div class="bv-row-bar-wrap">
-        <div class="bv-row-bar" style="width:${noOp ? 0 : pct}%"></div>
+      <div class="bv-row-middle">
+        <div class="bv-row-bar-wrap"><div class="bv-row-bar" style="width:${noOp ? 0 : pct}%"></div></div>
+        <div class="bv-row-label">${esc(label)}</div>
       </div>
-      <div class="bv-row-label">${chosen ? '✓ ' : ''}${esc(label)}</div>
+      <div class="bv-row-check">✓</div>
     </div>`;
 }
 
