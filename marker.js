@@ -125,6 +125,18 @@ function renderHero(m, user) {
     metaEl.textContent = parts.join(" · ");
   }
 
+  // Revenue CTA
+  const ctaEl = document.getElementById("mkRevenueCta");
+  if (ctaEl) {
+    if (isPlace) {
+      ctaEl.innerHTML = `<button class="mk-revenue-cta-btn" onclick="openTraction('preorder','${escapeHtml(MARKER_ID)}','${escapeHtml(cat?.name || '')}')">🛒 Pre-order here</button>`;
+      ctaEl.style.display = "block";
+    } else {
+      ctaEl.innerHTML = `<button class="mk-revenue-cta-btn" onclick="openTraction('top5','${escapeHtml(activeCatId)}','${escapeHtml(cat?.name || '')}')">🍽️ Taste the Top 5</button>`;
+      ctaEl.style.display = "block";
+    }
+  }
+
   // Placeholder icon (shown when no photos)
   const placeholderIcon = document.getElementById("mkPhotoPlaceholderIcon");
   if (placeholderIcon && cat?.icon_url) {
