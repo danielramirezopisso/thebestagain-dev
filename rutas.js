@@ -255,15 +255,8 @@ function updateStickyBar() {
 function renderGrid(ruta) {
   const catId = ruta.category_id;
 
-  // Sort: voted first (by score desc), unvoted last
-  const sorted = [...RUTA_ITEMS].sort((a, b) => {
-    const aVote = MY_VOTES[`${a.markers?.id}__${catId}`];
-    const bVote = MY_VOTES[`${b.markers?.id}__${catId}`];
-    if (aVote && bVote) return Number(bVote.vote) - Number(aVote.vote);
-    if (aVote) return -1;
-    if (bVote) return 1;
-    return a.position - b.position;
-  });
+  // Sort: always by position (fixed order regardless of votes)
+  const sorted = [...RUTA_ITEMS].sort((a, b) => a.position - b.position);
 
   document.getElementById('rutaGrid').innerHTML = sorted.map((ri, idx) =>
     renderRutaItem(ri, catId, idx)
