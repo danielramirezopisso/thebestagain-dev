@@ -1755,11 +1755,12 @@ async function initMarkerPage() {
     renderMiniMap(m);
     await renderRutaBadge(m);
   } else {
-    // Products: hide all place-specific sections
+    // Products: hide all place-specific sections + switch to single-column layout
     ["miniMapCard","mkRutaBadge","moreChainCard","nearbySection"].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = "none";
     });
+    document.querySelector(".mk-body")?.classList.add("mk-product-layout");
   }
 
   await renderRankingWidget(m);
