@@ -280,43 +280,37 @@
   gap: 0 28px;
   align-items: start;
 
-  /* Desktop: two columns */
+  /* Desktop: left = content, right = sidebar (flex col, hidden items collapse) */
   grid-template-columns: 1fr 300px;
   grid-template-areas:
-    "ranking  cta"
-    "ranking  ruta"
-    "ranking  map"
-    "ranking  actions"
-    "also     chain"
+    "ranking  sidebar"
+    "also     sidebar"
     "nearby   ."
     "comments ."
-    "brand    .";
+    "brand    ."
+    "chain    .";
+  align-items: start;
 }
 
-/* Products: single column, no right sidebar */
-.mk-body.mk-product-layout {
-  grid-template-columns: 1fr;
-  grid-template-areas:
-    "cta"
-    "ranking"
-    "also"
-    "nearby"
-    "comments"
-    "brand"
-    "chain";
-}
-
-/* Assign grid areas — use both class and ID selectors */
+/* Left column */
 .mk-cell-ranking, #mkRankingSection  { grid-area: ranking; }
-.mk-cell-ruta,    #mkRutaBadge       { grid-area: ruta; }
-.mk-cell-actions, #mkSideActions     { grid-area: actions; }
 .mk-cell-also,    #alsoSection       { grid-area: also; }
 .mk-cell-comments,#commentsCard      { grid-area: comments; }
 .mk-cell-brand,   #moreBrandCard     { grid-area: brand; }
-.mk-cell-cta,     #mkRevenueCta      { grid-area: cta; }
 .mk-cell-chain,   #moreChainCard     { grid-area: chain; }
 .mk-cell-nearby,  #nearbySection     { grid-area: nearby; }
-.mk-cell-map,     #miniMapCard       { grid-area: map; }
+
+/* Right column: single wrapper div that stacks all sidebar items */
+.mk-cell-sidebar, #mkSidebar {
+  grid-area: sidebar;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  align-self: start;
+  min-width: 0;
+}
+/* Hidden items inside sidebar collapse naturally in flex */
+#mkSidebar > * { width: 100%; }
 
 /* ── Sections ── */
 .mk-section {
@@ -729,11 +723,17 @@
   .mk-cell-ranking, .mk-cell-ruta, .mk-cell-actions,
   .mk-cell-also, .mk-cell-comments, .mk-cell-brand,
   .mk-cell-chain, .mk-cell-nearby, .mk-cell-map,
-  #mkRankingSection, #mkRutaBadge, #mkSideActions,
-  #mkRevenueCta, #alsoSection, #commentsCard, #moreBrandCard,
-  #moreChainCard, #nearbySection, #miniMapCard {
+  #mkRankingSection, #mkSidebar, #alsoSection, #commentsCard,
+  #moreBrandCard, #moreChainCard, #nearbySection,
+  .mk-cell-ranking, .mk-cell-sidebar, .mk-cell-also,
+  .mk-cell-comments, .mk-cell-brand, .mk-cell-chain, .mk-cell-nearby {
     grid-area: unset !important;
     min-width: 0;
+  }
+  /* On mobile sidebar becomes normal block flow */
+  #mkSidebar {
+    flex-direction: column;
+    order: 2; /* sidebar goes after main content on mobile */
   }
 
   /* ── Prevent horizontal overflow ── */

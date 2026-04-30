@@ -112,14 +112,16 @@
         <div class="mk-ranking-list" id="rankingList"></div>
       </section>
 
-      <!-- 2. Ruta badge (main col, after ranking) -->
-      <div class="mk-cell-ruta" id="mkRutaBadge" style="display:none;"></div>
-
-      <!-- 3. Revenue CTA (pre-order for places, top5 for products) -->
-      <div class="mk-cell-cta" id="mkRevenueCta" style="display:none;"></div>
-
-      <!-- 4. Side actions: Claim / Share / Wishlist (main col) -->
-      <div class="mk-side-actions mk-cell-actions" id="mkSideActions"></div>
+      <!-- 3. Sidebar: Revenue CTA + Ruta + Map + Actions — one flex column container -->
+      <div class="mk-cell-sidebar" id="mkSidebar">
+        <div id="mkRevenueCta" style="display:none;"></div>
+        <div id="mkRutaBadge" style="display:none;"></div>
+        <section class="mk-section mk-section-map" id="miniMapCard" style="display:none;">
+          <div id="miniMap" class="mk-mini-map"></div>
+          <div id="miniMapAddress" class="mk-map-address"></div>
+        </section>
+        <div class="mk-side-actions" id="mkSideActions"></div>
+      </div>
 
       <!-- 4. Also here for (main col) -->
       <section class="mk-section mk-cell-also" id="alsoSection" style="display:none;">
@@ -171,12 +173,6 @@
           <span class="mk-section-title" id="moreChainHead">Other locations</span>
         </div>
         <div class="mk-also-scroll" id="moreChainList"></div>
-      </section>
-
-      <!-- 9. Map (sidebar on desktop, bottom on mobile) -->
-      <section class="mk-section mk-section-map mk-cell-map" id="miniMapCard" style="display:none;">
-        <div id="miniMap" class="mk-mini-map"></div>
-        <div id="miniMapAddress" class="mk-map-address"></div>
       </section>
 
     </div><!-- /.mk-body -->
