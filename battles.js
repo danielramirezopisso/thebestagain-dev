@@ -74,8 +74,8 @@ async function initBattles() {
   const allVotes = votesRes.data || [];
 
   if (!ALL_BATTLES.length) {
-    hide('battlesSkeletonWrap');
-    show('battlesEmpty');
+    hide('debatesSkeleton');
+    show('debatesEmpty');
     return;
   }
 
