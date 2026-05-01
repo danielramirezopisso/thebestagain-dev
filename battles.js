@@ -23,13 +23,37 @@ function saveLocalVote(id, choice) {
   localStorage.setItem(VOTED_KEY, JSON.stringify(v));
 }
 
+
+// Editorial descriptions for each debate
+const DEBATE_DESCRIPTIONS = {
+  "cebolla": "La pregunta que divide familias en España desde generaciones. ¿Eres de los que no conciben una tortilla sin cebolla, o defiendes la pureza de la patata y el huevo?",
+  "babosa": "Hay dos tipos de personas: las que buscan el centro jugoso y cremoso, y las que prefieren una textura más firme y consistente. ¿En qué bando estás?",
+  "piña": "El debate más polarizante de la pizza. La piña en la pizza: ¿atrevida combinación agridulce o sacrilegio culinario imperdonable?",
+  "bordes": "El crust de la pizza tiene sus fans incondicionales y sus detractores acérrimos. ¿Te comes los bordes hasta el final o los dejas en el plato?",
+  "McDonald": "Dos imperios, dos filosofías, una sola hambre. La cheeseburger definitiva: ¿la clásica de McDonald's o la del Burger King?",
+  "pepinillo": "Pequeño, verde y muy controversial. El pepinillo en la hamburguesa: ¿le da ese toque ácido perfecto o arruina todo lo que toca?",
+  "Patatas fritas": "Las patatas fritas del fast food: ¿las finas y crujientes del arco dorado o las más gordas y sabrosas del rey?",
+  "croqueta": "La croqueta es sagrada en España. Pero ¿cuál es la reina? ¿La suave y contundente de jamón ibérico o la delicada y cremosa de pollo?",
+  "Desayuno": "Un debate de toda la vida. ¿Empiezas el día con una tostada con tomate y aceite, o te vas a los bollos, croissants y chocolate?",
+  "ColaCao": "El clásico del desayuno infantil español. ¿ColaCao con su textura característica o el suave Nesquick que se disuelve perfectamente?",
+  "Nutella": "Las dos grandes cremas de cacao. ¿La italiana Nutella con su sabor más intenso y famoso, o la española Nocilla que muchos llevamos en el alma?",
+  "Churros": "Crujientes, calientes y para mojar en chocolate. ¿Los churros finos y crujientes de toda la vida, o las porras más gordas y esponjosas?",
+  "Coca": "El debate de las colas. ¿La inconfundible Coca-Cola o la Pepsi con su sabor ligeramente más dulce? La pregunta de siempre.",
+  "Fanta": "La naranja en versión gaseosa. ¿La Fanta internacional con su sabor globalmente conocido, o el Kas naranja genuinamente español?",
+  "cerveza": "Para acompañar una buena comida, ¿qué eliges? ¿Una cerveza bien fría que refresca con cada bocado, o un buen vino que marida y eleva el sabor?"
+};
+
+function getDescription(question) {
+  for (const [key, desc] of Object.entries(DEBATE_DESCRIPTIONS)) {
+    if (question.includes(key)) return desc;
+  }
+  return '';
+}
+
 /* ── Global state ── */
 let ALL_BATTLES        = [];
 let TALLY              = {}; // battle_id → { a: N, b: N } — only active votes
 let MY_VOTES           = {}; // battle_id → 'a' | 'b' | 'no_opinion'
-let STACK_IDS          = [];
-let IS_ANIMATING       = false;
-let ACTIVE_SWIPE_CLEANUP = null;
 
 /* ═══════════════════════════════════════
    INIT
@@ -89,200 +113,41 @@ async function initBattles() {
     MY_VOTES = { ...getLocalVotes(), ...dbMap };
   }
 
-  STACK_IDS = ALL_BATTLES.filter(b => !MY_VOTES[b.id]).map(b => b.id);
-  const voted = ALL_BATTLES.filter(b => !!MY_VOTES[b.id]);
-
-  hide('battlesSkeletonWrap');
+  hide('debatesSkeleton');
   updateStats();
-  renderStack();
-
-  if (voted.length) {
-    show('battlesDivider');
-    renderVotedGrid(voted);
-  }
+  renderFeed();
 }
 
 function updateStats() {
-  const done = ALL_BATTLES.length - STACK_IDS.length;
-  const el = qs('battlesStats');
+  const total = ALL_BATTLES.length;
+  const done  = Object.keys(MY_VOTES).filter(id => MY_VOTES[id] && MY_VOTES[id] !== 'no_opinion').length;
+  const el    = qs('debatesStats');
   if (!el) return;
-  el.textContent = done > 0
-    ? `${done} of ${ALL_BATTLES.length} battles voted`
-    : '';
-  el.style.display = done > 0 ? 'block' : 'none';
+  if (done > 0) {
+    el.textContent = `${done} of ${total} debates voted`;
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
 }
 
 /* ═══════════════════════════════════════
-   CARD STACK (Tinder) — unchanged logic
+   FEED — single scrollable column
 ═══════════════════════════════════════ */
-function renderStack() {
-  const wrap = qs('stackWrap');
-  if (!wrap) return;
-  wrap.innerHTML = '';
-  if (ACTIVE_SWIPE_CLEANUP) { ACTIVE_SWIPE_CLEANUP(); ACTIVE_SWIPE_CLEANUP = null; }
+function renderFeed() {
+  const feed = qs('debatesFeed');
+  if (!feed) return;
+  feed.innerHTML = '';
 
-  if (!STACK_IDS.length) {
-    hide('stackSection');
+  if (!ALL_BATTLES.length) {
+    show('debatesEmpty');
     return;
   }
-  show('stackSection');
-
-  [...STACK_IDS].reverse().forEach(id => {
-    const b = ALL_BATTLES.find(x => x.id === id);
-    if (b) wrap.appendChild(buildStackCard(b));
-  });
-  attachSwipe(wrap.lastElementChild);
-}
-
-function buildStackCard(battle) {
-  const card = document.createElement('div');
-  card.className = 'stack-card';
-  card.dataset.battleId = battle.id;
-
-  const hasA = !!battle.image_a_url;
-  const hasB = !!battle.image_b_url;
-  const hasBoth = hasA && hasB;
-
-  // Question always at top
-  const questionHtml = `<div class="stack-question">${esc(battle.question)}</div>`;
-
-  // Panel A
-  const panelA = hasBoth
-    ? `<div class="stack-panel stack-panel-img" onclick="handleTapVote(event,'${battle.id}','a')" style="background-image:url('${esc(battle.image_a_url)}')">
-        <div class="stack-panel-overlay"></div>
-        <div class="stack-panel-label">${esc(battle.option_a)}</div>
-        <div class="stack-panel-hint">← tap</div>
-       </div>`
-    : `<div class="stack-panel" onclick="handleTapVote(event,'${battle.id}','a')">
-        <div class="stack-panel-label">${esc(battle.option_a)}</div>
-        <div class="stack-panel-hint">← tap</div>
-       </div>`;
-
-  // Panel B
-  const panelB = hasBoth
-    ? `<div class="stack-panel stack-panel-img" onclick="handleTapVote(event,'${battle.id}','b')" style="background-image:url('${esc(battle.image_b_url)}')">
-        <div class="stack-panel-overlay"></div>
-        <div class="stack-panel-label">${esc(battle.option_b)}</div>
-        <div class="stack-panel-hint">tap →</div>
-       </div>`
-    : `<div class="stack-panel" onclick="handleTapVote(event,'${battle.id}','b')">
-        <div class="stack-panel-label">${esc(battle.option_b)}</div>
-        <div class="stack-panel-hint">tap →</div>
-       </div>`;
-
-  card.innerHTML = `
-    <div class="vote-indicator vote-indicator-a">A</div>
-    <div class="vote-indicator vote-indicator-b">B</div>
-    ${questionHtml}
-    <div class="stack-panels">
-      ${panelA}
-      <div class="stack-panels-vs">VS</div>
-      ${panelB}
-    </div>`;
-  return card;
-}
-
-function handleTapVote(e, battleId, choice) {
-  if (IS_ANIMATING) return;
-  e.stopPropagation();
-  voteAndAdvance(battleId, choice, choice === 'a' ? 'fly-left' : 'fly-right');
-}
-
-function castNoOpinion() {
-  if (IS_ANIMATING || !STACK_IDS.length) return;
-  voteAndAdvance(STACK_IDS[0], 'no_opinion', 'fly-up');
-}
-
-async function voteAndAdvance(battleId, choice, flyClass) {
-  IS_ANIMATING = true;
-  if (ACTIVE_SWIPE_CLEANUP) { ACTIVE_SWIPE_CLEANUP(); ACTIVE_SWIPE_CLEANUP = null; }
-
-  const wrap  = qs('stackWrap');
-  const front = wrap?.lastElementChild;
-  if (!front) { IS_ANIMATING = false; return; }
-
-  const indKey = flyClass === 'fly-left' ? '.vote-indicator-a' : flyClass === 'fly-right' ? '.vote-indicator-b' : null;
-  if (indKey) { const ind = front.querySelector(indKey); if (ind) ind.style.opacity = '1'; }
-
-  front.classList.add(flyClass);
-  setTimeout(() => wrap.classList.add('promoting'), 40);
-
-  setTimeout(async () => {
-    front.remove();
-    wrap.classList.remove('promoting');
-
-    STACK_IDS.shift();
-    MY_VOTES[battleId] = choice;
-    saveLocalVote(battleId, choice);
-
-    if (choice !== 'no_opinion') {
-      if (!TALLY[battleId]) TALLY[battleId] = { a: 0, b: 0 };
-      TALLY[battleId][choice] = (TALLY[battleId][choice] || 0) + 1;
-    }
-
-    updateStats();
-
-    const newFront = wrap.lastElementChild;
-    if (newFront) {
-      rebuildStackClasses(wrap);
-      attachSwipe(newFront);
-    } else {
-      hide('stackSection');
-    }
-
-    // Add voted card to top of grid
-    const battle = ALL_BATTLES.find(b => b.id === battleId);
-    if (battle) {
-      // Show divider
-      show('battlesDivider');
-      // Re-render the whole grid to keep category grouping correct
-      const voted = ALL_BATTLES.filter(b => !!MY_VOTES[b.id]);
-      renderVotedGrid(voted);
-    }
-
-    IS_ANIMATING = false;
-    persistVote(battleId, choice);
-    if (typeof gtag !== 'undefined') gtag('event', 'battle_voted', { battle_id: battleId, choice });
-  }, 420);
-}
-
-function rebuildStackClasses(wrap) {
-  const cards = Array.from(wrap.children);
-  const total = cards.length;
-  cards.forEach((card, i) => {
-    const fromFront = total - 1 - i;
-    card.style.transform = fromFront === 0 ? '' :
-                           fromFront === 1 ? 'scale(0.95) translateY(10px)' :
-                                             'scale(0.90) translateY(20px)';
-    card.style.zIndex = total - fromFront;
-    card.style.pointerEvents = fromFront === 0 ? 'auto' : 'none';
-    card.style.boxShadow = fromFront === 0 ? '0 12px 40px rgba(26,23,20,0.14)' : 'none';
-  });
-}
-
-async function persistVote(battleId, choice) {
-  const visitorId = getVisitorId();
-  const user = await maybeUser();
-  const payload = { battle_id: battleId, visitor_id: visitorId, choice };
-  if (user) payload.user_id = user.id;
-  await sb.from('battle_votes').upsert(payload, {
-    onConflict: user ? 'battle_id,user_id' : 'battle_id,visitor_id',
-    ignoreDuplicates: false
-  });
-}
-
-/* ═══════════════════════════════════════
-   VOTED GRID — editorial leaderboard
-═══════════════════════════════════════ */
-function renderVotedGrid(battles) {
-  const grid = qs('battlesVotedGrid');
-  if (!grid) return;
-  grid.innerHTML = '';
 
   // Group by category
   const groups = {};
   const groupOrder = [];
-  battles.forEach(b => {
+  ALL_BATTLES.forEach(b => {
     const cat = b.category || 'Otros';
     const ord = b.category_order || 99;
     const key = `${String(ord).padStart(3,'0')}_${cat}`;
@@ -294,21 +159,48 @@ function renderVotedGrid(battles) {
   groupOrder.forEach(key => {
     const { label, items } = groups[key];
 
-    // Category divider
-    const divider = document.createElement('div');
-    divider.className = 'bv-category-divider';
-    divider.innerHTML = `<span>${esc(label)}</span>`;
-    grid.appendChild(divider);
+    // Chapter divider
+    const chapter = document.createElement('div');
+    chapter.className = 'debates-chapter';
+    chapter.innerHTML = `<span>${esc(label)}</span>`;
+    feed.appendChild(chapter);
 
-    // 2-column group
-    const group = document.createElement('div');
-    group.className = 'bv-group';
-    items.forEach(b => group.appendChild(buildVotedCard(b)));
-    grid.appendChild(group);
+    items.forEach(b => feed.appendChild(buildDebateRow(b)));
   });
 }
 
-function buildVotedCard(battle) {
+function buildDebateRow(battle) {
+  const row = document.createElement('div');
+  row.className = 'debate-row';
+  row.id = 'debate-' + battle.id;
+
+  const voted = MY_VOTES[battle.id];
+  const desc  = getDescription(battle.question);
+
+  row.innerHTML = `
+    <div class="debate-question">${esc(battle.question)}</div>
+    ${desc ? `<div class="debate-description">${esc(desc)}</div>` : ''}
+    <div class="debate-body" id="body-${battle.id}">
+      ${voted ? buildResultsHtml(battle) : buildVoteBtnsHtml(battle)}
+    </div>
+    <div class="debate-footer">
+      <span class="debate-vote-count" id="count-${battle.id}">${getVoteCountLabel(battle.id)}</span>
+      <button class="debate-share-btn" onclick="shareBattle(event,'${battle.id}')">Share ↗</button>
+    </div>`;
+
+  return row;
+}
+
+function buildVoteBtnsHtml(battle) {
+  return `
+    <div class="debate-vote-btns">
+      <button class="debate-vote-btn" onclick="castFeedVote('${battle.id}','a')">${esc(battle.option_a)}</button>
+      <button class="debate-vote-btn" onclick="castFeedVote('${battle.id}','b')">${esc(battle.option_b)}</button>
+    </div>
+    <div class="debate-vote-hint">Tap to vote and see the result</div>`;
+}
+
+function buildResultsHtml(battle) {
   const myChoice   = MY_VOTES[battle.id];
   const counts     = TALLY[battle.id] || { a: 0, b: 0 };
   const totalVotes = (counts.a || 0) + (counts.b || 0);
@@ -319,87 +211,84 @@ function buildVotedCard(battle) {
     pctB = 100 - pctA;
   }
 
-  const hasBoth   = !!(battle.image_a_url && battle.image_b_url);
-  const hasSingle = !!(battle.image_a_url && !battle.image_b_url);
-  const imgA      = hasBoth ? battle.image_a_url : hasSingle ? battle.image_a_url : null;
-  const imgB      = hasBoth ? battle.image_b_url : null;
-
   const chosenA = myChoice === 'a';
   const chosenB = myChoice === 'b';
   const noOp    = myChoice === 'no_opinion';
   const leaderA = pctA > pctB;
   const leaderB = pctB > pctA;
 
-  const card = document.createElement('div');
-  card.className = 'bv-card';
-  card.id = 'voted-' + battle.id;
-
-  // No images in results — clean editorial rows only
-
-  const rowA = buildResultRow({ label: battle.option_a, pct: pctA, chosen: chosenA, leader: leaderA, side: 'a', battleId: battle.id, noOp });
-  const rowB = buildResultRow({ label: battle.option_b, pct: pctB, chosen: chosenB, leader: leaderB, side: 'b', battleId: battle.id, noOp });
-
-  const votesLabel = noOp ? 'No opinion'
-    : totalVotes === 0 ? 'No votes yet'
-    : `${totalVotes.toLocaleString()} vote${totalVotes !== 1 ? 's' : ''}`;
-
-  card.innerHTML = `
-    <div class="bv-question">${esc(battle.question)}</div>
-    <div class="bv-results">${rowA}${rowB}</div>
-    <div class="bv-footer">
-      <span class="bv-vote-count">${votesLabel}</span>
-      <button class="bv-share-btn" onclick="shareBattle(event,'${battle.id}')">Share ↗</button>
-    </div>`;
-
-  return card;
-}
-
-function buildResultRow({ label, pct, chosen, leader, side, battleId, noOp }) {
-  const cls = ['bv-row'];
-  if (chosen) cls.push('bv-row-chosen');
-  if (leader) cls.push('bv-row-leader');
+  const rowA = buildResultRowHtml({ label: battle.option_a, pct: pctA, chosen: chosenA, leader: leaderA, side: 'a', battleId: battle.id, noOp });
+  const rowB = buildResultRowHtml({ label: battle.option_b, pct: pctB, chosen: chosenB, leader: leaderB, side: 'b', battleId: battle.id, noOp });
 
   return `
-    <div class="${cls.join(' ')}" onclick="handleVotedClick('${battleId}','${side}')">
-      <div class="bv-row-pct">${noOp ? '—' : pct + '%'}</div>
-      <div class="bv-row-middle">
-        <div class="bv-row-bar-wrap"><div class="bv-row-bar" style="width:${noOp ? 0 : pct}%"></div></div>
-        <div class="bv-row-label">${esc(label)}</div>
-      </div>
-      <div class="bv-row-check">✓</div>
+    <div class="debate-results">${rowA}${rowB}</div>
+    <div class="debate-change-vote">
+      <button onclick="resetFeedVote('${battle.id}')">Change vote</button>
     </div>`;
 }
 
-/* ── Vote interactions on voted grid ── */
-async function handleVotedClick(battleId, side) {
-  const current = MY_VOTES[battleId];
-  if (current === side) {
-    await unvote(battleId);
-  } else {
-    await changeVote(battleId, side);
-  }
+function buildResultRowHtml({ label, pct, chosen, leader, side, battleId, noOp }) {
+  const cls = ['debate-result-row'];
+  if (chosen) cls.push('is-chosen');
+  if (leader) cls.push('is-leader');
+  return `
+    <div class="${cls.join(' ')}" onclick="changeFeedVote('${battleId}','${side}')">
+      <div class="debate-result-pct">${noOp ? '—' : pct + '%'}</div>
+      <div class="debate-result-mid">
+        <div class="debate-result-bar-wrap">
+          <div class="debate-result-bar" data-pct="${noOp ? 0 : pct}"></div>
+        </div>
+        <div class="debate-result-label">${esc(label)}</div>
+      </div>
+      <div class="debate-result-check">✓</div>
+    </div>`;
 }
 
-async function unvote(battleId) {
-  const old = MY_VOTES[battleId];
-  if (!old || old === 'no_opinion') return;
+function getVoteCountLabel(battleId) {
+  const counts = TALLY[battleId] || { a: 0, b: 0 };
+  const total  = (counts.a || 0) + (counts.b || 0);
+  if (MY_VOTES[battleId] === 'no_opinion') return 'No opinion';
+  if (total === 0) return 'No votes yet';
+  return `${total.toLocaleString()} vote${total !== 1 ? 's' : ''}`;
+}
 
-  if (TALLY[battleId] && (old === 'a' || old === 'b')) {
-    TALLY[battleId][old] = Math.max(0, (TALLY[battleId][old] || 0) - 1);
-  }
-  MY_VOTES[battleId] = 'no_opinion';
-  saveLocalVote(battleId, 'no_opinion');
+// Animate bars in after insert
+function animateBars(battleId) {
+  requestAnimationFrame(() => {
+    const body = document.getElementById('body-' + battleId);
+    if (!body) return;
+    body.querySelectorAll('.debate-result-bar').forEach(bar => {
+      const pct = bar.dataset.pct;
+      requestAnimationFrame(() => { bar.style.width = pct + '%'; });
+    });
+  });
+}
 
-  // Re-render card in place
-  const card = qs('voted-' + battleId);
+// Vote from feed
+async function castFeedVote(battleId, choice) {
+  if (!TALLY[battleId]) TALLY[battleId] = { a: 0, b: 0 };
+  TALLY[battleId][choice] = (TALLY[battleId][choice] || 0) + 1;
+  MY_VOTES[battleId] = choice;
+  saveLocalVote(battleId, choice);
+
+  // Update body to show results
+  const body = document.getElementById('body-' + battleId);
   const battle = ALL_BATTLES.find(b => b.id === battleId);
-  if (card && battle) card.replaceWith(buildVotedCard(battle));
+  if (body && battle) {
+    body.innerHTML = buildResultsHtml(battle);
+    animateBars(battleId);
+  }
+  // Update count
+  const countEl = document.getElementById('count-' + battleId);
+  if (countEl) countEl.textContent = getVoteCountLabel(battleId);
 
   updateStats();
-  persistVote(battleId, 'no_opinion');
+  persistVote(battleId, choice);
+  if (typeof gtag !== 'undefined') gtag('event', 'battle_voted', { battle_id: battleId, choice });
 }
 
-async function changeVote(battleId, newChoice) {
+// Change vote (tap a result row)
+async function changeFeedVote(battleId, newChoice) {
   const old = MY_VOTES[battleId];
   if (old === newChoice) return;
 
@@ -412,91 +301,28 @@ async function changeVote(battleId, newChoice) {
   MY_VOTES[battleId] = newChoice;
   saveLocalVote(battleId, newChoice);
 
-  const card = qs('voted-' + battleId);
+  const body = document.getElementById('body-' + battleId);
   const battle = ALL_BATTLES.find(b => b.id === battleId);
-  if (card && battle) card.replaceWith(buildVotedCard(battle));
+  if (body && battle) {
+    body.innerHTML = buildResultsHtml(battle);
+    animateBars(battleId);
+  }
+  const countEl = document.getElementById('count-' + battleId);
+  if (countEl) countEl.textContent = getVoteCountLabel(battleId);
 
   updateStats();
   persistVote(battleId, newChoice);
-  if (typeof gtag !== 'undefined')
-    gtag('event', 'battle_vote_changed', { battle_id: battleId, from: old, to: newChoice });
 }
 
-/* ═══════════════════════════════════════
-   SWIPE
-═══════════════════════════════════════ */
-function attachSwipe(card) {
-  if (!card) return;
-  const battleId = card.dataset.battleId;
-  if (!battleId) return;
-
-  let startX = 0, startY = 0, dx = 0, dragging = false;
-  const THRESHOLD = 72, ROTATE_MAX = 20;
-
-  function onStart(e) {
-    if (IS_ANIMATING) return;
-    const pt = e.touches ? e.touches[0] : e;
-    startX = pt.clientX; startY = pt.clientY; dx = 0; dragging = true;
-    card.classList.add('dragging');
-  }
-  function onMove(e) {
-    if (!dragging || IS_ANIMATING) return;
-    const pt = e.touches ? e.touches[0] : e;
-    dx = pt.clientX - startX;
-    const dy = pt.clientY - startY;
-    if (Math.abs(dx) < Math.abs(dy) && Math.abs(dx) < 10) return;
-    e.preventDefault();
-    const rot = (dx / window.innerWidth) * ROTATE_MAX;
-    card.style.transform = `translateX(${dx}px) rotate(${rot}deg)`;
-    const indA = card.querySelector('.vote-indicator-a');
-    const indB = card.querySelector('.vote-indicator-b');
-    if (dx < -20) {
-      if (indA) indA.style.opacity = Math.min(1, (-dx - 20) / 60) + '';
-      if (indB) indB.style.opacity = '0';
-    } else if (dx > 20) {
-      if (indB) indB.style.opacity = Math.min(1, (dx - 20) / 60) + '';
-      if (indA) indA.style.opacity = '0';
-    } else {
-      if (indA) indA.style.opacity = '0';
-      if (indB) indB.style.opacity = '0';
-    }
-  }
-  function onEnd() {
-    if (!dragging) return;
-    dragging = false;
-    card.classList.remove('dragging');
-    if (IS_ANIMATING) return;
-    if (dx < -THRESHOLD) {
-      voteAndAdvance(battleId, 'a', 'fly-left');
-    } else if (dx > THRESHOLD) {
-      voteAndAdvance(battleId, 'b', 'fly-right');
-    } else {
-      card.style.transition = 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)';
-      card.style.transform  = '';
-      const indA = card.querySelector('.vote-indicator-a');
-      const indB = card.querySelector('.vote-indicator-b');
-      if (indA) indA.style.opacity = '0';
-      if (indB) indB.style.opacity = '0';
-      setTimeout(() => { if (card) card.style.transition = ''; }, 360);
-    }
-    dx = 0;
-  }
-  card.addEventListener('mousedown',  onStart);
-  card.addEventListener('touchstart', onStart, { passive: true });
-  window.addEventListener('mousemove', onMove);
-  window.addEventListener('touchmove', onMove, { passive: false });
-  window.addEventListener('mouseup',  onEnd);
-  window.addEventListener('touchend', onEnd);
-
-  ACTIVE_SWIPE_CLEANUP = () => {
-    card.removeEventListener('mousedown',  onStart);
-    card.removeEventListener('touchstart', onStart);
-    window.removeEventListener('mousemove', onMove);
-    window.removeEventListener('touchmove', onMove);
-    window.removeEventListener('mouseup',  onEnd);
-    window.removeEventListener('touchend', onEnd);
-  };
+// Reset to show vote buttons again
+function resetFeedVote(battleId) {
+  const body = document.getElementById('body-' + battleId);
+  const battle = ALL_BATTLES.find(b => b.id === battleId);
+  if (body && battle) body.innerHTML = buildVoteBtnsHtml(battle);
 }
+
+// Stack/swipe removed — replaced by inline feed voting
+
 
 /* ═══════════════════════════════════════
    SHARE
