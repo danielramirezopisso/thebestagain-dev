@@ -44,7 +44,6 @@ async function initBattles() {
     // Only count active votes (soft-delete safe)
     sb.from('battle_votes')
       .select('battle_id, choice')
-      .eq('is_active', true)
   ]);
 
   ALL_BATTLES = battlesRes.data || [];
@@ -68,20 +67,14 @@ async function initBattles() {
   const visitorId = getVisitorId();
   const user = await maybeUser();
 
-  let myVotesQuery = sb.from('battle_votes')
-    .select('battle_id, choice')
-    .eq('is_active', true);
-
   if (user) {
     // Logged in: prefer user votes, fall back to visitor
     const { data: userVotes } = await sb.from('battle_votes')
       .select('battle_id, choice')
-      .eq('user_id', user.id)
-      .eq('is_active', true);
+      .eq('user_id', user.id);
     const { data: visitorVotes } = await sb.from('battle_votes')
       .select('battle_id, choice')
-      .eq('visitor_id', visitorId)
-      .eq('is_active', true);
+      .eq('visitor_id', visitorId);
     const dbMap = {};
     // Visitor votes first, user votes override
     (visitorVotes || []).forEach(v => { dbMap[v.battle_id] = v.choice; });
@@ -90,8 +83,7 @@ async function initBattles() {
   } else {
     const { data: myVotes } = await sb.from('battle_votes')
       .select('battle_id, choice')
-      .eq('visitor_id', visitorId)
-      .eq('is_active', true);
+      .eq('visitor_id', visitorId);
     const dbMap = {};
     (myVotes || []).forEach(v => { dbMap[v.battle_id] = v.choice; });
     MY_VOTES = { ...getLocalVotes(), ...dbMap };
@@ -271,7 +263,7 @@ function rebuildStackClasses(wrap) {
 async function persistVote(battleId, choice) {
   const visitorId = getVisitorId();
   const user = await maybeUser();
-  const payload = { battle_id: battleId, visitor_id: visitorId, choice, is_active: true };
+  const payload = { battle_id: battleId, visitor_id: visitorId, choice };
   if (user) payload.user_id = user.id;
   await sb.from('battle_votes').upsert(payload, {
     onConflict: user ? 'battle_id,user_id' : 'battle_id,visitor_id',
