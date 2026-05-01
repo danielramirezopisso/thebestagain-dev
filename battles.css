@@ -122,122 +122,83 @@
 .vote-indicator-a { left: 14px; color: #2d9b6f; border-color: #2d9b6f; background: rgba(45,155,111,0.08); transform: rotate(-8deg); }
 .vote-indicator-b { right: 14px; color: #e05252; border-color: #e05252; background: rgba(224,82,82,0.08); transform: rotate(8deg); }
 
-.stack-card-question {
-  padding: 22px 24px 0;
+/* Question above the panels */
+.stack-question {
+  padding: 20px 20px 14px;
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 19px; font-weight: 700; line-height: 1.3;
+  font-size: 18px; font-weight: 700; line-height: 1.3;
   color: var(--text); text-align: center; flex-shrink: 0;
 }
 
-.stack-card-options {
-  display: grid; grid-template-columns: 1fr 1fr;
-  flex: 1; min-height: 0; position: relative;
+/* Two split panels with gap */
+.stack-panels {
+  display: flex;
+  gap: 8px;
+  flex: 1; min-height: 0;
+  padding: 0 12px 16px;
+  align-items: stretch;
+  position: relative;
 }
-.stack-card-opt {
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 8px; padding: 20px 14px; cursor: pointer;
-  transition: background 0.12s;
-  -webkit-tap-highlight-color: transparent;
-}
-.stack-card-opt:first-child { border-right: 1px solid var(--rule); }
-.stack-card-opt:active { background: var(--faint); }
 
-.stack-vs-overlay {
+/* VS badge between panels */
+.stack-panels-vs {
   position: absolute; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 9px; font-weight: 900;
-  letter-spacing: 0.16em; color: var(--muted);
+  font-size: 9px; font-weight: 900; letter-spacing: 0.16em;
+  color: var(--muted);
   background: var(--card); border: 1px solid var(--rule);
-  border-radius: 999px; padding: 4px 9px;
-  pointer-events: none; z-index: 5;
-}
-.stack-opt-label {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 15px; font-weight: 700;
-  color: var(--text); text-align: center; line-height: 1.3;
-}
-.stack-opt-hint {
-  font-size: 10px; color: var(--muted);
-  text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600;
+  border-radius: 999px; padding: 4px 8px;
+  z-index: 10; pointer-events: none;
 }
 
-.stack-card-options-img { grid-template-columns: 1fr 1fr; }
-.stack-card-opt-img {
-  position: relative; background-size: cover !important;
+/* Individual panel */
+.stack-panel {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  gap: 8px; padding: 16px 12px;
+  border-radius: 12px;
+  background: var(--faint);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden; position: relative;
+  min-height: 0;
+}
+.stack-panel:hover { border-color: var(--accent); background: rgba(45,74,138,0.04); }
+.stack-panel:active { background: rgba(45,74,138,0.08); }
+
+/* Image panel */
+.stack-panel-img {
+  background-size: cover !important;
   background-position: center !important;
+  border: none;
 }
-.stack-opt-img-overlay {
+.stack-panel-img:hover { border: none; }
+.stack-panel-overlay {
   position: absolute; inset: 0;
-  background: linear-gradient(transparent 35%, rgba(0,0,0,0.6) 100%);
+  background: linear-gradient(transparent 30%, rgba(0,0,0,0.65) 100%);
   pointer-events: none;
-}
-.stack-opt-label-img, .stack-opt-hint-img {
-  position: relative; z-index: 2;
-  color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.6);
-}
-.stack-vs-overlay-img {
-  position: absolute; top: 50%; left: 50%;
-  transform: translate(-50%,-50%);
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-  background: rgba(255,255,255,0.90); backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.6);
-  border-radius: 12px; padding: 8px 12px;
-  max-width: 130px; text-align: center; z-index: 10;
-}
-.stack-vs-question {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 11px; font-weight: 700; color: var(--text); line-height: 1.3;
-}
-.stack-vs-overlay-img span {
-  font-size: 9px; font-weight: 900; letter-spacing: 0.14em; color: var(--muted);
 }
 
-.stack-card-single-img {
-  flex: 1; display: flex; flex-direction: column;
-  justify-content: flex-end;
-  background-size: cover !important; background-position: center !important;
-  border-radius: 16px; overflow: hidden; position: relative;
-}
-.stack-single-gradient {
-  position: absolute; inset: 0;
-  background: linear-gradient(transparent 20%, rgba(0,0,0,0.28) 50%, rgba(0,0,0,0.72) 100%);
-  pointer-events: none;
-}
-.stack-single-question {
+/* Label + hint inside panel */
+.stack-panel-label {
   position: relative; z-index: 2;
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 17px; font-weight: 700; color: #fff;
-  text-align: center; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
-  padding: 0 18px 12px; line-height: 1.35;
+  font-size: 15px; font-weight: 700; line-height: 1.3;
+  text-align: center; color: var(--text);
 }
-.stack-single-options {
+.stack-panel-img .stack-panel-label {
+  color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+}
+.stack-panel-hint {
   position: relative; z-index: 2;
-  display: grid; grid-template-columns: 1fr auto 1fr;
-  border-top: 1px solid rgba(255,255,255,0.15);
+  font-size: 10px; font-weight: 600;
+  color: var(--muted); text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
-.stack-single-opt {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 3px; padding: 14px 12px;
-  cursor: pointer; transition: background 0.12s;
-}
-.stack-single-opt:hover { background: rgba(255,255,255,0.08); }
-.stack-single-opt-label {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 13px; font-weight: 700; color: #fff;
-  text-align: center; text-shadow: 0 1px 4px rgba(0,0,0,0.4);
-}
-.stack-single-opt-hint {
-  font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.6);
-  text-transform: uppercase; letter-spacing: 0.1em;
-}
-.stack-single-vs {
-  display: flex; align-items: center; justify-content: center;
-  padding: 0 10px; font-size: 9px; font-weight: 900;
-  letter-spacing: 0.14em; color: rgba(255,255,255,0.5);
-  border-left: 1px solid rgba(255,255,255,0.12);
-  border-right: 1px solid rgba(255,255,255,0.12);
-}
+.stack-panel-img .stack-panel-hint { color: rgba(255,255,255,0.65); }
 
 .stack-hint {
   display: flex; align-items: center; justify-content: space-between;
@@ -303,40 +264,6 @@
   font-size: 22px; font-weight: 700; line-height: 1.25;
   color: var(--text); margin-bottom: 16px;
 }
-
-/* Optional image strip */
-.bv-images {
-  display: grid; grid-template-columns: 1fr 1fr;
-  height: 80px; gap: 3px;
-  border-radius: 8px; overflow: hidden;
-  margin-bottom: 14px;
-}
-.bv-img {
-  background-size: cover !important; background-position: center !important;
-  cursor: pointer; transition: opacity 0.2s, filter 0.2s;
-}
-.bv-img.chosen { opacity: 1; filter: none; }
-.bv-img.dimmed { opacity: 0.28; filter: grayscale(0.4); }
-.bv-img.dimmed:hover { opacity: 0.5; }
-
-.bv-image-single {
-  height: 80px; border-radius: 8px; margin-bottom: 14px;
-  background-size: cover !important; background-position: center !important;
-  overflow: hidden; position: relative;
-}
-.bv-single-labels {
-  position: absolute; inset: 0;
-  display: grid; grid-template-columns: 1fr 1fr;
-  background: linear-gradient(transparent 30%, rgba(0,0,0,0.5) 100%);
-}
-.bv-single-label {
-  display: flex; align-items: flex-end; justify-content: center;
-  padding-bottom: 8px; background: none; border: none; cursor: pointer;
-  color: #fff; font-size: 11px; font-weight: 700;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.6); text-align: center;
-}
-.bv-single-label:first-child { border-right: 1px solid rgba(255,255,255,0.2); }
-.bv-single-label.chosen { color: #ffe88a; }
 
 .bv-text-options {
   display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
@@ -445,8 +372,10 @@
 @media (max-width: 620px) {
   .battles-main { padding: 0 16px 80px; }
   .battles-hero { padding: 24px 0 14px; }
+  .stack-question { font-size: 16px; padding: 16px 16px 10px; }
+  .stack-panels { padding: 0 8px 12px; gap: 6px; }
+  .stack-panel-label { font-size: 13px; }
   .bv-question { font-size: 18px; }
   .bv-row-pct { font-size: 20px; }
   .bv-row { grid-template-columns: 40px 1fr 18px; gap: 10px; }
-  .bv-images, .bv-image-single { height: 65px; }
 }

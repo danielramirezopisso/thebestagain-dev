@@ -147,63 +147,45 @@ function buildStackCard(battle) {
   card.className = 'stack-card';
   card.dataset.battleId = battle.id;
 
-  const hasBoth   = !!(battle.image_a_url && battle.image_b_url);
-  const hasSingle = !!(battle.image_a_url && !battle.image_b_url);
+  const hasA = !!battle.image_a_url;
+  const hasB = !!battle.image_b_url;
+  const hasBoth = hasA && hasB;
 
-  if (hasSingle) {
-    card.innerHTML = `
-      <div class="vote-indicator vote-indicator-a">A</div>
-      <div class="vote-indicator vote-indicator-b">B</div>
-      <div class="stack-card-single-img" style="background-image:url('${esc(battle.image_a_url)}')">
-        <div class="stack-single-gradient"></div>
-        <div class="stack-single-question">${esc(battle.question)}</div>
-        <div class="stack-single-options">
-          <div class="stack-single-opt" onclick="handleTapVote(event,'${battle.id}','a')">
-            <div class="stack-single-opt-label">${esc(battle.option_a)}</div>
-            <div class="stack-single-opt-hint">← tap</div>
-          </div>
-          <div class="stack-single-vs">VS</div>
-          <div class="stack-single-opt" onclick="handleTapVote(event,'${battle.id}','b')">
-            <div class="stack-single-opt-label">${esc(battle.option_b)}</div>
-            <div class="stack-single-opt-hint">tap →</div>
-          </div>
-        </div>
-      </div>`;
-    return card;
-  }
+  // Question always at top
+  const questionHtml = `<div class="stack-question">${esc(battle.question)}</div>`;
 
-  const optA = hasBoth
-    ? `<div class="stack-card-opt stack-card-opt-img" onclick="handleTapVote(event,'${battle.id}','a')" style="background-image:url('${esc(battle.image_a_url)}')">
-         <div class="stack-opt-img-overlay"></div>
-         <div class="stack-opt-label stack-opt-label-img">${esc(battle.option_a)}</div>
-         <div class="stack-opt-hint stack-opt-hint-img">← tap</div>
+  // Panel A
+  const panelA = hasBoth
+    ? `<div class="stack-panel stack-panel-img" onclick="handleTapVote(event,'${battle.id}','a')" style="background-image:url('${esc(battle.image_a_url)}')">
+        <div class="stack-panel-overlay"></div>
+        <div class="stack-panel-label">${esc(battle.option_a)}</div>
+        <div class="stack-panel-hint">← tap</div>
        </div>`
-    : `<div class="stack-card-opt" onclick="handleTapVote(event,'${battle.id}','a')">
-         <div class="stack-opt-label">${esc(battle.option_a)}</div>
-         <div class="stack-opt-hint">← tap</div>
+    : `<div class="stack-panel" onclick="handleTapVote(event,'${battle.id}','a')">
+        <div class="stack-panel-label">${esc(battle.option_a)}</div>
+        <div class="stack-panel-hint">← tap</div>
        </div>`;
 
-  const optB = hasBoth
-    ? `<div class="stack-card-opt stack-card-opt-img" onclick="handleTapVote(event,'${battle.id}','b')" style="background-image:url('${esc(battle.image_b_url)}')">
-         <div class="stack-opt-img-overlay"></div>
-         <div class="stack-opt-label stack-opt-label-img">${esc(battle.option_b)}</div>
-         <div class="stack-opt-hint stack-opt-hint-img">tap →</div>
+  // Panel B
+  const panelB = hasBoth
+    ? `<div class="stack-panel stack-panel-img" onclick="handleTapVote(event,'${battle.id}','b')" style="background-image:url('${esc(battle.image_b_url)}')">
+        <div class="stack-panel-overlay"></div>
+        <div class="stack-panel-label">${esc(battle.option_b)}</div>
+        <div class="stack-panel-hint">tap →</div>
        </div>`
-    : `<div class="stack-card-opt" onclick="handleTapVote(event,'${battle.id}','b')">
-         <div class="stack-opt-label">${esc(battle.option_b)}</div>
-         <div class="stack-opt-hint">tap →</div>
+    : `<div class="stack-panel" onclick="handleTapVote(event,'${battle.id}','b')">
+        <div class="stack-panel-label">${esc(battle.option_b)}</div>
+        <div class="stack-panel-hint">tap →</div>
        </div>`;
 
   card.innerHTML = `
     <div class="vote-indicator vote-indicator-a">A</div>
     <div class="vote-indicator vote-indicator-b">B</div>
-    ${hasBoth ? '' : `<div class="stack-card-question">${esc(battle.question)}</div>`}
-    <div class="stack-card-options${hasBoth ? ' stack-card-options-img' : ''}">
-      ${optA}
-      <div class="stack-vs-overlay${hasBoth ? ' stack-vs-overlay-img' : ''}">
-        ${hasBoth ? `<div class="stack-vs-question">${esc(battle.question)}</div><span>VS</span>` : 'VS'}
-      </div>
-      ${optB}
+    ${questionHtml}
+    <div class="stack-panels">
+      ${panelA}
+      <div class="stack-panels-vs">VS</div>
+      ${panelB}
     </div>`;
   return card;
 }
@@ -360,31 +342,7 @@ function buildVotedCard(battle) {
   card.className = 'bv-card';
   card.id = 'voted-' + battle.id;
 
-  // Optional image strip
-  let imageHtml = '';
-  if (hasSingle) {
-    imageHtml = `
-      <div class="bv-image-single" style="background-image:url('${esc(imgA)}')">
-        <div class="bv-single-labels">
-          <button class="bv-single-label${chosenA ? ' chosen' : ''}" onclick="handleVotedClick('${battle.id}','a')">${esc(battle.option_a)}</button>
-          <button class="bv-single-label${chosenB ? ' chosen' : ''}" onclick="handleVotedClick('${battle.id}','b')">${esc(battle.option_b)}</button>
-        </div>
-      </div>`;
-  } else if (hasBoth) {
-    imageHtml = `
-      <div class="bv-images">
-        <div class="bv-img${chosenA ? ' chosen' : ' dimmed'}" style="background-image:url('${esc(imgA)}')" onclick="handleVotedClick('${battle.id}','a')"></div>
-        <div class="bv-img${chosenB ? ' chosen' : ' dimmed'}" style="background-image:url('${esc(imgB)}')" onclick="handleVotedClick('${battle.id}','b')"></div>
-      </div>`;
-  } else {
-    // No images — inline text options
-    imageHtml = `
-      <div class="bv-text-options">
-        <button class="bv-text-opt${chosenA ? ' chosen' : ''}" onclick="handleVotedClick('${battle.id}','a')">${esc(battle.option_a)}</button>
-        <span class="bv-vs">vs</span>
-        <button class="bv-text-opt${chosenB ? ' chosen' : ''}" onclick="handleVotedClick('${battle.id}','b')">${esc(battle.option_b)}</button>
-      </div>`;
-  }
+  // No images in results — clean editorial rows only
 
   const rowA = buildResultRow({ label: battle.option_a, pct: pctA, chosen: chosenA, leader: leaderA, side: 'a', battleId: battle.id, noOp });
   const rowB = buildResultRow({ label: battle.option_b, pct: pctB, chosen: chosenB, leader: leaderB, side: 'b', battleId: battle.id, noOp });
@@ -395,7 +353,6 @@ function buildVotedCard(battle) {
 
   card.innerHTML = `
     <div class="bv-question">${esc(battle.question)}</div>
-    ${imageHtml}
     <div class="bv-results">${rowA}${rowB}</div>
     <div class="bv-footer">
       <span class="bv-vote-count">${votesLabel}</span>
