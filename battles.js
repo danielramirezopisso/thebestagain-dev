@@ -191,8 +191,6 @@ function buildDebateRow(battle) {
   return row;
 }
 
-// Unified body — always shows bars + radio buttons
-// voted = shows filled radio + bars; unvoted = shows empty radio + greyed bars
 function buildDebateBodyHtml(battle) {
   const myChoice   = MY_VOTES[battle.id];
   const counts     = TALLY[battle.id] || { a: 0, b: 0 };
@@ -204,56 +202,73 @@ function buildDebateBodyHtml(battle) {
     pctB = 100 - pctA;
   }
 
-  const chosenA = myChoice === 'a';
-  const chosenB = myChoice === 'b';
-  const hasVoted = myChoice && myChoice !== 'no_opinion';
-  const leaderA  = hasVoted && pctA > pctB;
-  const leaderB  = hasVoted && pctB > pctA;
+  const chosenA  = myChoice === 'a';
+  const chosenB  = myChoice === 'b';
+  const hasVoted = !!(myChoice && myChoice !== 'no_opinion');
+  const noOp     = myChoice === 'no_opinion';
 
-  const rowA = buildRadioRowHtml({ label: battle.option_a, pct: pctA, chosen: chosenA, leader: leaderA, side: 'a', battleId: battle.id, hasVoted });
-  const rowB = buildRadioRowHtml({ label: battle.option_b, pct: pctB, chosen: chosenB, leader: leaderB, side: 'b', battleId: battle.id, hasVoted });
+  const pieHtml = buildPieChart(pctA, chosenA, chosenB, hasVoted);
 
-  const noOpLink = myChoice === 'no_opinion'
+  const noOpLink = noOp
     ? `<span class="debate-no-opinion is-chosen">No opinion ✓</span>`
     : `<button class="debate-no-opinion-btn" onclick="castFeedVote('${battle.id}','no_opinion')">No opinion</button>`;
 
   return `
-    <div class="debate-results${hasVoted ? ' has-voted' : ''}">${rowA}${rowB}</div>
+    <div class="debate-body-wrap${hasVoted ? ' has-voted' : ''}">
+      <div class="debate-pie-wrap">${pieHtml}</div>
+      <div class="debate-options">
+        <div class="debate-option${chosenA ? ' is-chosen' : ''}" onclick="toggleFeedVote('${battle.id}','a')">
+          <div class="debate-option-dot debate-option-dot-a"></div>
+          <div class="debate-option-info">
+            <div class="debate-option-label">${esc(battle.option_a)}</div>
+            ${hasVoted ? `<div class="debate-option-pct">${pctA}%</div>` : ''}
+          </div>
+          <div class="debate-option-radio${chosenA ? ' is-filled' : ''}"></div>
+        </div>
+        <div class="debate-option${chosenB ? ' is-chosen' : ''}" onclick="toggleFeedVote('${battle.id}','b')">
+          <div class="debate-option-dot debate-option-dot-b"></div>
+          <div class="debate-option-info">
+            <div class="debate-option-label">${esc(battle.option_b)}</div>
+            ${hasVoted ? `<div class="debate-option-pct">${pctB}%</div>` : ''}
+          </div>
+          <div class="debate-option-radio${chosenB ? ' is-filled' : ''}"></div>
+        </div>
+      </div>
+    </div>
     <div class="debate-footer-inner">${noOpLink}</div>`;
 }
 
-function buildRadioRowHtml({ label, pct, chosen, leader, side, battleId, hasVoted }) {
-  const cls = ['debate-result-row'];
-  if (chosen) cls.push('is-chosen');
-  if (leader) cls.push('is-leader');
+function buildPieChart(pctA, chosenA, chosenB, hasVoted) {
+  const r = 40; const cx = 50; const cy = 50;
+  const circ = 2 * Math.PI * r;
 
-  const barWidth = hasVoted ? pct : 0;
-  // Mini donut SVG — circle circumference = 2*pi*8 ≈ 50.3
-  const circ = 50.27;
-  const fill = hasVoted ? (circ * pct / 100) : 0;
-  const donutColor = chosen ? 'var(--accent)' : 'rgba(26,23,20,0.25)';
-  const donutSvg = `<svg class="debate-donut" viewBox="0 0 20 20">
-    <circle cx="10" cy="10" r="8" fill="none" stroke="rgba(26,23,20,0.08)" stroke-width="2.5"/>
-    <circle cx="10" cy="10" r="8" fill="none" stroke="${donutColor}" stroke-width="2.5"
-      stroke-dasharray="${fill} ${circ}"
-      stroke-dashoffset="${circ / 4}"
-      stroke-linecap="round"/>
+  if (!hasVoted) {
+    return `<svg viewBox="0 0 100 100" class="debate-pie">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
+        stroke="rgba(26,23,20,0.08)" stroke-width="9"/>
+      <text x="50" y="57" text-anchor="middle" class="debate-pie-label">Vote</text>
+    </svg>`;
+  }
+
+  const fillA = circ * pctA / 100;
+  const colorA = '#2d4a8a';
+  const colorB = '#b8860b';
+  const swA = chosenA ? 11 : 8;
+  const swB = chosenB ? 11 : 8;
+  const winPct = pctA >= pctB ? pctA : pctB;
+
+  return `<svg viewBox="0 0 100 100" class="debate-pie">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
+      stroke="${colorB}" stroke-width="${swB}"
+      stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="0"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
+      stroke="${colorA}" stroke-width="${swA}"
+      stroke-dasharray="${fillA.toFixed(2)} ${circ.toFixed(2)}"
+      stroke-dashoffset="${(circ / 4).toFixed(2)}"
+      stroke-linecap="butt"/>
+    <text x="50" y="47" text-anchor="middle" class="debate-pie-pct">${winPct}%</text>
+    <text x="50" y="60" text-anchor="middle" class="debate-pie-label">${pctA >= pctB ? 'A wins' : 'B wins'}</text>
   </svg>`;
-
-  return `
-    <div class="${cls.join(' ')}" onclick="toggleFeedVote('${battleId}','${side}')">
-      <div class="debate-radio${chosen ? ' is-filled' : ''}"></div>
-      <div class="debate-result-mid">
-        <div class="debate-result-label">${esc(label)}</div>
-        <div class="debate-result-bar-wrap">
-          <div class="debate-result-bar" data-pct="${barWidth}" style="width:${barWidth}%"></div>
-        </div>
-      </div>
-      <div class="debate-result-pct-wrap">
-        ${donutSvg}
-        <div class="debate-result-pct">${hasVoted ? pct + '%' : ''}</div>
-      </div>
-    </div>`;
 }
 
 // Kept for compatibility — now unified
