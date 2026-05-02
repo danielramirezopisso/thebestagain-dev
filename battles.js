@@ -278,7 +278,6 @@ function buildVoteBtnsHtml(battle) { return buildDebateBodyHtml(battle); }
 function getVoteCountLabel(battleId) {
   const counts = TALLY[battleId] || { a: 0, b: 0 };
   const total  = (counts.a || 0) + (counts.b || 0);
-  if (MY_VOTES[battleId] === 'no_opinion') return 'No opinion';
   if (total === 0) return 'No votes yet';
   return `${total.toLocaleString()} vote${total !== 1 ? 's' : ''}`;
 }

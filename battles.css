@@ -59,7 +59,7 @@
 
 /* ── Category chapter — newspaper section break ── */
 .debates-chapter {
-  margin: 52px 0 0;
+  margin: 36px 0 0;
   padding-bottom: 10px;
   border-bottom: 2px solid var(--text);
 }
@@ -74,7 +74,7 @@
    DEBATE ROW
 ══════════════════════════════════════ */
 .debate-row {
-  padding: 28px 0 20px;
+  padding: 20px 0 16px;
   border-bottom: 1px solid var(--rule);
 }
 .debate-row:last-child { border-bottom: none; }
