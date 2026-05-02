@@ -159,10 +159,10 @@ function renderFeed() {
   groupOrder.forEach(key => {
     const { label, items } = groups[key];
 
-    // Chapter divider
+    // Chapter divider — bold newspaper section break
     const chapter = document.createElement('div');
     chapter.className = 'debates-chapter';
-    chapter.innerHTML = `<span>${esc(label)}</span>`;
+    chapter.innerHTML = `<div class="debates-chapter-label">${esc(label)}</div>`;
     feed.appendChild(chapter);
 
     items.forEach(b => feed.appendChild(buildDebateRow(b)));
@@ -181,7 +181,7 @@ function buildDebateRow(battle) {
     <div class="debate-question">${esc(battle.question)}</div>
     ${desc ? `<div class="debate-description">${esc(desc)}</div>` : ''}
     <div class="debate-body" id="body-${battle.id}">
-      ${voted ? buildResultsHtml(battle) : buildVoteBtnsHtml(battle)}
+      ${buildDebateBodyHtml(battle)}
     </div>
     <div class="debate-footer">
       <span class="debate-vote-count" id="count-${battle.id}">${getVoteCountLabel(battle.id)}</span>
@@ -191,16 +191,9 @@ function buildDebateRow(battle) {
   return row;
 }
 
-function buildVoteBtnsHtml(battle) {
-  return `
-    <div class="debate-vote-btns">
-      <button class="debate-vote-btn" onclick="castFeedVote('${battle.id}','a')">${esc(battle.option_a)}</button>
-      <button class="debate-vote-btn" onclick="castFeedVote('${battle.id}','b')">${esc(battle.option_b)}</button>
-    </div>
-    <div class="debate-vote-hint">Tap to vote and see the result</div>`;
-}
-
-function buildResultsHtml(battle) {
+// Unified body — always shows bars + radio buttons
+// voted = shows filled radio + bars; unvoted = shows empty radio + greyed bars
+function buildDebateBodyHtml(battle) {
   const myChoice   = MY_VOTES[battle.id];
   const counts     = TALLY[battle.id] || { a: 0, b: 0 };
   const totalVotes = (counts.a || 0) + (counts.b || 0);
@@ -213,36 +206,46 @@ function buildResultsHtml(battle) {
 
   const chosenA = myChoice === 'a';
   const chosenB = myChoice === 'b';
-  const noOp    = myChoice === 'no_opinion';
-  const leaderA = pctA > pctB;
-  const leaderB = pctB > pctA;
+  const hasVoted = myChoice && myChoice !== 'no_opinion';
+  const leaderA  = hasVoted && pctA > pctB;
+  const leaderB  = hasVoted && pctB > pctA;
 
-  const rowA = buildResultRowHtml({ label: battle.option_a, pct: pctA, chosen: chosenA, leader: leaderA, side: 'a', battleId: battle.id, noOp });
-  const rowB = buildResultRowHtml({ label: battle.option_b, pct: pctB, chosen: chosenB, leader: leaderB, side: 'b', battleId: battle.id, noOp });
+  const rowA = buildRadioRowHtml({ label: battle.option_a, pct: pctA, chosen: chosenA, leader: leaderA, side: 'a', battleId: battle.id, hasVoted });
+  const rowB = buildRadioRowHtml({ label: battle.option_b, pct: pctB, chosen: chosenB, leader: leaderB, side: 'b', battleId: battle.id, hasVoted });
+
+  const noOpLink = myChoice === 'no_opinion'
+    ? `<span class="debate-no-opinion is-chosen">No opinion ✓</span>`
+    : `<button class="debate-no-opinion-btn" onclick="castFeedVote('${battle.id}','no_opinion')">No opinion</button>`;
 
   return `
-    <div class="debate-results">${rowA}${rowB}</div>
-    <div class="debate-change-vote">
-      <button onclick="resetFeedVote('${battle.id}')">Change vote</button>
-    </div>`;
+    <div class="debate-results${hasVoted ? ' has-voted' : ''}">${rowA}${rowB}</div>
+    <div class="debate-footer-inner">${noOpLink}</div>`;
 }
 
-function buildResultRowHtml({ label, pct, chosen, leader, side, battleId, noOp }) {
+function buildRadioRowHtml({ label, pct, chosen, leader, side, battleId, hasVoted }) {
   const cls = ['debate-result-row'];
   if (chosen) cls.push('is-chosen');
   if (leader) cls.push('is-leader');
+  if (!hasVoted) cls.push('pre-vote');
+
+  const barWidth = hasVoted ? pct : 0;
+
   return `
-    <div class="${cls.join(' ')}" onclick="changeFeedVote('${battleId}','${side}')">
-      <div class="debate-result-pct">${noOp ? '—' : pct + '%'}</div>
+    <div class="${cls.join(' ')}" onclick="toggleFeedVote('${battleId}','${side}')">
+      <div class="debate-radio${chosen ? ' is-filled' : ''}"></div>
       <div class="debate-result-mid">
-        <div class="debate-result-bar-wrap">
-          <div class="debate-result-bar" data-pct="${noOp ? 0 : pct}"></div>
-        </div>
         <div class="debate-result-label">${esc(label)}</div>
+        <div class="debate-result-bar-wrap">
+          <div class="debate-result-bar" data-pct="${barWidth}" style="width:${barWidth}%"></div>
+        </div>
       </div>
-      <div class="debate-result-check">✓</div>
+      <div class="debate-result-pct">${hasVoted ? pct + '%' : ''}</div>
     </div>`;
 }
+
+// Kept for compatibility — now unified
+function buildResultsHtml(battle) { return buildDebateBodyHtml(battle); }
+function buildVoteBtnsHtml(battle) { return buildDebateBodyHtml(battle); }
 
 function getVoteCountLabel(battleId) {
   const counts = TALLY[battleId] || { a: 0, b: 0 };
@@ -271,17 +274,7 @@ async function castFeedVote(battleId, choice) {
   MY_VOTES[battleId] = choice;
   saveLocalVote(battleId, choice);
 
-  // Update body to show results
-  const body = document.getElementById('body-' + battleId);
-  const battle = ALL_BATTLES.find(b => b.id === battleId);
-  if (body && battle) {
-    body.innerHTML = buildResultsHtml(battle);
-    animateBars(battleId);
-  }
-  // Update count
-  const countEl = document.getElementById('count-' + battleId);
-  if (countEl) countEl.textContent = getVoteCountLabel(battleId);
-
+  refreshDebateBody(battleId);
   updateStats();
   persistVote(battleId, choice);
   if (typeof gtag !== 'undefined') gtag('event', 'battle_voted', { battle_id: battleId, choice });
@@ -301,24 +294,38 @@ async function changeFeedVote(battleId, newChoice) {
   MY_VOTES[battleId] = newChoice;
   saveLocalVote(battleId, newChoice);
 
-  const body = document.getElementById('body-' + battleId);
-  const battle = ALL_BATTLES.find(b => b.id === battleId);
-  if (body && battle) {
-    body.innerHTML = buildResultsHtml(battle);
-    animateBars(battleId);
-  }
-  const countEl = document.getElementById('count-' + battleId);
-  if (countEl) countEl.textContent = getVoteCountLabel(battleId);
-
+  refreshDebateBody(battleId);
   updateStats();
   persistVote(battleId, newChoice);
 }
 
-// Reset to show vote buttons again
-function resetFeedVote(battleId) {
+// Toggle: tap chosen radio = unvote; tap other = change vote
+async function toggleFeedVote(battleId, side) {
+  const current = MY_VOTES[battleId];
+  if (current === side) {
+    // Unvote
+    if (current !== 'no_opinion' && TALLY[battleId]) {
+      TALLY[battleId][current] = Math.max(0, (TALLY[battleId][current] || 0) - 1);
+    }
+    delete MY_VOTES[battleId];
+    saveLocalVote(battleId, null);
+    refreshDebateBody(battleId);
+    updateStats();
+    persistVote(battleId, 'no_opinion');
+  } else {
+    castFeedVote(battleId, side);
+  }
+}
+
+function refreshDebateBody(battleId) {
   const body = document.getElementById('body-' + battleId);
   const battle = ALL_BATTLES.find(b => b.id === battleId);
-  if (body && battle) body.innerHTML = buildVoteBtnsHtml(battle);
+  if (body && battle) {
+    body.innerHTML = buildDebateBodyHtml(battle);
+    animateBars(battleId);
+  }
+  const countEl = document.getElementById('count-' + battleId);
+  if (countEl) countEl.textContent = getVoteCountLabel(battleId);
 }
 
 // Stack/swipe removed — replaced by inline feed voting
