@@ -360,6 +360,22 @@ function refreshDebateBody(battleId) {
 
 
 /* ═══════════════════════════════════════
+   PERSIST VOTE TO DB
+═══════════════════════════════════════ */
+async function persistVote(battleId, choice) {
+  const visitorId = getVisitorId();
+  const user      = await maybeUser();
+  const payload   = { battle_id: battleId, visitor_id: visitorId, choice };
+  if (user) payload.user_id = user.id;
+
+  const { error } = await sb.from('battle_votes')
+    .upsert(payload, {
+      onConflict: user ? 'battle_id,user_id' : 'battle_id,visitor_id'
+    });
+  if (error) console.warn('Vote save error:', error.message);
+}
+
+/* ═══════════════════════════════════════
    SHARE
 ═══════════════════════════════════════ */
 async function shareBattle(e, battleId) {
