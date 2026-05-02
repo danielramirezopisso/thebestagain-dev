@@ -226,9 +226,19 @@ function buildRadioRowHtml({ label, pct, chosen, leader, side, battleId, hasVote
   const cls = ['debate-result-row'];
   if (chosen) cls.push('is-chosen');
   if (leader) cls.push('is-leader');
-  if (!hasVoted) cls.push('pre-vote');
 
   const barWidth = hasVoted ? pct : 0;
+  // Mini donut SVG — circle circumference = 2*pi*8 ≈ 50.3
+  const circ = 50.27;
+  const fill = hasVoted ? (circ * pct / 100) : 0;
+  const donutColor = chosen ? 'var(--accent)' : 'rgba(26,23,20,0.25)';
+  const donutSvg = `<svg class="debate-donut" viewBox="0 0 20 20">
+    <circle cx="10" cy="10" r="8" fill="none" stroke="rgba(26,23,20,0.08)" stroke-width="2.5"/>
+    <circle cx="10" cy="10" r="8" fill="none" stroke="${donutColor}" stroke-width="2.5"
+      stroke-dasharray="${fill} ${circ}"
+      stroke-dashoffset="${circ / 4}"
+      stroke-linecap="round"/>
+  </svg>`;
 
   return `
     <div class="${cls.join(' ')}" onclick="toggleFeedVote('${battleId}','${side}')">
@@ -239,7 +249,10 @@ function buildRadioRowHtml({ label, pct, chosen, leader, side, battleId, hasVote
           <div class="debate-result-bar" data-pct="${barWidth}" style="width:${barWidth}%"></div>
         </div>
       </div>
-      <div class="debate-result-pct">${hasVoted ? pct + '%' : ''}</div>
+      <div class="debate-result-pct-wrap">
+        ${donutSvg}
+        <div class="debate-result-pct">${hasVoted ? pct + '%' : ''}</div>
+      </div>
     </div>`;
 }
 

@@ -1,6 +1,5 @@
 /* ══════════════════════════════════════════════════════
    DEBATES — Editorial newspaper feed
-   Single scrollable column, max 640px, centered
 ══════════════════════════════════════════════════════ */
 
 .battles-page { background: var(--page-bg); min-height: 100dvh; }
@@ -56,78 +55,94 @@
 }
 
 /* ── Feed ── */
-.debates-feed {
-  display: flex; flex-direction: column;
-}
+.debates-feed { display: flex; flex-direction: column; }
 
-/* ── Category chapter — proper newspaper section break ── */
+/* ── Category chapter — newspaper section break ── */
 .debates-chapter {
-  margin: 56px 0 0;
+  margin: 52px 0 0;
   padding-bottom: 10px;
   border-bottom: 2px solid var(--text);
 }
+.debates-chapter:first-child { margin-top: 20px; }
 .debates-chapter-label {
   font-size: 11px; font-weight: 900;
   letter-spacing: 0.3em; text-transform: uppercase;
   color: var(--text);
 }
-/* First chapter less top margin */
-.debates-chapter:first-child { margin-top: 24px; }
 
 /* ══════════════════════════════════════
-   DEBATE ROW — the heart of it
+   DEBATE ROW
 ══════════════════════════════════════ */
 .debate-row {
-  padding: 28px 0 24px;
+  padding: 28px 0 20px;
   border-bottom: 1px solid var(--rule);
 }
 .debate-row:last-child { border-bottom: none; }
 
-/* Headline — the question */
 .debate-question {
   font-family: 'Playfair Display', Georgia, serif;
   font-size: 24px; font-weight: 700; line-height: 1.2;
   color: var(--text); margin-bottom: 6px;
 }
-
-/* Subhead — editorial description */
 .debate-description {
   font-size: 13px; color: var(--muted);
   font-style: italic; line-height: 1.6;
   margin-bottom: 18px;
 }
 
-/* vote buttons replaced by inline radio rows */
-
-/* ── Results (voted state) ── */
+/* ── Poll rows with radio ── */
 .debate-results {
   display: flex; flex-direction: column; gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .debate-result-row {
   display: grid;
-  grid-template-columns: 52px 1fr 22px;
+  grid-template-columns: 22px 1fr auto;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   cursor: pointer;
+  padding: 3px 0;
 }
 .debate-result-row:hover .debate-result-label { color: var(--text); }
 
-/* Big % */
-.debate-result-pct {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 26px; font-weight: 900; line-height: 1;
-  color: rgba(26,23,20,0.22);
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  transition: color 0.25s;
+/* Modern radio dot */
+.debate-radio {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: none;
+  flex-shrink: 0;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  position: relative; cursor: pointer;
+}
+.debate-radio.is-filled {
+  border-color: var(--accent);
+  background: var(--accent);
+  transform: scale(1.1);
+}
+.debate-radio.is-filled::after {
+  content: '';
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 7px; height: 7px;
+  background: #fff; border-radius: 50%;
+}
+.debate-result-row:hover .debate-radio:not(.is-filled) {
+  border-color: var(--accent);
+  background: rgba(45,74,138,0.08);
 }
 
-/* Bar + label */
+/* Label + bar */
 .debate-result-mid {
   display: flex; flex-direction: column; gap: 5px;
   min-width: 0;
+}
+.debate-result-label {
+  font-size: 14px; font-weight: 600;
+  color: var(--muted); line-height: 1.2;
+  transition: color 0.2s;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .debate-result-bar-wrap {
   height: 3px; background: rgba(26,23,20,0.07);
@@ -135,42 +150,71 @@
 }
 .debate-result-bar {
   height: 100%; background: var(--accent);
-  opacity: 0.3; border-radius: 999px;
-  width: 0%; /* start at 0, animate in */
-  transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
-}
-.debate-result-label {
-  font-size: 14px; font-weight: 600;
-  color: var(--muted); line-height: 1.25;
-  transition: color 0.25s;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  opacity: 0.25; border-radius: 999px;
+  width: 0%;
+  transition: width 0.8s cubic-bezier(0.16,1,0.3,1), opacity 0.3s;
 }
 
-/* Check */
-.debate-result-check {
-  font-size: 13px; color: var(--accent);
-  opacity: 0; transition: opacity 0.25s;
-  text-align: center; font-weight: 700;
+/* % + mini donut */
+.debate-result-pct-wrap {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+  min-width: 44px;
+}
+.debate-result-pct {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 17px; font-weight: 900; line-height: 1;
+  color: rgba(26,23,20,0.2);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.2s;
+  text-align: center;
+}
+.debate-donut {
+  width: 24px; height: 24px; flex-shrink: 0;
+  opacity: 0; transition: opacity 0.3s;
 }
 
-/* States */
-.debate-result-row.is-chosen .debate-result-pct   { color: var(--accent); }
-.debate-result-row.is-chosen .debate-result-bar   { opacity: 0.7; }
+/* Pre-vote: bars invisible, % invisible */
+.debate-results:not(.has-voted) .debate-result-bar { opacity: 0; }
+.debate-results:not(.has-voted) .debate-result-pct { color: transparent; }
+.debate-results:not(.has-voted) .debate-donut { opacity: 0; }
+
+/* Voted states */
+.debate-results.has-voted .debate-donut { opacity: 1; }
+.debate-results.has-voted .debate-result-pct { color: rgba(26,23,20,0.3); }
+
 .debate-result-row.is-chosen .debate-result-label { color: var(--text); font-weight: 700; }
-.debate-result-row.is-chosen .debate-result-check { opacity: 1; }
+.debate-result-row.is-chosen .debate-result-bar   { opacity: 0.65; }
+.debate-result-row.is-chosen .debate-result-pct   { color: var(--accent); }
 
-.debate-result-row.is-leader .debate-result-pct   { color: var(--text); }
-.debate-result-row.is-leader .debate-result-bar   { opacity: 0.5; }
 .debate-result-row.is-leader .debate-result-label { color: var(--text); }
+.debate-result-row.is-leader .debate-result-bar   { opacity: 0.45; }
+.debate-result-row.is-leader .debate-result-pct   { color: var(--text); }
 
 .debate-result-row.is-chosen.is-leader .debate-result-pct   { color: var(--accent); }
 .debate-result-row.is-chosen.is-leader .debate-result-label { color: var(--accent); }
+
+/* No opinion — tiny ghost link */
+.debate-footer-inner {
+  margin-top: 4px;
+}
+.debate-no-opinion-btn {
+  background: none; border: none; box-shadow: none;
+  font-size: 11px; font-weight: 500;
+  color: rgba(26,23,20,0.3);
+  cursor: pointer; padding: 0;
+  transition: color 0.12s;
+}
+.debate-no-opinion-btn:hover { color: var(--muted); transform: none; box-shadow: none; }
+.debate-no-opinion.is-chosen {
+  font-size: 11px; color: rgba(26,23,20,0.4);
+}
 
 /* Footer */
 .debate-footer {
   display: flex; align-items: center;
   justify-content: space-between;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 .debate-vote-count {
   font-size: 11px; font-weight: 600;
@@ -179,21 +223,10 @@
 .debate-share-btn {
   background: none; border: none; box-shadow: none;
   font-size: 11px; font-weight: 600; color: var(--muted);
-  cursor: pointer; padding: 0; letter-spacing: 0.03em;
+  cursor: pointer; padding: 0;
   transition: color 0.12s;
 }
 .debate-share-btn:hover { color: var(--text); background: none; transform: none; }
-
-/* Change vote link (below results) */
-.debate-change-vote {
-  font-size: 11px; color: var(--muted); text-align: center;
-  margin-top: 8px; opacity: 0.7;
-}
-.debate-change-vote button {
-  background: none; border: none; color: var(--accent);
-  font-size: 11px; cursor: pointer; padding: 0; text-decoration: underline;
-  text-underline-offset: 3px; box-shadow: none;
-}
 
 /* Empty */
 .debates-empty {
@@ -207,8 +240,10 @@
   .debates-main { padding: 0 16px 100px; }
   .debates-hero { padding: 28px 0 18px; }
   .debate-question { font-size: 20px; }
-  .debate-result-pct { font-size: 16px; min-width: 36px; }
-  .debate-result-row { grid-template-columns: 20px 1fr 38px; gap: 10px; }
-  .debate-radio { width: 16px; height: 16px; }
-  .debates-chapter { margin-top: 44px; }
+  .debate-result-pct { font-size: 15px; }
+  .debate-result-row { grid-template-columns: 18px 1fr auto; gap: 10px; }
+  .debate-radio { width: 18px; height: 18px; }
+  .debates-chapter { margin-top: 40px; }
+  .debate-result-pct-wrap { min-width: 38px; }
+  .debate-donut { width: 20px; height: 20px; }
 }
