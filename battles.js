@@ -207,7 +207,7 @@ function buildDebateBodyHtml(battle) {
   const hasVoted = !!(myChoice && myChoice !== 'no_opinion');
   const noOp     = myChoice === 'no_opinion';
 
-  const pieHtml = buildPieChart(pctA, chosenA, chosenB, hasVoted);
+  const pieHtml = buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted);
 
   const noOpLink = noOp
     ? `<span class="debate-no-opinion is-chosen">No opinion ✓</span>`
@@ -238,7 +238,7 @@ function buildDebateBodyHtml(battle) {
     <div class="debate-footer-inner">${noOpLink}</div>`;
 }
 
-function buildPieChart(pctA, chosenA, chosenB, hasVoted) {
+function buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted) {
   const r = 40; const cx = 50; const cy = 50;
   const circ = 2 * Math.PI * r;
 
@@ -267,7 +267,7 @@ function buildPieChart(pctA, chosenA, chosenB, hasVoted) {
       stroke-dashoffset="${(circ / 4).toFixed(2)}"
       stroke-linecap="butt"/>
     <text x="50" y="47" text-anchor="middle" class="debate-pie-pct">${winPct}%</text>
-    <text x="50" y="60" text-anchor="middle" class="debate-pie-label">${pctA >= pctB ? 'A wins' : 'B wins'}</text>
+
   </svg>`;
 }
 
