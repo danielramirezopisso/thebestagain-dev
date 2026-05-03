@@ -252,13 +252,32 @@
    PIE CHART DEBATE LAYOUT
 ══════════════════════════════════════ */
 
-/* Wrapper: pie on left, options on right */
+/* Wrapper: images + pie on left, options on right */
 .debate-body-wrap {
   display: grid;
-  grid-template-columns: 120px 1fr;
-  gap: 20px;
+  grid-template-columns: auto 100px 1fr;
+  gap: 14px;
   align-items: center;
   margin-bottom: 6px;
+}
+/* No images: pie takes first col */
+.debate-body-wrap .debate-pie-wrap:first-child {
+  grid-column: 1 / 2;
+}
+
+/* Small stacked images */
+.debate-imgs {
+  display: flex; flex-direction: column; gap: 4px;
+  align-items: center;
+}
+.debate-img {
+  width: 40px; height: 40px;
+  border-radius: 6px;
+  background-size: cover !important;
+  background-position: center !important;
+  background-color: var(--faint);
+  flex-shrink: 0;
+  border: 1px solid var(--border);
 }
 
 /* Pie chart SVG */
@@ -291,21 +310,21 @@
   display: flex; flex-direction: column; gap: 10px;
 }
 .debate-option {
-  display: flex; align-items: center; gap: 10px;
-  cursor: pointer; padding: 6px 0;
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; padding: 5px 0;
   transition: opacity 0.15s;
 }
-.debate-option:hover { opacity: 0.8; }
+.debate-option:hover { opacity: 0.85; }
 
-/* Colour dot — the legend indicator */
+/* Colour dot */
 .debate-option-dot {
-  width: 10px; height: 10px;
+  width: 9px; height: 9px;
   border-radius: 50%; flex-shrink: 0;
 }
 .debate-option-dot-a { background: #2d4a8a; }
-.debate-option-dot-b { background: #b8860b; }
+.debate-option-dot-b { background: #b0bcce; }
 
-/* Label + % */
+/* Label + bar */
 .debate-option-info { flex: 1; min-width: 0; }
 .debate-option-label {
   font-size: 14px; font-weight: 600;
@@ -313,50 +332,66 @@
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   transition: color 0.2s;
 }
-.debate-option.is-chosen .debate-option-label {
-  color: var(--text); font-weight: 700;
+.debate-option.is-chosen .debate-option-label { color: var(--text); font-weight: 700; }
+
+/* Thin bar below label */
+.debate-option-bar-wrap {
+  height: 2px; background: rgba(26,23,20,0.07);
+  border-radius: 999px; overflow: hidden;
+  margin-top: 4px;
+}
+.debate-option-bar {
+  height: 100%; border-radius: 999px;
+  transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.debate-option-bar-a { background: #2d4a8a; opacity: 0.6; }
+.debate-option-bar-b { background: #b0bcce; opacity: 0.8; }
+.debate-option.is-chosen .debate-option-bar-a { opacity: 1; }
+.debate-option.is-chosen .debate-option-bar-b { opacity: 1; }
+
+/* Right side: % + radio */
+.debate-option-right {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
 }
 .debate-option-pct {
-  font-size: 11px; font-weight: 700; color: var(--muted);
-  margin-top: 2px;
+  font-size: 12px; font-weight: 700;
+  color: var(--muted); min-width: 32px; text-align: right;
+  transition: color 0.2s;
 }
 .debate-option.is-chosen .debate-option-pct { color: var(--accent); }
 
-/* Radio on the right */
+/* Radio */
 .debate-option-radio {
   width: 18px; height: 18px;
   border-radius: 50%;
   border: 2px solid var(--border);
-  flex-shrink: 0;
-  position: relative;
+  flex-shrink: 0; position: relative;
   transition: border-color 0.15s, background 0.15s;
 }
 .debate-option-radio.is-filled {
-  border-color: var(--accent);
-  background: var(--accent);
+  border-color: var(--accent); background: var(--accent);
 }
 .debate-option-radio.is-filled::after {
-  content: '';
-  position: absolute; top: 50%; left: 50%;
+  content: ''; position: absolute; top: 50%; left: 50%;
   transform: translate(-50%,-50%);
-  width: 6px; height: 6px;
-  background: #fff; border-radius: 50%;
+  width: 6px; height: 6px; background: #fff; border-radius: 50%;
 }
 .debate-option:hover .debate-option-radio:not(.is-filled) {
-  border-color: var(--accent);
-  background: rgba(45,74,138,0.08);
+  border-color: var(--accent); background: rgba(45,74,138,0.08);
 }
 
-/* Pre-vote: hide % (shown only after voting) */
+/* Pre-vote: hide % */
 .debate-body-wrap:not(.has-voted) .debate-option-pct { display: none; }
+.debate-body-wrap:not(.has-voted) .debate-option-bar-wrap { display: none; }
 
-/* Mobile: stack pie above options */
 @media (max-width: 500px) {
   .debate-body-wrap {
-    grid-template-columns: 1fr;
+    grid-template-columns: auto 1fr;
     grid-template-rows: auto auto;
   }
-  .debate-pie { width: 90px; height: 90px; }
-  .debate-pie-wrap { justify-content: flex-start; }
+  /* Images + pie in first col, options span both rows */
+  .debate-imgs { flex-direction: row; }
+  .debate-img { width: 32px; height: 32px; }
+  .debate-pie { width: 80px; height: 80px; }
 }
 

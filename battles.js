@@ -209,29 +209,45 @@ function buildDebateBodyHtml(battle) {
 
   const pieHtml = buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted);
 
+  // Small images — left of chart, stacked or single
+  const hasImgA = !!battle.image_a_url;
+  const hasImgB = !!battle.image_b_url;
+  const imgsHtml = (hasImgA || hasImgB) ? `
+    <div class="debate-imgs">
+      ${hasImgA ? `<div class="debate-img" style="background-image:url('${esc(battle.image_a_url)}')"></div>` : ''}
+      ${hasImgB ? `<div class="debate-img" style="background-image:url('${esc(battle.image_b_url)}')"></div>` : ''}
+    </div>` : '';
+
   const noOpLink = noOp
     ? `<span class="debate-no-opinion is-chosen">No opinion ✓</span>`
     : `<button class="debate-no-opinion-btn" onclick="castFeedVote('${battle.id}','no_opinion')">No opinion</button>`;
 
   return `
     <div class="debate-body-wrap${hasVoted ? ' has-voted' : ''}">
+      ${imgsHtml}
       <div class="debate-pie-wrap">${pieHtml}</div>
       <div class="debate-options">
         <div class="debate-option${chosenA ? ' is-chosen' : ''}" onclick="toggleFeedVote('${battle.id}','a')">
           <div class="debate-option-dot debate-option-dot-a"></div>
           <div class="debate-option-info">
             <div class="debate-option-label">${esc(battle.option_a)}</div>
-            ${hasVoted ? `<div class="debate-option-pct">${pctA}%</div>` : ''}
+            ${hasVoted ? `<div class="debate-option-bar-wrap"><div class="debate-option-bar debate-option-bar-a" style="width:${pctA}%"></div></div>` : ''}
           </div>
-          <div class="debate-option-radio${chosenA ? ' is-filled' : ''}"></div>
+          <div class="debate-option-right">
+            ${hasVoted ? `<div class="debate-option-pct">${pctA}%</div>` : ''}
+            <div class="debate-option-radio${chosenA ? ' is-filled' : ''}"></div>
+          </div>
         </div>
         <div class="debate-option${chosenB ? ' is-chosen' : ''}" onclick="toggleFeedVote('${battle.id}','b')">
           <div class="debate-option-dot debate-option-dot-b"></div>
           <div class="debate-option-info">
             <div class="debate-option-label">${esc(battle.option_b)}</div>
-            ${hasVoted ? `<div class="debate-option-pct">${pctB}%</div>` : ''}
+            ${hasVoted ? `<div class="debate-option-bar-wrap"><div class="debate-option-bar debate-option-bar-b" style="width:${pctB}%"></div></div>` : ''}
           </div>
-          <div class="debate-option-radio${chosenB ? ' is-filled' : ''}"></div>
+          <div class="debate-option-right">
+            ${hasVoted ? `<div class="debate-option-pct">${pctB}%</div>` : ''}
+            <div class="debate-option-radio${chosenB ? ' is-filled' : ''}"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -239,35 +255,38 @@ function buildDebateBodyHtml(battle) {
 }
 
 function buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted) {
-  const r = 40; const cx = 50; const cy = 50;
+  const r = 36; const cx = 50; const cy = 50;
   const circ = 2 * Math.PI * r;
 
   if (!hasVoted) {
     return `<svg viewBox="0 0 100 100" class="debate-pie">
       <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
-        stroke="rgba(26,23,20,0.08)" stroke-width="9"/>
-      <text x="50" y="57" text-anchor="middle" class="debate-pie-label">Vote</text>
+        stroke="rgba(26,23,20,0.07)" stroke-width="10"/>
+      <text x="50" y="55" text-anchor="middle" class="debate-pie-label">Vote</text>
     </svg>`;
   }
 
-  const fillA = circ * pctA / 100;
+  // Blue family: dark blue for A, muted blue-grey for B
   const colorA = '#2d4a8a';
-  const colorB = '#b8860b';
-  const swA = chosenA ? 11 : 8;
-  const swB = chosenB ? 11 : 8;
+  const colorB = '#b0bcce';
+
+  const fillA = circ * Math.max(pctA, 0) / 100;
+  const fillB = circ - fillA;
+  // Negative offset = start at 12 o'clock
+  const offset = -(circ / 4);
   const winPct = pctA >= pctB ? pctA : pctB;
 
   return `<svg viewBox="0 0 100 100" class="debate-pie">
     <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
-      stroke="${colorB}" stroke-width="${swB}"
-      stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="0"/>
+      stroke="${colorB}" stroke-width="10"
+      stroke-dasharray="${fillB.toFixed(2)} ${fillA.toFixed(2)}"
+      stroke-dashoffset="${(offset - fillA).toFixed(2)}"/>
     <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
-      stroke="${colorA}" stroke-width="${swA}"
-      stroke-dasharray="${fillA.toFixed(2)} ${circ.toFixed(2)}"
-      stroke-dashoffset="${(circ / 4).toFixed(2)}"
-      stroke-linecap="butt"/>
+      stroke="${colorA}" stroke-width="10"
+      stroke-dasharray="${fillA.toFixed(2)} ${fillB.toFixed(2)}"
+      stroke-dashoffset="${offset.toFixed(2)}"/>
     <text x="50" y="47" text-anchor="middle" class="debate-pie-pct">${winPct}%</text>
-
+    <text x="50" y="61" text-anchor="middle" class="debate-pie-sublabel">${pctA >= pctB ? 'leads' : 'leads'}</text>
   </svg>`;
 }
 
