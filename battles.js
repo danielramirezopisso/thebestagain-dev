@@ -204,7 +204,7 @@ function buildDebateBodyHtml(battle) {
 
   const chosenA  = myChoice === 'a';
   const chosenB  = myChoice === 'b';
-  const hasVoted = !!(myChoice && myChoice !== 'no_opinion');
+  const hasVoted = !!myChoice; // no_opinion also shows results
   const noOp     = myChoice === 'no_opinion';
 
   const pieHtml = buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted);

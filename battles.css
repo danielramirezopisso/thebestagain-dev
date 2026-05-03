@@ -72,7 +72,10 @@
   padding-bottom: 10px;
   border-bottom: 2px solid var(--text);
 }
-.debates-chapter:first-child { margin-top: 20px; }
+.debates-chapter:first-child { 
+  margin-top: 0;
+  border-top: none;
+}
 .debates-chapter-label {
   font-size: 11px; font-weight: 900;
   letter-spacing: 0.3em; text-transform: uppercase;
@@ -292,9 +295,7 @@
   border-color: var(--accent);
   box-shadow: 0 0 0 2px rgba(45,74,138,0.15);
 }
-.debate-img.is-loser {
-  opacity: 0.45;
-}
+/* loser: no fade — winner border is enough signal */
 
 /* Pie chart SVG */
 .debate-pie-wrap {
@@ -348,6 +349,12 @@
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   transition: color 0.2s;
 }
+.debate-option.is-chosen {
+  background: rgba(45,74,138,0.06);
+  border-radius: 8px;
+  margin: 0 -8px;
+  padding: 5px 8px;
+}
 .debate-option.is-chosen .debate-option-label { color: var(--accent); font-weight: 800; }
 
 /* Thin bar below label */
@@ -375,7 +382,10 @@
   transition: color 0.2s;
 }
 .debate-option.is-chosen .debate-option-pct { color: var(--accent); }
-.debate-option.is-chosen .debate-option-dot { background: var(--accent) !important; }
+/* chosen dot: keeps its own colour, accent ring around it */
+.debate-option.is-chosen .debate-option-dot {
+  box-shadow: 0 0 0 2px var(--accent);
+}
 
 /* Radio */
 .debate-option-radio {
