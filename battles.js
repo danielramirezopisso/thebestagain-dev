@@ -207,7 +207,7 @@ function buildDebateBodyHtml(battle) {
   const hasVoted = !!myChoice; // no_opinion also shows results
   const noOp     = myChoice === 'no_opinion';
 
-  const pieHtml = buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted);
+  const pieHtml = buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted, battle.option_a, battle.option_b);
 
   // Small images — left of chart, stacked or single
   const hasImgA = !!battle.image_a_url;
@@ -227,7 +227,6 @@ function buildDebateBodyHtml(battle) {
   return `
     <div class="debate-body-wrap${hasVoted ? ' has-voted' : ''}">
       ${imgsHtml}
-      <div class="debate-pie-wrap">${pieHtml}</div>
       <div class="debate-options">
         <div class="debate-option${chosenA ? ' is-chosen' : ''}" onclick="toggleFeedVote('${battle.id}','a')">
           <div class="debate-option-dot debate-option-dot-a"></div>
@@ -252,11 +251,12 @@ function buildDebateBodyHtml(battle) {
           </div>
         </div>
       </div>
+      <div class="debate-pie-wrap">${pieHtml}</div>
     </div>
     <div class="debate-footer-inner">${noOpLink}</div>`;
 }
 
-function buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted) {
+function buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted, winLabelA, winLabelB) {
   const r = 36; const cx = 50; const cy = 50;
   const circ = 2 * Math.PI * r;
 

@@ -264,16 +264,16 @@
    PIE CHART DEBATE LAYOUT
 ══════════════════════════════════════ */
 
-/* Wrapper: images + pie on left, options on right */
+/* Wrapper: images | options | pie */
 .debate-body-wrap {
   display: grid;
-  grid-template-columns: auto 100px 1fr;
-  gap: 14px;
+  grid-template-columns: auto 1fr 110px;
+  gap: 16px;
   align-items: center;
   margin-bottom: 6px;
 }
-/* No images: pie takes first col */
-.debate-body-wrap .debate-pie-wrap:first-child {
+/* No images: options start from col 1 */
+.debate-body-wrap:not(:has(.debate-imgs)) .debate-options {
   grid-column: 1 / 2;
 }
 
@@ -283,7 +283,7 @@
   align-items: center;
 }
 .debate-img {
-  width: 56px; height: 56px;
+  width: 64px; height: 64px;
   border-radius: 6px;
   background-size: cover !important;
   background-position: center !important;
@@ -420,6 +420,13 @@
   /* Images + pie in first col, options span both rows */
   .debate-imgs { flex-direction: row; }
   .debate-img { width: 32px; height: 32px; }
-  .debate-pie { width: 80px; height: 80px; }
+  .debate-pie { width: 110px; height: 110px; }
 }
 
+
+/* Pie winner label */
+.debate-pie-winner {
+  font-size: 9px; font-weight: 700;
+  fill: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
