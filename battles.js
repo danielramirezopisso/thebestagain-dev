@@ -265,7 +265,8 @@ function buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted, winLabelA, winLab
       <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
         stroke="rgba(26,23,20,0.07)" stroke-width="10"/>
       <text x="50" y="55" text-anchor="middle" class="debate-pie-label">Vote</text>
-    </svg>`;
+    </svg>
+    <div class="debate-pie-winner" style="visibility:hidden">—</div>`;
   }
 
   // Blue family: dark blue for A, muted blue-grey for B
@@ -287,9 +288,9 @@ function buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted, winLabelA, winLab
       stroke="${colorA}" stroke-width="10"
       stroke-dasharray="${fillA.toFixed(2)} ${fillB.toFixed(2)}"
       stroke-dashoffset="${offset.toFixed(2)}"/>
-    <text x="50" y="47" text-anchor="middle" class="debate-pie-pct">${winPct}%</text>
-
-  </svg>`;
+    <text x="50" y="55" text-anchor="middle" class="debate-pie-pct">${winPct}%</text>
+  </svg>
+  <div class="debate-pie-winner">${esc(pctA >= pctB ? winLabelA : winLabelB)}</div>`;
 }
 
 // Kept for compatibility — now unified
