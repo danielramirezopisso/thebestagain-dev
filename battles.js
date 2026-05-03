@@ -212,10 +212,12 @@ function buildDebateBodyHtml(battle) {
   // Small images — left of chart, stacked or single
   const hasImgA = !!battle.image_a_url;
   const hasImgB = !!battle.image_b_url;
+  const winnerA = hasVoted && pctA > pctB;
+  const winnerB = hasVoted && pctB > pctA;
   const imgsHtml = (hasImgA || hasImgB) ? `
     <div class="debate-imgs">
-      ${hasImgA ? `<div class="debate-img" style="background-image:url('${esc(battle.image_a_url)}')"></div>` : ''}
-      ${hasImgB ? `<div class="debate-img" style="background-image:url('${esc(battle.image_b_url)}')"></div>` : ''}
+      ${hasImgA ? `<div class="debate-img${winnerA ? ' is-winner' : (hasVoted && !winnerA ? ' is-loser' : '')}" style="background-image:url('${esc(battle.image_a_url)}')"></div>` : ''}
+      ${hasImgB ? `<div class="debate-img${winnerB ? ' is-winner' : (hasVoted && !winnerB ? ' is-loser' : '')}" style="background-image:url('${esc(battle.image_b_url)}')"></div>` : ''}
     </div>` : '';
 
   const noOpLink = noOp
@@ -286,7 +288,7 @@ function buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted) {
       stroke-dasharray="${fillA.toFixed(2)} ${fillB.toFixed(2)}"
       stroke-dashoffset="${offset.toFixed(2)}"/>
     <text x="50" y="47" text-anchor="middle" class="debate-pie-pct">${winPct}%</text>
-    <text x="50" y="61" text-anchor="middle" class="debate-pie-sublabel">${pctA >= pctB ? 'leads' : 'leads'}</text>
+
   </svg>`;
 }
 

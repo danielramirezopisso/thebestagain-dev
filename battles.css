@@ -5,9 +5,9 @@
 .battles-page { background: var(--page-bg); min-height: 100dvh; }
 
 .debates-main {
-  max-width: 640px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 0 24px 100px;
+  padding: 0 32px 100px;
 }
 
 /* ── Hero ── */
@@ -55,7 +55,16 @@
 }
 
 /* ── Feed ── */
-.debates-feed { display: flex; flex-direction: column; }
+.debates-feed {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 48px;
+  align-items: start;
+}
+/* Chapter dividers span full width */
+.debates-chapter {
+  grid-column: 1 / -1;
+}
 
 /* ── Category chapter — newspaper section break ── */
 .debates-chapter {
@@ -236,16 +245,15 @@
 .debates-empty-icon { font-size: 40px; margin-bottom: 12px; }
 
 /* ── Mobile ── */
+@media (max-width: 860px) {
+  .debates-feed {
+    grid-template-columns: 1fr; /* single column on tablet/mobile */
+  }
+}
 @media (max-width: 620px) {
   .debates-main { padding: 0 16px 100px; }
   .debates-hero { padding: 28px 0 18px; }
   .debate-question { font-size: 20px; }
-  .debate-result-pct { font-size: 15px; }
-  .debate-result-row { grid-template-columns: 18px 1fr auto; gap: 10px; }
-  .debate-radio { width: 18px; height: 18px; }
-  .debates-chapter { margin-top: 40px; }
-  .debate-result-pct-wrap { min-width: 38px; }
-  .debate-donut { width: 20px; height: 20px; }
 }
 
 /* ══════════════════════════════════════
@@ -271,13 +279,21 @@
   align-items: center;
 }
 .debate-img {
-  width: 40px; height: 40px;
+  width: 56px; height: 56px;
   border-radius: 6px;
   background-size: cover !important;
   background-position: center !important;
   background-color: var(--faint);
   flex-shrink: 0;
-  border: 1px solid var(--border);
+  border: 2px solid transparent;
+  transition: border-color 0.3s, opacity 0.3s;
+}
+.debate-img.is-winner {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(45,74,138,0.15);
+}
+.debate-img.is-loser {
+  opacity: 0.45;
 }
 
 /* Pie chart SVG */
@@ -332,7 +348,7 @@
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   transition: color 0.2s;
 }
-.debate-option.is-chosen .debate-option-label { color: var(--text); font-weight: 700; }
+.debate-option.is-chosen .debate-option-label { color: var(--accent); font-weight: 800; }
 
 /* Thin bar below label */
 .debate-option-bar-wrap {
@@ -359,6 +375,7 @@
   transition: color 0.2s;
 }
 .debate-option.is-chosen .debate-option-pct { color: var(--accent); }
+.debate-option.is-chosen .debate-option-dot { background: var(--accent) !important; }
 
 /* Radio */
 .debate-option-radio {
