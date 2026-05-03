@@ -301,8 +301,9 @@
 /* Pie chart SVG */
 .debate-pie-wrap {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 .debate-pie {
   width: 100px; height: 100px;
@@ -437,9 +438,4 @@
   white-space: nowrap;
 }
 
-/* Pie wrap: flex column to stack SVG + winner label */
-.debate-pie-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+/* pie-wrap defined above */
