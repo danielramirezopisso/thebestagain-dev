@@ -267,7 +267,7 @@
 /* Wrapper: images | options | pie */
 .debate-body-wrap {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 72px 1fr auto;
   gap: 12px;
   align-items: center;
   margin-bottom: 6px;
@@ -277,15 +277,16 @@
   grid-column: 1 / 2;
 }
 
-/* Small stacked images */
+/* Images — fill column width, stacked */
 .debate-imgs {
-  display: flex; flex-direction: column; gap: 4px;
-  align-items: center;
+  display: flex; flex-direction: column; gap: 5px;
+  align-items: stretch;
   align-self: center;
+  width: 72px; /* fixed column width */
 }
 .debate-img {
-  width: 52px; height: 52px;
-  border-radius: 6px;
+  width: 72px; height: 72px;
+  border-radius: 8px;
   background-size: cover !important;
   background-position: center !important;
   background-color: var(--faint);
@@ -425,7 +426,8 @@
     align-items: start;
   }
   .debate-imgs { flex-direction: row; margin-bottom: 10px; }
-  .debate-img { width: 44px; height: 44px; }
+  .debate-img { width: 52px; height: 52px; }
+  .debate-imgs { width: 52px; }
   .debate-options { grid-column: 1; }
   .debate-pie-wrap { grid-column: 2; grid-row: 1; align-self: center; }
   .debate-pie { width: 120px; height: 120px; }
