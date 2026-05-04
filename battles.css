@@ -267,7 +267,7 @@
 /* Wrapper: images | options | pie */
 .debate-body-wrap {
   display: grid;
-  grid-template-columns: 72px 1fr auto;
+  grid-template-columns: minmax(80px, 120px) 1fr auto;
   gap: 12px;
   align-items: center;
   margin-bottom: 6px;
@@ -277,20 +277,21 @@
   grid-column: 1 / 2;
 }
 
-/* Images — fill column width, stacked */
+/* Images — horizontal row, each fills 50% of column */
 .debate-imgs {
-  display: flex; flex-direction: column; gap: 5px;
+  display: flex; flex-direction: row; gap: 4px;
   align-items: stretch;
   align-self: center;
-  width: 72px; /* fixed column width */
+  width: 100%; /* fill the column */
 }
 .debate-img {
-  width: 72px; height: 72px;
+  flex: 1; /* each takes equal share */
+  min-width: 0;
+  aspect-ratio: 1;
   border-radius: 8px;
   background-size: cover !important;
   background-position: center !important;
   background-color: var(--faint);
-  flex-shrink: 0;
   border: 2px solid transparent;
   transition: border-color 0.3s, opacity 0.3s;
 }
@@ -306,6 +307,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  align-self: center; /* vertically center in grid row */
   gap: 4px;
 }
 .debate-pie {
@@ -426,8 +428,9 @@
     align-items: start;
   }
   .debate-imgs { flex-direction: row; margin-bottom: 10px; }
-  .debate-img { width: 52px; height: 52px; }
-  .debate-imgs { width: 52px; }
+  /* Images fill left col on mobile */
+  .debate-imgs { width: 100%; }
+  .debate-img { aspect-ratio: 1; }
   .debate-options { grid-column: 1; }
   .debate-pie-wrap { grid-column: 2; grid-row: 1; align-self: center; }
   .debate-pie { width: 120px; height: 120px; }
