@@ -414,14 +414,21 @@
 .debate-body-wrap:not(.has-voted) .debate-option-bar-wrap { display: none; }
 
 @media (max-width: 500px) {
+  /* Mobile: 2 equal columns
+     Left (50%): images horizontally + options + no opinion
+     Right (50%): pie chart + winner label */
   .debate-body-wrap {
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: start;
   }
-  /* Images + pie in first col, options span both rows */
-  .debate-imgs { flex-direction: row; }
-  .debate-img { width: 32px; height: 32px; }
-  .debate-pie { width: 110px; height: 110px; }
+  .debate-imgs { flex-direction: row; margin-bottom: 10px; }
+  .debate-img { width: 44px; height: 44px; }
+  .debate-options { grid-column: 1; }
+  .debate-pie-wrap { grid-column: 2; grid-row: 1; align-self: center; }
+  .debate-pie { width: 120px; height: 120px; }
+  .debate-pie-pct { font-size: 22px; }
+  .debate-pie-winner { font-size: 11px; max-width: 120px; margin-top: 6px; }
 }
 
 
