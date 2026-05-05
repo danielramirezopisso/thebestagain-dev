@@ -163,7 +163,7 @@ async function initHomeMap() {
     });
     L.marker([m.lat, m.lon], { icon: leafIcon })
       .addTo(HOME_MAP)
-      .on("click", () => { window.location.href = `marker.html?id=${encodeURIComponent(m.id)}`; });
+      .on("click", () => { window.location.href = "map.html"; });
   });
 
   setTimeout(() => HOME_MAP.invalidateSize(), 200);
