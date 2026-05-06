@@ -2,13 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <title>The Best Again — Top rated products by category</title>
-  <meta name="description" content="Discover the highest-rated food products ranked by the community. Croissants, pizza, tiramisu and more." />
-  <meta property="og:title" content="The Best Again — Top rated products by category" />
-  <meta property="og:description" content="Discover the highest-rated food products ranked by the community. Croissants, pizza, tiramisu and more." />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary" />
-  <!-- Google Analytics 4 — replace G-VYVTQPBTPC with your Measurement ID -->
+  <meta name="description" content="Discover the highest-rated food products ranked by the community." />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -16,15 +13,15 @@
     gtag("js", new Date());
     gtag("config", "G-VYVTQPBTPC");
   </script>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-
   <link rel="stylesheet" href="base.css" />
   <link rel="stylesheet" href="products.css" />
   <link rel="stylesheet" href="traction.css" />
 </head>
 
 <body class="products-page" onload="initProductsMasonryPage()">
-    <header class="topbar topbar-sticky">
+
+  <!-- Topbar -->
+  <header class="topbar topbar-sticky">
     <a class="brand" href="index.html">TBA</a>
     <nav class="nav" id="mainNav">
       <a href="index.html">Home</a>
@@ -36,124 +33,123 @@
     </nav>
     <div class="nav-right">
       <span id="authStatus" class="auth-pill"></span>
-      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu">&#9776;</button>
     </div>
   </header>
 
-  <main class="products-shell">
-    <!-- TOP TOOLBAR -->
-    <section class="products-toolbar">
-      <button class="filter-toggle-btn" id="prodFilterToggle" style="display:none;">
-        Filters <span class="filter-toggle-arrow">▼</span>
-      </button>
-      <div class="filter-collapsible open" id="prodFilterBody">
-      <div class="toolbar-left">
-        <div class="toolbar-block">
-          <div class="toolbar-label">Category</div>
-          <div class="toolbar-inline">
-            <div id="catQuick" class="chip-row"></div>
+  <main class="products-main">
 
-            <select id="catMore" class="select-compact" onchange="onCategoryMoreChanged()">
-              <option value="">More…</option>
-            </select>
+    <!-- Hero -->
+    <header class="products-hero">
+      <div class="products-hero-eyebrow">The Best Again</div>
+      <h1 class="products-hero-title">Products</h1>
+      <p class="products-hero-sub">The highest-rated food products, ranked by the community.</p>
 
-            <button id="btnClearFilters" class="chip chip-clear" style="display:none;" onclick="clearFilters()">✕ Clear</button>
-          </div>
-        </div>
+      <!-- Controls row: Filters pill + Journey toggle -->
+      <div class="products-controls">
+        <button class="prod-filter-pill" id="prodFilterPill" onclick="toggleFilterDrawer()">
+          <span>⚙ Filters</span>
+          <span class="prod-filter-count" id="prodFilterCount" style="display:none;"></span>
+        </button>
 
-        <div class="toolbar-block">
-          <div class="toolbar-label">Rating</div>
-          <div id="ratingSeg" class="seg-row"></div>
+        <div class="prod-journey-toggle" onclick="toggleJourneyModeProd()">
+          <span class="journey-opt journey-opt-active" id="prodJOptDiscover">🌍 Discover</span>
+          <span class="journey-divider">|</span>
+          <span class="journey-opt" id="prodJOptJourney">🧭 My Journey</span>
         </div>
       </div>
+    </header>
 
-      <div class="toolbar-right">
-        <span id="pageStatus" class="muted"></span>
+    <!-- Status -->
+    <div class="prod-status" id="pageStatus"></div>
 
-        <div class="toolbar-suggest">
-          <span class="request-link" onclick="openTraction('requestCategory', null)">💡 Suggest category</span>
-          <span class="request-link" onclick="openTraction('requestBrand', null)">🏷️ Suggest brand</span>
-        </div>
-      </div>
-    </section>
-    <div class="journey-bar-centered" id="prodJourneyWrap">
-      <div class="journey-float-toggle" onclick="toggleJourneyModeProd()">
-        <span class="journey-opt journey-opt-active" id="prodJOptDiscover">🌍 Discover</span>
-        <span class="journey-divider">|</span>
-        <span class="journey-opt" id="prodJOptJourney">🧭 My Journey</span>
-      </div>
-    </div>
+    <!-- Lanes grid -->
+    <div class="lanes-grid" id="lanes"></div>
 
-    <!-- CONTENT -->
-    <section class="products-area">
-      <!-- lanes (grid, row-first) -->
-      <div id="lanes" class="lanes-grid"></div>
-
-      <!-- Floating add button + collapsible panel overlay -->
-      <button class="add-product-fab" id="addFab" onclick="toggleAddPanel()" title="Add new product">＋</button>
-
-      <aside id="addPanel" class="add-panel add-panel-collapsed">
-        <div class="add-panel-header">
-          <div class="panel-title">Add product</div>
-          <button class="add-panel-close" onclick="toggleAddPanel()">✕</button>
-        </div>
-        <div class="panel-sub muted">Category + Brand (unique). Creating also saves your vote.</div>
-
-        <div id="addPanelLoggedOut" class="muted" style="display:none; margin-top:10px;">
-          Please <a href="login.html"><b>login</b></a> to add products.
-        </div>
-
-        <div id="addPanelForm" style="margin-top:10px;">
-          <label>Category</label>
-          <select id="p_category"></select>
-
-          <label style="margin-top:10px;">Brand</label>
-          <select id="p_brand"></select>
-
-          <label style="margin-top:10px;">Product name <span class="muted" style="font-weight:400;font-size:11px;">(optional)</span></label>
-          <input id="p_product_name" placeholder="Leave blank if only one version" />
-
-          <label style="margin-top:10px;">My vote (1–10)</label>
-          <select id="p_vote"></select>
-
-          <div style="margin-top:12px; display:flex; gap:10px; align-items:center;">
-            <button class="tba-btn tba-btn-primary" onclick="saveProduct()">Save</button>
-            <span id="p_status" class="muted"></span>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Right drawer OVERLAY (does not steal width) -->
-      <div id="drawerOverlay" class="drawer-overlay" style="display:none;" onclick="closeDrawer()"></div>
-
-      <aside id="drawer" class="drawer drawer-slide" style="display:none;">
-        <div class="drawer-head">
-          <div class="drawer-title">
-            <span class="drawer-pill">🛒 Product</span>
-            <span id="drawerCatName">—</span>
-          </div>
-
-          <div class="drawer-actions">
-            <button class="tba-btn" id="drawerSortBtn" onclick="toggleDrawerSort()" title="Toggle sort">↓</button>
-            <button class="tba-btn" onclick="closeDrawer()">Close</button>
-          </div>
-        </div>
-
-        <div class="drawer-body" id="drawerList"></div>
-      </aside>
-    </section>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="auth.js"></script>
-  <script src="header-auth.js"></script>
-  <script>renderAuthHeader();</script>
+  <!-- Filter drawer (like map) -->
+  <div class="prod-filter-overlay" id="prodFilterOverlay" onclick="closeFilterDrawer()" style="display:none;"></div>
+  <div class="prod-filter-drawer" id="prodFilterDrawer" style="display:none;">
+    <div class="prod-filter-drawer-head">
+      <span class="prod-filter-drawer-title">Filters</span>
+      <button class="prod-filter-drawer-close" onclick="closeFilterDrawer()">✕</button>
+    </div>
 
-  <script src="wishlist-btn.js"></script>
-  <script src="products.js?v=202"></script>
-  <script src="traction.js?v=204"></script>
+    <div class="prod-filter-section">
+      <div class="prod-filter-label">Category</div>
+      <div id="catQuick" class="prod-filter-chips"></div>
+      <!-- Hidden select kept for compatibility -->
+      <select id="catMore" style="display:none;" onchange="onCategoryMoreChanged()">
+        <option value="">More…</option>
+      </select>
+    </div>
 
-  <!-- ── TRACTION POPUP ── -->
+    <div class="prod-filter-section">
+      <div class="prod-filter-label">Rating</div>
+      <div id="ratingSeg" class="prod-filter-chips"></div>
+    </div>
+
+    <div class="prod-filter-section prod-filter-suggest">
+      <span class="request-link" onclick="openTraction('requestCategory', null)">💡 Suggest category</span>
+      <span class="request-link" onclick="openTraction('requestBrand', null)">🏷️ Suggest brand</span>
+    </div>
+
+    <div class="prod-filter-actions">
+      <button class="prod-filter-clear" id="btnClearFilters" onclick="clearFilters()" style="display:none;">✕ Clear filters</button>
+    </div>
+  </div>
+
+  <!-- FAB: Add product -->
+  <button class="add-product-fab" id="addFab" onclick="toggleAddPanel()" title="Add new product">＋</button>
+
+  <!-- Add product panel -->
+  <div class="prod-add-overlay" id="prodAddOverlay" onclick="if(event.target===this)toggleAddPanel()" style="display:none;">
+    <aside class="prod-add-panel" id="addPanel">
+      <div class="prod-add-head">
+        <div class="prod-add-title">Add product</div>
+        <button class="prod-add-close" onclick="toggleAddPanel()">✕</button>
+      </div>
+      <p class="prod-add-sub">Category + Brand (unique). Creating also saves your vote.</p>
+
+      <div id="addPanelLoggedOut" style="display:none;">
+        Please <a href="login.html"><b>login</b></a> to add products.
+      </div>
+
+      <div id="addPanelForm">
+        <label>Category</label>
+        <select id="p_category"></select>
+        <label>Brand</label>
+        <select id="p_brand"></select>
+        <label>Product name <span class="prod-add-optional">(optional)</span></label>
+        <input id="p_product_name" placeholder="Leave blank if only one version" />
+        <label>My vote (1–10)</label>
+        <select id="p_vote"></select>
+        <div class="prod-add-footer">
+          <button class="tba-btn tba-btn-primary" onclick="saveProduct()">Save</button>
+          <span id="p_status" class="muted"></span>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- See all drawer -->
+  <div id="drawerOverlay" class="drawer-overlay" style="display:none;" onclick="closeDrawer()"></div>
+  <aside id="drawer" class="drawer drawer-slide" style="display:none;">
+    <div class="drawer-head">
+      <div class="drawer-title">
+        <span class="drawer-pill">🛒 Product</span>
+        <span id="drawerCatName">—</span>
+      </div>
+      <div class="drawer-actions">
+        <button class="tba-btn" id="drawerSortBtn" onclick="toggleDrawerSort()">↓</button>
+        <button class="tba-btn" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+    <div class="drawer-body" id="drawerList"></div>
+  </aside>
+
+  <!-- Traction popup -->
   <div class="traction-overlay" id="tractionOverlay" onclick="if(event.target===this)closeTraction()">
     <div class="traction-popup">
       <span class="traction-emoji" id="trEmoji">🚧</span>
@@ -162,12 +158,9 @@
       <div class="traction-request-area" id="trRequestArea" style="display:none;">
         <label class="tr-field-label" id="trRequestLabel">Your suggestion</label>
         <textarea id="trRequestText" rows="2"></textarea>
-        <!-- Brand-only extras -->
         <div id="trBrandExtras" style="display:none;">
-          <label class="tr-field-label" style="margin-top:10px;">Category <span class="tr-field-note">(which category does this brand belong to?)</span></label>
-          <select id="trCategorySelect">
-            <option value="">— Select existing category —</option>
-          </select>
+          <label class="tr-field-label" style="margin-top:10px;">Category</label>
+          <select id="trCategorySelect"><option value="">— Select existing category —</option></select>
           <div class="tr-or-row"><span>or suggest a new one</span></div>
           <input type="text" id="trNewCategory" placeholder="New category name (optional)" />
         </div>
@@ -183,6 +176,14 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <script src="header-auth.js"></script>
+  <script>renderAuthHeader();</script>
+  <script src="wishlist-btn.js"></script>
+  <script src="products.js?v=203"></script>
+  <script src="traction.js?v=204"></script>
+
   <script>
   function toggleNav() {
     const nav = document.getElementById('mainNav');
@@ -190,31 +191,29 @@
     const open = nav.classList.toggle('nav-open');
     btn.innerHTML = open ? '&#10005;' : '&#9776;';
   }
-  // Close nav when a link is clicked
   document.addEventListener('DOMContentLoaded', () => {
     const nav = document.getElementById('mainNav');
     if (nav) nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
       nav.classList.remove('nav-open');
-      const btn = document.getElementById('burgerBtn');
-      if (btn) btn.innerHTML = '&#9776;';
+      document.getElementById('burgerBtn').innerHTML = '&#9776;';
     }));
   });
-  </script>
 
-  <script>
-  window.addEventListener('load', function() {
-    if (window.innerWidth > 768) return;
-    const btn = document.getElementById('prodFilterToggle');
-    const body = document.getElementById('prodFilterBody');
-    if (!btn || !body) return;
-    btn.style.display = 'flex';
-    body.classList.remove('open');
-    btn.addEventListener('click', () => {
-      const open = body.classList.toggle('open');
-      btn.classList.toggle('open', open);
-      btn.querySelector('.filter-toggle-arrow').textContent = open ? '▲' : '▼';
-    });
-  });
+  function toggleFilterDrawer() {
+    const drawer = document.getElementById('prodFilterDrawer');
+    const overlay = document.getElementById('prodFilterOverlay');
+    const open = drawer.style.display === 'none';
+    drawer.style.display = open ? 'block' : 'none';
+    overlay.style.display = open ? 'block' : 'none';
+  }
+  function closeFilterDrawer() {
+    document.getElementById('prodFilterDrawer').style.display = 'none';
+    document.getElementById('prodFilterOverlay').style.display = 'none';
+  }
+  function toggleAddPanel() {
+    const overlay = document.getElementById('prodAddOverlay');
+    overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
+  }
   </script>
 </body>
 </html>

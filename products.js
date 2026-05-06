@@ -415,17 +415,15 @@ function renderLane(catId, markersForCat){
   const visible = sorted.slice(0, 5);
   const hasMore = sorted.length > 5;
 
-  const itemsHtml = visible.map(m=>{
+  const itemsHtml = visible.map((m, idx)=>{
     const brand = BRAND_BY_ID[m.brand_id]?.name || "(unknown brand)";
-    const displayName = m.product_name || brand;
-    const unvisited = JOURNEY_MODE_PROD && !MY_VOTED_IDS_PROD.has(m.id); // grey only in journey mode
+    const displayName = m.product_name ? `${brand} · ${m.product_name}` : brand;
+    const unvisited = JOURNEY_MODE_PROD && !MY_VOTED_IDS_PROD.has(m.id);
     return `
       <div class="item-row${unvisited ? " journey-unvisited-item" : ""}">
         <a class="item" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${encodeURIComponent(catId)}">
-          <div class="item-left">
-            ${brandIconSlotHtml(m.brand_id)}
-            <div class="item-name">${escapeHtml(displayName)}</div>
-          </div>
+          ${brandIconSlotHtml(m.brand_id)}
+          <div class="item-name">${escapeHtml(displayName)}</div>
           ${ratingBadgeHtml(m)}
         </a>
         ${wlBtnHtml(m.id, "wl-btn-sm")}
@@ -470,14 +468,12 @@ function renderDrawer(){
   rows = sortMarkers(rows.slice(), DRAWER_SORT);
   qs("drawerList").innerHTML = rows.map(m=>{
     const brand = BRAND_BY_ID[m.brand_id]?.name || "(unknown brand)";
-    const displayName = m.product_name || brand;
+    const displayName = m.product_name ? `${brand} · ${m.product_name}` : brand;
     return `
       <div class="item-row">
         <a class="item" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${encodeURIComponent(catId)}">
-          <div class="item-left">
-            ${brandIconSlotHtml(m.brand_id)}
-            <div class="item-name">${escapeHtml(displayName)}</div>
-          </div>
+          ${brandIconSlotHtml(m.brand_id)}
+          <div class="item-name">${escapeHtml(displayName)}</div>
           ${ratingBadgeHtml(m)}
         </a>
         ${wlBtnHtml(m.id, "wl-btn-sm")}
@@ -503,10 +499,19 @@ function renderAll(){
   TOP_CATS = computeTopCategories();
 
   const more = qs("catMore");
-  more.innerHTML = `<option value="">More…</option>` + CATS
-    .map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`)
-    .join("");
-  more.value = FILTER_CATEGORY ? FILTER_CATEGORY : "";
+  if (more) {
+    more.innerHTML = `<option value="">More…</option>` + CATS
+      .map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`)
+      .join("");
+    more.value = FILTER_CATEGORY ? FILTER_CATEGORY : "";
+  }
+
+  // Update filter pill active state
+  const pill = qs("prodFilterPill");
+  const count = qs("prodFilterCount");
+  const activeCount = (FILTER_CATEGORY ? 1 : 0) + (FILTER_BUCKET ? 1 : 0);
+  if (pill) pill.classList.toggle("active", activeCount > 0);
+  if (count) { count.textContent = activeCount; count.style.display = activeCount > 0 ? "inline" : "none"; }
 
   renderCatQuick();
 
