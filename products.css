@@ -194,12 +194,12 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
   transition: color 0.15s;
 }
 .rate-badge:hover { color: var(--accent); }
-.rate-badge.rating-9-10 { color: #0f9d58; }
-.rate-badge.rating-7-8  { color: #34a853; }
-.rate-badge.rating-5-6  { color: #f4a400; }
-.rate-badge.rating-3-4  { color: #e65100; }
-.rate-badge.rating-1-2  { color: #c62828; }
-.rate-badge.rating-none { color: var(--muted); font-size: 12px; }
+.rate-badge.rating-9-10 { color: #0f9d58 !important; }
+.rate-badge.rating-7-8  { color: #34a853 !important; }
+.rate-badge.rating-5-6  { color: #f4a400 !important; }
+.rate-badge.rating-3-4  { color: #e65100 !important; }
+.rate-badge.rating-1-2  { color: #c62828 !important; }
+.rate-badge.rating-none { color: var(--muted) !important; font-size: 12px; }
 
 /* Journey unvoted */
 .journey-unvisited-item .item-name { color: rgba(26,23,20,0.3); }
@@ -421,11 +421,19 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
   background: rgba(26,23,20,0.4); z-index: 500;
 }
 .drawer {
-  position: fixed; top: 0; right: 0; bottom: 0;
-  width: min(420px, 95vw);
+  position: fixed; top: 56px; right: 0; bottom: 0;
+  width: min(420px, 92vw);
   background: var(--card); z-index: 501;
   display: flex; flex-direction: column;
   box-shadow: -4px 0 32px rgba(26,23,20,0.12);
+  border-radius: 12px 0 0 0;
+}
+@media (max-width: 580px) {
+  .drawer {
+    top: auto; left: 0; right: 0; bottom: 0;
+    width: 100%; border-radius: 20px 20px 0 0;
+    max-height: 75vh;
+  }
 }
 .drawer-head {
   display: flex; align-items: center;
@@ -459,4 +467,30 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
   .products-main { padding: 0 16px 120px; }
   .lanes-grid { grid-template-columns: 1fr; }
   .products-hero { padding: 24px 0 16px; }
+}
+
+/* ── Item info with bar ── */
+.item {
+  grid-template-columns: 28px 1fr auto !important;
+}
+.item-info {
+  display: flex; flex-direction: column; gap: 4px;
+  min-width: 0;
+}
+.item-bar-wrap {
+  height: 3px; background: rgba(26,23,20,0.07);
+  border-radius: 999px; overflow: hidden;
+}
+.item-bar {
+  height: 100%; background: var(--accent);
+  opacity: 0.45; border-radius: 999px;
+  transition: width 0.5s ease;
+}
+/* Score badge — fixed width, right aligned, no grid issues */
+.rate-badge {
+  display: block !important;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 16px; font-weight: 900;
+  min-width: 36px; text-align: right;
+  flex-shrink: 0;
 }

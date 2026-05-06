@@ -415,15 +415,24 @@ function renderLane(catId, markersForCat){
   const visible = sorted.slice(0, 5);
   const hasMore = sorted.length > 5;
 
+  // Max avg for bar width
+  const maxAvg = Math.max(...sorted.map(m => Number(m.rating_avg || 0)), 1);
+
   const itemsHtml = visible.map((m, idx)=>{
     const brand = BRAND_BY_ID[m.brand_id]?.name || "(unknown brand)";
     const displayName = m.product_name ? `${brand} · ${m.product_name}` : brand;
     const unvisited = JOURNEY_MODE_PROD && !MY_VOTED_IDS_PROD.has(m.id);
+    const avg = Number(m.rating_avg || 0);
+    const cnt = Number(m.rating_count || 0);
+    const barPct = cnt ? Math.round((avg / maxAvg) * 100) : 0;
     return `
       <div class="item-row${unvisited ? " journey-unvisited-item" : ""}">
         <a class="item" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${encodeURIComponent(catId)}">
           ${brandIconSlotHtml(m.brand_id)}
-          <div class="item-name">${escapeHtml(displayName)}</div>
+          <div class="item-info">
+            <div class="item-name">${escapeHtml(displayName)}</div>
+            ${cnt ? `<div class="item-bar-wrap"><div class="item-bar" style="width:${barPct}%"></div></div>` : ''}
+          </div>
           ${ratingBadgeHtml(m)}
         </a>
         ${wlBtnHtml(m.id, "wl-btn-sm")}
@@ -441,18 +450,12 @@ function renderLane(catId, markersForCat){
   return `
     <div class="lane ${density}">
       <div class="lane-head">
-        <div class="lane-title">
+        <div class="lane-title" onclick="openDrawer(${catId})" style="cursor:pointer;">
           <img class="lane-ic" src="${escapeHtml(icon)}" alt=""/>
-          <div style="min-width:0;">
-            <div class="lane-name">${escapeHtml(name)}</div>
-            <div class="lane-count">${markersForCat.length} brand${markersForCat.length === 1 ? "" : "s"}</div>
-          </div>
+          <div class="lane-name">${escapeHtml(name)}</div>
         </div>
         <button class="tba-btn lane-sort" onclick="toggleLaneSort(${catId})" title="Toggle sort">
           ${escapeHtml(arrowFor(dir))}
-        </button>
-        <button class="top5-btn" onclick="openTraction('top5', ${catId})" title="Get a tasting set of the top 5">
-          🍽️ Taste the Top 5
         </button>
       </div>
       ${itemsHtml || `<div class="muted">No products in this category yet.</div>`}
