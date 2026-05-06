@@ -499,3 +499,31 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
   border-radius: 0 !important;
   color: var(--text);
 }
+
+/* ── Product score — plain coloured number, no box ── */
+.prod-score {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 17px; font-weight: 900; line-height: 1;
+  min-width: 28px; text-align: right;
+  flex-shrink: 0; cursor: pointer;
+  transition: opacity 0.15s;
+}
+.prod-score:hover { opacity: 0.7; }
+.prod-score.prod-voted { font-size: 15px; }
+
+/* Fix close X buttons alignment */
+.prod-filter-drawer-close,
+.prod-add-close {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--faint); border: none; box-shadow: none;
+  font-size: 14px; cursor: pointer; color: var(--muted);
+  flex-shrink: 0;
+}
+
+/* Drawer title — no pill */
+.drawer-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 18px; font-weight: 700; color: var(--text);
+  display: flex; align-items: center; gap: 8px;
+}

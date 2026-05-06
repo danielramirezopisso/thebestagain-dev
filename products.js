@@ -226,6 +226,7 @@ function toggleLaneSort(catId){
   const id = parseInt(catId);
   const cur = LANE_SORT[id] || "desc";
   LANE_SORT[id] = (cur === "desc") ? "asc" : "desc";
+  event.stopPropagation(); // prevent opening drawer
   renderAll();
 }
 
@@ -275,29 +276,35 @@ function ratingBadgeHtml(m){
   const cnt = Number(m.rating_count ?? 0);
   const hasVoted = MY_VOTED_IDS_PROD.has(m.id);
 
-  // In My Journey: show MY score if voted, empty outline if not
-  // In Discover: always show global average
-  let cls, n, tip;
+  let n, tip, color;
   if (JOURNEY_MODE_PROD && hasVoted) {
     const myScore = MY_VOTE_SCORES_PROD[m.id];
-    cls = colorClassForRating(myScore, 1);
-    n   = String(Math.round(myScore));
-    tip = `Your vote: ${myScore}/10`;
+    n     = String(Math.round(myScore));
+    tip   = `Your vote: ${myScore}/10`;
+    color = scoreColor(myScore);
   } else if (JOURNEY_MODE_PROD && !hasVoted) {
-    cls = 'rating-none journey-empty-badge';
-    n   = '';
-    tip = 'Not voted yet — click to vote';
+    n     = '';
+    tip   = 'Not voted yet — click to vote';
+    color = 'var(--muted)';
   } else {
-    // Discover mode: global average
-    cls = colorClassForRating(avg, cnt);
-    n   = cnt ? String(Math.round(avg)) : '—';
-    tip = cnt ? `${avg.toFixed(2)}/10 (${cnt} votes)` : 'No votes yet';
+    n     = cnt ? String(Math.round(avg)) : '—';
+    tip   = cnt ? `${avg.toFixed(2)}/10 (${cnt} votes)` : 'No votes yet';
+    color = cnt ? scoreColor(avg) : 'var(--muted)';
   }
 
-  const myVote = hasVoted ? ' voted' : '';
-  return `<div class="rate-badge ${cls}${myVote}" title="${escapeHtml(tip)}"
+  const myVote = hasVoted ? ' prod-voted' : '';
+  return `<div class="prod-score${myVote}" style="color:${color}" title="${escapeHtml(tip)}"
     onclick="event.preventDefault(); event.stopPropagation(); openProductVote('${m.id}', '${m.category_id}', this); return false;"
     >${escapeHtml(n)}</div>`;
+}
+
+function scoreColor(score) {
+  const s = Number(score);
+  if (s >= 9) return '#1e5c3a';
+  if (s >= 7) return '#2e7d4f';
+  if (s >= 5) return '#d4a017';
+  if (s >= 3) return '#e67e22';
+  return '#c0392b';
 }
 
 // ── Inline vote popover ──
@@ -530,7 +537,10 @@ function renderAll(){
     (byCat[cid] ||= []).push(m);
   });
 
-  qs("lanes").innerHTML = laneIds.map(cid => renderLane(cid, byCat[cid] || [])).join("");
+  // Hide empty lanes when filtering
+  qs("lanes").innerHTML = laneIds
+    .filter(cid => (byCat[cid] || []).length > 0)
+    .map(cid => renderLane(cid, byCat[cid] || [])).join("");
   setStatus(`Loaded ${filtered.length} product(s).`);
   if (DRAWER_CAT) renderDrawer();
 }
