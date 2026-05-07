@@ -938,7 +938,7 @@ body.map-page{
 /* ── Locate me button ── */
 .map-locate-btn {
   position: absolute;
-  bottom: 120px; right: 12px;
+  bottom: 24px; left: 12px;
   width: 40px; height: 40px;
   border-radius: 50%;
   background: var(--card);
