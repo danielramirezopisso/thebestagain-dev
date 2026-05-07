@@ -1,6 +1,6 @@
 // rutas.js v2 — full redesign with map, celebrations, sticky bar, tier teaser
 
-let SELECTED_CITY = 'BCN';
+let SELECTED_CITY = null;
 let SELECTED_CAT_ID = null;
 let ACTIVE_RUTA = null;
 let ALL_RUTAS = [];
@@ -220,7 +220,7 @@ function showRutaSection(ruta) {
   section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   document.getElementById('rutaTitleLabel').textContent = 'La Selección · ' + (cat?.name || '');
-  document.getElementById('rutaTitle').textContent = SELECTED_CITY === 'BCN' ? 'Barcelona' : 'Madrid';
+  document.getElementById('rutaTitle').textContent = SELECTED_CITY === 'BCN' ? 'Barcelona' : SELECTED_CITY === 'MAD' ? 'Madrid' : '';
 
   updateProgress(ruta);
   renderGrid(ruta);
