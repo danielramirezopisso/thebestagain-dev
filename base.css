@@ -870,6 +870,11 @@ body.colorblind .rating-9-10  { background: #1a3f8f !important; border-color: #1
   padding: 12px 0;
   border-top: 1px solid var(--rule);
   margin-top: 8px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+.cb-toggle-label {
+  flex: 1; min-width: 0; overflow: hidden;
 }
 .cb-toggle-label {
   display: flex; align-items: center; gap: 8px;
