@@ -139,10 +139,11 @@ function updateCatCardProgress() {
     const countEl = document.getElementById(`catCount-${ruta.category_id}`);
     const items = RUTA_ITEMS_BY_CAT[ruta.category_id] || [];
     if (!items.length) return;
-    const total = items.filter(ri => ri.markers?.is_active).length;
+    const total = items.filter(ri => ri.marker_id || ri.markers?.is_active).length;
     const voted = items.filter(ri => {
-      if (!ri.markers?.is_active) return false;
-      return !!MY_VOTES[`${ri.markers.id}__${ruta.category_id}`];
+      const mid = ri.marker_id || ri.markers?.id;
+      if (!mid) return false;
+      return !!MY_VOTES[`${mid}__${ruta.category_id}`];
     }).length;
     const pct = total ? Math.round((voted / total) * 100) : 0;
     if (progressEl) {
