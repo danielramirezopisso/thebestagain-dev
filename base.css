@@ -912,18 +912,20 @@ body.colorblind .rating-9-10  { background: #1a3f8f !important; border-color: #1
 
 /* ── Back button (marker page) ── */
 .mk-toprow {
-  display: flex; align-items: center; gap: 12px;
-  margin-bottom: 4px;
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 6px;
 }
 .mk-back-btn {
   background: none; border: none; box-shadow: none;
-  font-size: 13px; font-weight: 600; color: var(--muted);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--accent);
   cursor: pointer; padding: 0;
-  transition: color 0.12s;
-  white-space: nowrap;
-  flex-shrink: 0;
+  transition: opacity 0.12s;
+  white-space: nowrap; flex-shrink: 0;
+  line-height: 1;
 }
-.mk-back-btn:hover { color: var(--text); transform: none; box-shadow: none; }
+.mk-back-btn:hover { opacity: 0.7; transform: none; box-shadow: none; }
 
 /* ── Scroll to top button ── */
 .scroll-top-btn {
