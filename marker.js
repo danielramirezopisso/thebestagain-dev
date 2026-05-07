@@ -8,7 +8,7 @@ function injectSchema(m, cat) {
   const existing = document.getElementById('tba-schema');
   if (existing) existing.remove();
 
-  const { avg, count } = getRatingForActiveCategory(m);
+  const { avg, count } = getActiveCatRating(m);
   if (!avg || !count) return; // no rating yet — don't inject
 
   const isPlace = m.group_type === 'place';
@@ -1833,8 +1833,10 @@ async function initMarkerPage() {
   updatePageSEO(m);
 
   // Inject schema.org JSON-LD for Google rich results (stars in search)
-  const activeCat = getCategoryById(ACTIVE_CATEGORY_ID || m.category_id);
-  injectSchema(m, activeCat);
+  try {
+    const activeCat = getCategoryById(ACTIVE_CATEGORY_ID || m.category_id);
+    injectSchema(m, activeCat);
+  } catch(e) { console.warn('Schema injection failed:', e); }
 
   if (m.group_type === "place") {
     renderMiniMap(m);
