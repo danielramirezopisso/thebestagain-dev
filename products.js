@@ -303,7 +303,7 @@ function ratingBadgeHtml(m){
 function scoreColor(score) {
   const s = Number(score);
   if (s >= 9) return '#1e5c3a';    // deep forest — best
-  if (s >= 7) return '#52b788';    // sage green
+  if (s >= 7) return '#4a7c59';    // sage green
   if (s >= 5) return '#c8972a';    // warm amber
   if (s >= 3) return '#e76f51';    // terracotta
   return '#c1440e';                // brick red
