@@ -302,11 +302,19 @@ function ratingBadgeHtml(m){
 
 function scoreColor(score) {
   const s = Number(score);
-  if (s >= 9) return '#1e5c3a';    // deep forest — best
-  if (s >= 7) return '#4a7c59';    // sage green
-  if (s >= 5) return '#c8972a';    // warm amber
-  if (s >= 3) return '#e76f51';    // terracotta
-  return '#c1440e';                // brick red
+  const cb = localStorage.getItem('tba_colorblind') === '1';
+  if (cb) {
+    if (s >= 9) return '#1a3f8f';
+    if (s >= 7) return '#2d6be4';
+    if (s >= 5) return '#c8972a';
+    if (s >= 3) return '#e87722';
+    return '#b35c00';
+  }
+  if (s >= 9) return '#1e5c3a';
+  if (s >= 7) return '#4a7c59';
+  if (s >= 5) return '#c8972a';
+  if (s >= 3) return '#e76f51';
+  return '#c1440e';
 }
 
 // ── Inline vote popover ──

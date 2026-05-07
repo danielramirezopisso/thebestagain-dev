@@ -105,6 +105,23 @@
         </label>
       </div>
 
+
+      <!-- Colorblind mode toggle -->
+      <div class="cb-toggle-row">
+        <label class="cb-toggle-label">
+          <span>👁</span>
+          <div>
+            Colorblind mode
+            <div class="cb-toggle-sub">Replaces red/green with blue/orange</div>
+          </div>
+        </label>
+        <label class="cb-toggle-switch">
+          <input type="checkbox" class="cb-toggle-input" id="cbToggleMap"
+            onchange="toggleColorblindMode()">
+          <span class="cb-toggle-track"></span>
+        </label>
+      </div>
+
       <div class="map-drawer-footer">
         <span id="mapStatus" class="muted" style="font-size:12px;"></span>
         <button class="map-drawer-suggest" onclick="openTraction('requestCategory', null); closeFilterDrawer();">
@@ -208,6 +225,7 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="accessibility.js"></script>
   <script src="auth.js"></script>
   <script src="header-auth.js"></script>
   <script>renderAuthHeader();</script>
@@ -278,5 +296,11 @@
     document.getElementById('mapFilterOverlay').classList.remove('open');
   }
   </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var on = localStorage.getItem('tba_colorblind') === '1';
+  document.querySelectorAll('.cb-toggle-input').forEach(function(el) { el.checked = on; });
+});
+</script>
 </body>
 </html>

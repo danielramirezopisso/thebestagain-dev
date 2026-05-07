@@ -851,3 +851,56 @@ input:focus, select:focus, textarea:focus {
   border-bottom: 1px solid var(--rule);
   margin-bottom: 8px;
 }
+
+/* ══════════════════════════════════════
+   COLORBLIND MODE — deuteranopia safe
+   Blue scale replaces green, orange replaces red
+══════════════════════════════════════ */
+body.colorblind .rating-none  { background: #f4f1ec !important; border-color: var(--border) !important; color: var(--muted) !important; }
+body.colorblind .rating-1-2   { background: #b35c00 !important; border-color: #8a4700 !important; color: #fff !important; }
+body.colorblind .rating-3-4   { background: #e87722 !important; border-color: #c45e18 !important; color: #fff !important; }
+body.colorblind .rating-5-6   { background: #c8972a !important; border-color: #a07a20 !important; color: #fff !important; }
+body.colorblind .rating-7-8   { background: #2d6be4 !important; border-color: #2255b8 !important; color: #fff !important; }
+body.colorblind .rating-9-10  { background: #1a3f8f !important; border-color: #122d6b !important; color: #fff !important; }
+
+/* Colorblind toggle pill */
+.cb-toggle-row {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-top: 1px solid var(--rule);
+  margin-top: 8px;
+}
+.cb-toggle-label {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 600; color: var(--text);
+  cursor: pointer;
+}
+.cb-toggle-label span { font-size: 16px; }
+.cb-toggle-sub {
+  font-size: 11px; color: var(--muted); font-weight: 400;
+}
+
+/* iOS-style toggle switch */
+.cb-toggle-switch {
+  position: relative; width: 44px; height: 24px;
+  flex-shrink: 0;
+}
+.cb-toggle-input {
+  opacity: 0; width: 0; height: 0;
+}
+.cb-toggle-track {
+  position: absolute; inset: 0;
+  background: var(--border); border-radius: 999px;
+  cursor: pointer; transition: background 0.2s;
+}
+.cb-toggle-track::after {
+  content: '';
+  position: absolute; top: 3px; left: 3px;
+  width: 18px; height: 18px;
+  background: #fff; border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.cb-toggle-input:checked + .cb-toggle-track { background: var(--accent); }
+.cb-toggle-input:checked + .cb-toggle-track::after { transform: translateX(20px); }

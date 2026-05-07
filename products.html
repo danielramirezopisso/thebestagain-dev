@@ -95,6 +95,23 @@
       <span class="request-link" onclick="openTraction('requestBrand', null)">🏷️ Suggest brand</span>
     </div>
 
+
+      <!-- Colorblind mode toggle -->
+      <div class="cb-toggle-row">
+        <label class="cb-toggle-label">
+          <span>👁</span>
+          <div>
+            Colorblind mode
+            <div class="cb-toggle-sub">Replaces red/green with blue/orange</div>
+          </div>
+        </label>
+        <label class="cb-toggle-switch">
+          <input type="checkbox" class="cb-toggle-input" id="cbToggleProd"
+            onchange="toggleColorblindMode()">
+          <span class="cb-toggle-track"></span>
+        </label>
+      </div>
+
     <div class="prod-filter-actions">
       <button class="prod-filter-clear" id="btnClearFilters" onclick="clearFilters()" style="display:none;">✕ Clear filters</button>
     </div>
@@ -176,6 +193,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="accessibility.js"></script>
   <script src="auth.js"></script>
   <script src="header-auth.js"></script>
   <script>renderAuthHeader();</script>
@@ -214,5 +232,11 @@
     overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
   }
   </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var on = localStorage.getItem('tba_colorblind') === '1';
+  document.querySelectorAll('.cb-toggle-input').forEach(function(el) { el.checked = on; });
+});
+</script>
 </body>
 </html>
