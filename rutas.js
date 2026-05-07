@@ -87,7 +87,7 @@ async function selectCity(city) {
 
   closeRuta();
   renderCatCards();
-  preloadAllRutaItems(); // load items in background so progress shows immediately
+  await preloadAllRutaItems(); // must complete before showing cards
 
   const catSection = document.getElementById('catSection');
   catSection.style.display = 'block';
@@ -163,12 +163,14 @@ async function preloadAllRutaItems() {
   if (!catIds.length) return;
 
   // Simple query matching selectCategory pattern exactly
-  const { data } = await sb.from('ruta_items')
+  const { data, error } = await sb.from('ruta_items')
     .select('id, position, category_id, marker_id, markers(id, title, is_active)')
     .in('category_id', catIds)
     .order('position', { ascending: true });
 
-  if (!data) return;
+  if (error) { console.warn('preloadAllRutaItems error:', error.message); return; }
+  if (!data || !data.length) { console.warn('preloadAllRutaItems: no data returned'); return; }
+  console.log('preloadAllRutaItems: loaded', data.length, 'items');
 
   // Group by category, only active markers
   data.forEach(item => {
