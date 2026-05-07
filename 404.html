@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>Not Found — The Best Again</title>
+  <link rel="stylesheet" href="base.css">
+  <style>
+    .notfound-page {
+      background: var(--page-bg);
+      min-height: 100dvh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 40px 24px;
+    }
+    .notfound-code {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(80px, 20vw, 160px);
+      font-weight: 900; letter-spacing: -0.06em;
+      line-height: 1; color: var(--text);
+      opacity: 0.08; margin-bottom: -20px;
+    }
+    .notfound-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(24px, 6vw, 42px);
+      font-weight: 700; color: var(--text);
+      margin-bottom: 12px;
+    }
+    .notfound-sub {
+      font-size: 15px; color: var(--muted);
+      font-style: italic; max-width: 340px;
+      line-height: 1.6; margin-bottom: 32px;
+    }
+    .notfound-links {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      justify-content: center;
+    }
+    .notfound-link {
+      padding: 10px 24px;
+      border-radius: 999px;
+      font-size: 13px; font-weight: 700;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .notfound-link:hover { opacity: 0.75; }
+    .notfound-link-primary {
+      background: var(--text); color: var(--page-bg);
+    }
+    .notfound-link-ghost {
+      border: 1.5px solid var(--border); color: var(--text);
+    }
+  </style>
+</head>
+<body class="notfound-page">
+  <div class="notfound-code">404</div>
+  <h1 class="notfound-title">Nothing to eat here.</h1>
+  <p class="notfound-sub">This page doesn't exist — but the best food in Barcelona does.</p>
+  <div class="notfound-links">
+    <a href="index.html" class="notfound-link notfound-link-primary">Go home</a>
+    <a href="map.html" class="notfound-link notfound-link-ghost">Open the map</a>
+  </div>
+</body>
+</html>

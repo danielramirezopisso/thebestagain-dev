@@ -909,3 +909,40 @@ body.colorblind .rating-9-10  { background: #1a3f8f !important; border-color: #1
 }
 .cb-toggle-input:checked + .cb-toggle-track { background: var(--accent); }
 .cb-toggle-input:checked + .cb-toggle-track::after { transform: translateX(20px); }
+
+/* ── Back button (marker page) ── */
+.mk-toprow {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 4px;
+}
+.mk-back-btn {
+  background: none; border: none; box-shadow: none;
+  font-size: 13px; font-weight: 600; color: var(--muted);
+  cursor: pointer; padding: 0;
+  transition: color 0.12s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.mk-back-btn:hover { color: var(--text); transform: none; box-shadow: none; }
+
+/* ── Scroll to top button ── */
+.scroll-top-btn {
+  position: fixed; bottom: 28px; right: 24px;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  box-shadow: 0 2px 8px rgba(26,23,20,0.12);
+  font-size: 18px; font-weight: 700;
+  cursor: pointer; z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s, transform 0.15s;
+  color: var(--text);
+}
+.scroll-top-btn.visible {
+  opacity: 1; pointer-events: auto;
+}
+.scroll-top-btn:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(26,23,20,0.18); }
+
+/* Products page — scroll top btn clears FAB */
+.products-page .scroll-top-btn { right: 84px; }
