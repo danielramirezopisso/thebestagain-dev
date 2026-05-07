@@ -84,6 +84,7 @@ async function selectCity(city) {
 
   closeRuta();
   renderCatCards();
+  preloadAllRutaItems(); // load items in background so progress shows immediately
 
   const catSection = document.getElementById('catSection');
   catSection.style.display = 'block';
@@ -149,6 +150,30 @@ function updateCatCardProgress() {
       countEl.textContent = voted > 0 ? `${voted}/${total}` : '';
     }
   });
+}
+
+/* ══════════════════════════════
+   PRELOAD ALL RUTA ITEMS (for progress bars)
+══════════════════════════════ */
+async function preloadAllRutaItems() {
+  const catIds = ALL_RUTAS.map(r => r.category_id);
+  if (!catIds.length) return;
+
+  const { data } = await sb.from('ruta_items')
+    .select('category_id, markers(id, title, is_active)')
+    .in('category_id', catIds);
+
+  if (!data) return;
+
+  data.forEach(item => {
+    const cid = item.category_id;
+    if (!RUTA_ITEMS_BY_CAT[cid]) RUTA_ITEMS_BY_CAT[cid] = [];
+    if (!RUTA_ITEMS_BY_CAT[cid].find(x => x.markers?.id === item.markers?.id)) {
+      RUTA_ITEMS_BY_CAT[cid].push(item);
+    }
+  });
+
+  updateCatCardProgress();
 }
 
 /* ══════════════════════════════
