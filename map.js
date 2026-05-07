@@ -756,10 +756,17 @@ function locateMe() {
     },
     function(err) {
       if (btn) { btn.textContent = '📍'; btn.classList.remove('locating'); }
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
       if (err.code === err.PERMISSION_DENIED) {
-        alert('Location access denied. Please allow location in your browser settings.');
-      } else {
-        alert('Could not get your location. Please try again.');
+        if (isIOS) {
+          alert('Location access denied.\n\nTo fix on iPhone:\nSettings → Privacy & Security → Location Services → Safari → While Using App');
+        } else {
+          alert('Location access denied. Tap the lock icon in your browser bar and allow location access.');
+        }
+      } else if (err.code === err.POSITION_UNAVAILABLE) {
+        alert('Your location could not be determined. Make sure Location Services is enabled.');
+      } else if (err.code === err.TIMEOUT) {
+        alert('Location request timed out. Please try again.');
       }
     },
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
