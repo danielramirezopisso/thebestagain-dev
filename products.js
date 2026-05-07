@@ -231,6 +231,7 @@ function toggleLaneSort(catId){
 }
 
 function openDrawer(catId){
+  document.body.style.overflow = 'hidden';
   DRAWER_CAT = parseInt(catId);
   DRAWER_SORT = LANE_SORT[DRAWER_CAT] || "desc";
   qs("drawerOverlay").style.display = "block";
@@ -241,6 +242,7 @@ function openDrawer(catId){
 }
 
 function closeDrawer(){
+  document.body.style.overflow = '';
   qs("drawerOverlay").style.display = "none";
   qs("drawer").style.display = "none";
   DRAWER_CAT = null;
@@ -300,11 +302,11 @@ function ratingBadgeHtml(m){
 
 function scoreColor(score) {
   const s = Number(score);
-  if (s >= 9) return '#1e5c3a';
-  if (s >= 7) return '#2e7d4f';
-  if (s >= 5) return '#d4a017';
-  if (s >= 3) return '#e67e22';
-  return '#c0392b';
+  if (s >= 9) return '#1e5c3a';    // deep forest — best
+  if (s >= 7) return '#52b788';    // sage green
+  if (s >= 5) return '#c8972a';    // warm amber
+  if (s >= 3) return '#e76f51';    // terracotta
+  return '#c1440e';                // brick red
 }
 
 // ── Inline vote popover ──
