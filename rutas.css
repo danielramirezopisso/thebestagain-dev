@@ -498,12 +498,19 @@
 /* sticky bar removed */
 
 /* ── Rating score colors ── */
-.ruta-score-9-10 { background: #0f9d58; }
-.ruta-score-7-8  { background: #34c759; }
-.ruta-score-5-6  { background: #ffd60a; color: #111 !important; }
-.ruta-score-3-4  { background: #ff8a00; }
-.ruta-score-1-2  { background: #ff3b30; }
+.ruta-score-9-10 { background: #1e5c3a; color: #fff; }
+.ruta-score-7-8  { background: #4a7c59; color: #fff; }
+.ruta-score-5-6  { background: #c8972a; color: #fff; }
+.ruta-score-3-4  { background: #e76f51; color: #fff; }
+.ruta-score-1-2  { background: #c1440e; color: #fff; }
 .ruta-score-none { background: var(--rule,#e5e5e5); color: var(--muted,#999) !important; }
+
+/* Colorblind overrides */
+body.colorblind .ruta-score-9-10 { background: #1a3f8f; }
+body.colorblind .ruta-score-7-8  { background: #2d6be4; }
+body.colorblind .ruta-score-5-6  { background: #c8972a; }
+body.colorblind .ruta-score-3-4  { background: #e87722; }
+body.colorblind .ruta-score-1-2  { background: #b35c00; }
 
 /* ── Animations ── */
 @keyframes fadeUp {
