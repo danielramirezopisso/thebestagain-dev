@@ -162,17 +162,17 @@ async function preloadAllRutaItems() {
   const catIds = ALL_RUTAS.map(r => r.category_id);
   if (!catIds.length) return;
 
-  // Load all ruta items for all categories in one query
+  // Simple query matching selectCategory pattern exactly
   const { data } = await sb.from('ruta_items')
-    .select('id, position, category_id, marker_id, markers!inner(id, title, is_active)')
+    .select('id, position, category_id, marker_id, markers(id, title, is_active)')
     .in('category_id', catIds)
-    .eq('markers.is_active', true)
     .order('position', { ascending: true });
 
   if (!data) return;
 
-  // Group by category
+  // Group by category, only active markers
   data.forEach(item => {
+    if (!item.markers?.is_active) return;
     const cid = item.category_id;
     if (!RUTA_ITEMS_BY_CAT[cid]) RUTA_ITEMS_BY_CAT[cid] = [];
     RUTA_ITEMS_BY_CAT[cid].push(item);
