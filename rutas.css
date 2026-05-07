@@ -45,25 +45,25 @@
 .rutas-city-section { margin-bottom: 32px; }
 .rutas-city-tabs {
   display: inline-flex;
-  gap: 0;
-  border: 1.5px solid var(--rule, #e5e5e5);
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--surface, #fff);
+  gap: 10px;
+  background: none;
+  border: none;
 }
 .city-tab {
-  padding: 9px 24px;
-  font-size: 13px;
+  padding: 10px 28px;
+  font-size: 14px;
   font-weight: 700;
-  border: none;
-  background: transparent;
-  color: var(--muted, #888);
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--muted);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
   white-space: nowrap;
+  box-shadow: none;
 }
-.city-tab + .city-tab { border-left: 1.5px solid var(--rule, #e5e5e5); }
-.city-tab-active { background: var(--accent, #e0355b); color: #fff; }
+.city-tab:hover { border-color: var(--accent); color: var(--accent); background: rgba(45,74,138,0.04); transform: none; box-shadow: none; }
+.city-tab-active { border-color: var(--accent); background: var(--accent); color: #fff; }
 .city-tab-disabled { opacity: 0.4; cursor: not-allowed; }
 .city-tab-soon {
   display: inline-block;

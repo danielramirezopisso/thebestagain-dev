@@ -46,16 +46,19 @@ async function initRutasPage() {
   if (CURRENT_USER) await loadMyVotes(CURRENT_USER.id);
 
   // Read URL params from marker page links
-  const _qp  = new URLSearchParams(location.search);
-  const _city = _qp.get('city') || 'BCN';
+  const _qp    = new URLSearchParams(location.search);
+  const _city  = _qp.get('city');
   const _rutaId = _qp.get('ruta');
 
-  await selectCity(_city);
-
-  if (_rutaId) {
-    const _target = ALL_RUTAS.find(r => r.id === _rutaId);
-    if (_target) await selectCategory(_target.category_id);
+  if (_city) {
+    // Came from a direct link with city param
+    await selectCity(_city);
+    if (_rutaId) {
+      const _target = ALL_RUTAS.find(r => r.id === _rutaId);
+      if (_target) await selectCategory(_target.category_id);
+    }
   }
+  // Otherwise: no city preselected — user picks
 }
 
 async function loadMyVotes(userId) {
