@@ -1,3 +1,84 @@
+
+/* ══════════════════════════════════════
+   SCHEMA.ORG — JSON-LD for Google rich results
+   Injected dynamically after data loads
+══════════════════════════════════════ */
+function injectSchema(m, cat) {
+  // Remove any existing schema tag
+  const existing = document.getElementById('tba-schema');
+  if (existing) existing.remove();
+
+  const { avg, count } = getRatingForActiveCategory(m);
+  if (!avg || !count) return; // no rating yet — don't inject
+
+  const isPlace = m.group_type === 'place';
+  const cityLabel = m.city === 'BCN' ? 'Barcelona'
+    : m.city === 'MAD' ? 'Madrid'
+    : m.city === 'BIL' ? 'Bilbao'
+    : (m.city || 'Spain');
+
+  const brand = getBrandById(m.brand_id);
+  const catName = cat?.name || '';
+
+  let schema;
+
+  if (isPlace) {
+    // Restaurant / FoodEstablishment
+    schema = {
+      '@context': 'https://schema.org',
+      '@type': 'Restaurant',
+      'name': m.title,
+      'servesCuisine': catName,
+      'address': {
+        '@type': 'PostalAddress',
+        'addressLocality': cityLabel,
+        'addressCountry': 'ES'
+      },
+      'aggregateRating': {
+        '@type': 'AggregateRating',
+        'ratingValue': avg.toFixed(1),
+        'bestRating': '10',
+        'worstRating': '1',
+        'ratingCount': String(count)
+      },
+      'url': window.location.href
+    };
+    if (m.address) schema.address.streetAddress = m.address;
+    if (m.lat && m.lng) schema.geo = {
+      '@type': 'GeoCoordinates',
+      'latitude': m.lat,
+      'longitude': m.lng
+    };
+  } else {
+    // Product
+    const productName = m.product_name
+      ? `${brand?.name || ''} ${m.product_name}`.trim()
+      : (brand?.name || m.title);
+    schema = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      'name': productName,
+      'category': catName,
+      'brand': brand ? { '@type': 'Brand', 'name': brand.name } : undefined,
+      'aggregateRating': {
+        '@type': 'AggregateRating',
+        'ratingValue': avg.toFixed(1),
+        'bestRating': '10',
+        'worstRating': '1',
+        'ratingCount': String(count)
+      },
+      'url': window.location.href
+    };
+    // Remove undefined fields
+    Object.keys(schema).forEach(k => schema[k] === undefined && delete schema[k]);
+  }
+
+  const tag = document.createElement('script');
+  tag.id = 'tba-schema';
+  tag.type = 'application/ld+json';
+  tag.textContent = JSON.stringify(schema, null, 2);
+  document.head.appendChild(tag);
+}
 // marker.js v6 — multi-category context aware
 
 let MARKER_ID = null;
@@ -1750,6 +1831,10 @@ async function initMarkerPage() {
   renderRating(m);
   renderDetails(m, creatorName);
   updatePageSEO(m);
+
+  // Inject schema.org JSON-LD for Google rich results (stars in search)
+  const activeCat = getCategoryById(ACTIVE_CATEGORY_ID || m.category_id);
+  injectSchema(m, activeCat);
 
   if (m.group_type === "place") {
     renderMiniMap(m);
