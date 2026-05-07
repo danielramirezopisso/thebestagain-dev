@@ -143,7 +143,10 @@ function updateCatCardProgress() {
     const voted = items.filter(ri => {
       const mid = ri.marker_id || ri.markers?.id;
       if (!mid) return false;
-      return !!MY_VOTES[`${mid}__${ruta.category_id}`];
+      // Try both string and number forms of category_id
+      return !!(MY_VOTES[`${mid}__${ruta.category_id}`] ||
+                MY_VOTES[`${mid}__${String(ruta.category_id)}`] ||
+                MY_VOTES[`${mid}__${Number(ruta.category_id)}`]);
     }).length;
     const pct = total ? Math.round((voted / total) * 100) : 0;
     if (progressEl) {
