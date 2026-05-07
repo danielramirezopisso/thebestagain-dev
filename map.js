@@ -706,3 +706,62 @@ function hideSearchResults() {
 document.addEventListener('click', e => {
   if (!document.getElementById('mapSearchWrap')?.contains(e.target)) hideSearchResults();
 });
+
+/* ── Geolocation — "locate me" ── */
+let USER_LOCATION_MARKER = null;
+let USER_ACCURACY_CIRCLE = null;
+
+function locateMe() {
+  const btn = document.getElementById('mapLocateBtn');
+  if (!navigator.geolocation) {
+    alert('Geolocation is not supported by your browser.');
+    return;
+  }
+  // Show loading state
+  if (btn) { btn.textContent = '⟳'; btn.classList.add('locating'); }
+
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      const acc = pos.coords.accuracy; // metres
+
+      // Fly to position
+      MAP.flyTo([lat, lng], 15, { duration: 1.2 });
+
+      // Remove previous markers
+      if (USER_LOCATION_MARKER) MAP.removeLayer(USER_LOCATION_MARKER);
+      if (USER_ACCURACY_CIRCLE) MAP.removeLayer(USER_ACCURACY_CIRCLE);
+
+      // Accuracy circle
+      USER_ACCURACY_CIRCLE = L.circle([lat, lng], {
+        radius: acc,
+        color: '#2d4a8a', fillColor: '#2d4a8a',
+        fillOpacity: 0.08, weight: 1, opacity: 0.3
+      }).addTo(MAP);
+
+      // Pulsing dot marker
+      const icon = L.divIcon({
+        className: '',
+        html: '<div class="user-location-dot"><div class="user-location-pulse"></div></div>',
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+      });
+      USER_LOCATION_MARKER = L.marker([lat, lng], { icon, zIndexOffset: 1000 })
+        .addTo(MAP)
+        .bindPopup('You are here');
+
+      // Reset button
+      if (btn) { btn.textContent = '📍'; btn.classList.remove('locating'); btn.classList.add('located'); }
+    },
+    function(err) {
+      if (btn) { btn.textContent = '📍'; btn.classList.remove('locating'); }
+      if (err.code === err.PERMISSION_DENIED) {
+        alert('Location access denied. Please allow location in your browser settings.');
+      } else {
+        alert('Could not get your location. Please try again.');
+      }
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+  );
+}
