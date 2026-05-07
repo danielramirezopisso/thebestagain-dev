@@ -159,18 +159,20 @@ async function preloadAllRutaItems() {
   const catIds = ALL_RUTAS.map(r => r.category_id);
   if (!catIds.length) return;
 
+  // Load all ruta items for all categories in one query
   const { data } = await sb.from('ruta_items')
-    .select('category_id, markers(id, title, is_active)')
-    .in('category_id', catIds);
+    .select('id, position, category_id, marker_id, markers!inner(id, title, is_active)')
+    .in('category_id', catIds)
+    .eq('markers.is_active', true)
+    .order('position', { ascending: true });
 
   if (!data) return;
 
+  // Group by category
   data.forEach(item => {
     const cid = item.category_id;
     if (!RUTA_ITEMS_BY_CAT[cid]) RUTA_ITEMS_BY_CAT[cid] = [];
-    if (!RUTA_ITEMS_BY_CAT[cid].find(x => x.markers?.id === item.markers?.id)) {
-      RUTA_ITEMS_BY_CAT[cid].push(item);
-    }
+    RUTA_ITEMS_BY_CAT[cid].push(item);
   });
 
   updateCatCardProgress();

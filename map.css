@@ -946,7 +946,7 @@ body.map-page{
   box-shadow: 0 2px 8px rgba(26,23,20,0.12);
   font-size: 18px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  z-index: 1000;
+  z-index: 700; /* below marker panel (800) */
   pointer-events: all !important;
   transition: transform 0.15s, box-shadow 0.15s;
 }
