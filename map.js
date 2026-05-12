@@ -417,8 +417,11 @@ function showDesktopHint() {
 /* ── JOURNEY MODE ── */
 async function refreshMyVotes(userId) {
   if (!userId) return;
-  const { data } = await sb.from("votes").select("marker_id").eq("user_id", userId).eq("is_active", true);
+  const { data } = await sb.from("votes").select("marker_id,vote,category_id").eq("user_id", userId).eq("is_active", true);
   MY_VOTED_IDS = new Set((data || []).map(v => v.marker_id));
+  // Store personal scores for journey mode colors
+  window.MY_VOTE_SCORES_MAP = {};
+  (data || []).forEach(v => { window.MY_VOTE_SCORES_MAP[v.marker_id] = v.vote; });
 }
 
 function showJourneyLoginPrompt() {
@@ -520,7 +523,9 @@ async function reloadMarkers() {
     const avg = Number(primaryRating.avg ?? m.rating_avg ?? 0);
     const cnt = Number(primaryRating.count ?? m.rating_count ?? 0);
     const greyed = JOURNEY_MODE && !MY_VOTED_IDS.has(m.id);
-    const icon = makeMarkerIcon(iconUrl, avg, cnt, greyed, useSparkle);
+    const displayAvg = (JOURNEY_MODE && window.MY_VOTE_SCORES_MAP?.[m.id])
+      ? Number(window.MY_VOTE_SCORES_MAP[m.id]) : avg;
+    const icon = makeMarkerIcon(iconUrl, displayAvg, cnt, greyed, useSparkle);
     const mk = L.marker([m.lat, m.lon], { icon }).addTo(LAYER_GROUP);
     LEAFLET_MARKERS_BY_ID[m.id] = mk;
     MARKER_DATA_BY_ID[m.id] = m;
