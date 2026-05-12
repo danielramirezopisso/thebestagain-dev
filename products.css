@@ -142,12 +142,13 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
 /* ── Item rows — marker ranking style ── */
 .item-row {
   display: flex; align-items: center;
-  border-bottom: 1px solid var(--rule);
-  padding: 0;
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 4px 0;
   transition: background 0.15s;
+  overflow: hidden;
 }
-.item-row:last-child { border-bottom: none; }
+.item-row:first-child { margin-top: 10px; }
 
 /* Left border color accent per score */
 .item-row.score-10, .item-row.score-9  { border-left: 3px solid #1e5c3a; }
@@ -160,13 +161,13 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
 .item {
   display: flex;
   flex-direction: column;
-  padding: 8px 10px;
+  padding: 9px 10px 7px;
   text-decoration: none; color: inherit;
   flex: 1; min-width: 0;
   gap: 5px;
-  transition: opacity 0.1s;
+  transition: background 0.1s;
 }
-.item:hover { opacity: 0.85; }
+.item:hover { background: rgba(26,23,20,0.02); }
 
 /* Top row: logo + name + score */
 .item-top {
@@ -497,6 +498,26 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
 .score-4 .item-bar,  .score-3 .item-bar { background: #e76f51; }
 .score-low .item-bar                     { background: #c1440e; }
 .score-none .item-bar                    { background: rgba(26,23,20,0.1); }
+
+/* Colorblind bar colors */
+body.colorblind .score-10 .item-bar,
+body.colorblind .score-9 .item-bar  { background: #1a3f8f; }
+body.colorblind .score-8 .item-bar,
+body.colorblind .score-7 .item-bar  { background: #2d6be4; }
+body.colorblind .score-6 .item-bar,
+body.colorblind .score-5 .item-bar  { background: #c8972a; }
+body.colorblind .score-4 .item-bar,
+body.colorblind .score-3 .item-bar  { background: #e87722; }
+body.colorblind .score-low .item-bar { background: #b35c00; }
+
+/* Left border also colorblind */
+body.colorblind .item-row.score-10,
+body.colorblind .item-row.score-9  { border-left: 3px solid #1a3f8f; }
+body.colorblind .item-row.score-8,
+body.colorblind .item-row.score-7  { border-left: 3px solid #2d6be4; }
+body.colorblind .item-row.score-4,
+body.colorblind .item-row.score-3  { border-left: 3px solid #e87722; }
+body.colorblind .item-row.score-low { border-left: 3px solid #b35c00; }
 /* Score badge — plain coloured number, no background */
 .rate-badge {
   display: block !important;
@@ -532,17 +553,16 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
   opacity: 0.5;
 }
 
-/* Score gets tinted background matching its color */
-.prod-score[style*="#1e5c3a"] { background: rgba(30,92,58,0.1); }
-.prod-score[style*="#4a7c59"] { background: rgba(74,124,89,0.1); }
-.prod-score[style*="#c8972a"] { background: rgba(200,151,42,0.1); }
-.prod-score[style*="#e76f51"] { background: rgba(231,111,81,0.1); }
-.prod-score[style*="#c1440e"] { background: rgba(193,68,14,0.1); }
-/* Colorblind */
-.prod-score[style*="#1a3f8f"] { background: rgba(26,63,143,0.1); }
-.prod-score[style*="#2d6be4"] { background: rgba(45,107,228,0.1); }
-.prod-score[style*="#e87722"] { background: rgba(232,119,34,0.1); }
-.prod-score[style*="#b35c00"] { background: rgba(179,92,0,0.1); }
+/* Score tinted background — inline style selector */
+.prod-score[style*="#1e5c3a"] { background: rgba(30,92,58,0.08); }
+.prod-score[style*="#4a7c59"] { background: rgba(74,124,89,0.08); }
+.prod-score[style*="#c8972a"] { background: rgba(200,151,42,0.08); }
+.prod-score[style*="#e76f51"] { background: rgba(231,111,81,0.08); }
+.prod-score[style*="#c1440e"] { background: rgba(193,68,14,0.08); }
+.prod-score[style*="#1a3f8f"] { background: rgba(26,63,143,0.08); }
+.prod-score[style*="#2d6be4"] { background: rgba(45,107,228,0.08); }
+.prod-score[style*="#e87722"] { background: rgba(232,119,34,0.08); }
+.prod-score[style*="#b35c00"] { background: rgba(179,92,0,0.08); }
 .prod-score:hover { opacity: 0.8; transform: scale(1.05); }
 .prod-score.prod-voted { font-size: 13px; }
 
