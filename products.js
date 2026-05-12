@@ -285,9 +285,13 @@ function ratingBadgeHtml(m){
     tip   = `Your vote: ${myScore}/10`;
     color = scoreColor(myScore);
   } else if (JOURNEY_MODE_PROD && !hasVoted) {
-    n     = '';
+    n     = '–';
     tip   = 'Not voted yet — click to vote';
-    color = 'var(--muted)';
+    color = 'var(--border)';
+    const myVoteJ = hasVoted ? ' prod-voted' : '';
+    return `<div class="prod-score journey-empty${myVoteJ}" title="${escapeHtml(tip)}"
+      onclick="event.preventDefault(); event.stopPropagation(); openProductVote('${m.id}', '${m.category_id}', this); return false;"
+      >${escapeHtml(n)}</div>`;
   } else {
     n     = cnt ? String(Math.round(avg)) : '—';
     tip   = cnt ? `${avg.toFixed(2)}/10 (${cnt} votes)` : 'No votes yet';

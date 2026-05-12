@@ -509,9 +509,30 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
   padding: 4px 7px;
   border-radius: 6px;
   border: 1.5px solid currentColor;
-  background: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.85);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   transition: opacity 0.15s, transform 0.1s;
 }
+/* Journey unvoted — clear empty pill */
+.prod-score.journey-empty {
+  border-style: dashed;
+  border-color: var(--border);
+  color: var(--muted) !important;
+  background: transparent !important;
+  opacity: 0.5;
+}
+
+/* Score gets tinted background matching its color */
+.prod-score[style*="#1e5c3a"] { background: rgba(30,92,58,0.1); }
+.prod-score[style*="#4a7c59"] { background: rgba(74,124,89,0.1); }
+.prod-score[style*="#c8972a"] { background: rgba(200,151,42,0.1); }
+.prod-score[style*="#e76f51"] { background: rgba(231,111,81,0.1); }
+.prod-score[style*="#c1440e"] { background: rgba(193,68,14,0.1); }
+/* Colorblind */
+.prod-score[style*="#1a3f8f"] { background: rgba(26,63,143,0.1); }
+.prod-score[style*="#2d6be4"] { background: rgba(45,107,228,0.1); }
+.prod-score[style*="#e87722"] { background: rgba(232,119,34,0.1); }
+.prod-score[style*="#b35c00"] { background: rgba(179,92,0,0.1); }
 .prod-score:hover { opacity: 0.8; transform: scale(1.05); }
 .prod-score.prod-voted { font-size: 13px; }
 
