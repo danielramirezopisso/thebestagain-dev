@@ -1,3 +1,17 @@
+function scoreRowClass(score, hasVoted) {
+  if (!hasVoted) return 'score-none';
+  const s = Math.round(Number(score));
+  if (s >= 10) return 'score-10';
+  if (s >= 9)  return 'score-9';
+  if (s >= 8)  return 'score-8';
+  if (s >= 7)  return 'score-7';
+  if (s >= 6)  return 'score-6';
+  if (s >= 5)  return 'score-5';
+  if (s >= 4)  return 'score-4';
+  if (s >= 3)  return 'score-3';
+  return 'score-low';
+}
+
 // products.js — Products UX v2.3
 // NEW: brands filtered by selected category via category_brands table
 
@@ -443,11 +457,15 @@ function renderLane(catId, markersForCat){
     const brand = BRAND_BY_ID[m.brand_id]?.name || "(unknown brand)";
     const displayName = m.product_name ? `${brand} · ${m.product_name}` : brand;
     const unvisited = JOURNEY_MODE_PROD && !MY_VOTED_IDS_PROD.has(m.id);
+    const myScore = JOURNEY_MODE_PROD && MY_VOTED_IDS_PROD.has(m.id) ? MY_VOTE_SCORES_PROD[m.id] : null;
+    const rowScore = myScore ?? m.rating_avg;
+    const rowHasVotes = myScore != null || (!JOURNEY_MODE_PROD && Number(m.rating_count) > 0);
+    const rowScoreCls = scoreRowClass(rowScore, rowHasVotes);
     const avg = Number(m.rating_avg || 0);
     const cnt = Number(m.rating_count || 0);
     const barPct = cnt ? Math.round((avg / maxAvg) * 100) : 0;
     return `
-      <div class="item-row${unvisited ? " journey-unvisited-item" : ""}">
+      <div class="item-row ${rowScoreCls}${unvisited ? " journey-unvisited-item" : ""}">
         <a class="item" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${encodeURIComponent(catId)}">
           ${brandIconSlotHtml(m.brand_id)}
           <div class="item-info">
