@@ -159,19 +159,23 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
 .item-row.score-none                    { border-left: 3px solid transparent; }
 
 .item {
-  display: flex;
-  flex-direction: column;
-  padding: 9px 10px 7px;
+  display: grid;
+  grid-template-columns: 22px 28px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
   text-decoration: none; color: inherit;
   flex: 1; min-width: 0;
-  gap: 5px;
   transition: background 0.1s;
 }
 .item:hover { background: rgba(26,23,20,0.02); }
 
-/* Top row: logo + name + score */
-.item-top {
-  display: flex; align-items: center; gap: 8px;
+/* Position number */
+.item-pos {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 12px; font-weight: 700;
+  color: var(--muted); text-align: right;
+  flex-shrink: 0;
 }
 
 .brand-ic-slot {
@@ -484,33 +488,7 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
 /* ── Item info with bar ── */
 .item {
 }
-.item-bar-wrap {
-  height: 3px; background: rgba(26,23,20,0.07);
-  border-radius: 999px; overflow: hidden; width: 100%;
-}
-.item-bar {
-  height: 100%; border-radius: 999px;
-  transition: width 0.5s ease; opacity: 1;
-}
-.score-10 .item-bar, .score-9 .item-bar { background: #1e5c3a; }
-.score-8 .item-bar,  .score-7 .item-bar { background: #4a7c59; }
-.score-6 .item-bar,  .score-5 .item-bar { background: #c8972a; }
-.score-4 .item-bar,  .score-3 .item-bar { background: #e76f51; }
-.score-low .item-bar                     { background: #c1440e; }
-.score-none .item-bar                    { background: rgba(26,23,20,0.1); }
-
-/* Colorblind bar colors */
-body.colorblind .score-10 .item-bar,
-body.colorblind .score-9 .item-bar  { background: #1a3f8f; }
-body.colorblind .score-8 .item-bar,
-body.colorblind .score-7 .item-bar  { background: #2d6be4; }
-body.colorblind .score-6 .item-bar,
-body.colorblind .score-5 .item-bar  { background: #c8972a; }
-body.colorblind .score-4 .item-bar,
-body.colorblind .score-3 .item-bar  { background: #e87722; }
-body.colorblind .score-low .item-bar { background: #b35c00; }
-
-/* Left border also colorblind */
+/* Left border colorblind */
 body.colorblind .item-row.score-10,
 body.colorblind .item-row.score-9  { border-left: 3px solid #1a3f8f; }
 body.colorblind .item-row.score-8,

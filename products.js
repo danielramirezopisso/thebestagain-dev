@@ -450,9 +450,6 @@ function renderLane(catId, markersForCat){
   const visible = sorted.slice(0, 5);
   const hasMore = sorted.length > 5;
 
-  // Max avg for bar width
-  const maxAvg = Math.max(...sorted.map(m => Number(m.rating_avg || 0)), 1);
-
   const itemsHtml = visible.map((m, idx)=>{
     const brand = BRAND_BY_ID[m.brand_id]?.name || "(unknown brand)";
     const displayName = m.product_name ? `${brand} · ${m.product_name}` : brand;
@@ -463,16 +460,13 @@ function renderLane(catId, markersForCat){
     const rowScoreCls = scoreRowClass(rowScore, rowHasVotes);
     const avg = Number(m.rating_avg || 0);
     const cnt = Number(m.rating_count || 0);
-    const barPct = cnt ? Math.round((avg / maxAvg) * 100) : 0;
     return `
       <div class="item-row ${rowScoreCls}${unvisited ? " journey-unvisited-item" : ""}">
         <a class="item" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${encodeURIComponent(catId)}">
-          <div class="item-top">
-            ${brandIconSlotHtml(m.brand_id)}
-            <div class="item-name">${escapeHtml(displayName)}</div>
-            ${ratingBadgeHtml(m)}
-          </div>
-          ${cnt ? `<div class="item-bar-wrap"><div class="item-bar" style="width:${barPct}%"></div></div>` : ''}
+          <div class="item-pos">${idx + 1}</div>
+          ${brandIconSlotHtml(m.brand_id)}
+          <div class="item-name">${escapeHtml(displayName)}</div>
+          ${ratingBadgeHtml(m)}
         </a>
         ${wlBtnHtml(m.id, "wl-btn-sm")}
       </div>
