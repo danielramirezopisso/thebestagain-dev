@@ -139,14 +139,11 @@ function updateCatCardProgress() {
     const countEl = document.getElementById(`catCount-${ruta.category_id}`);
     const items = RUTA_ITEMS_BY_CAT[ruta.category_id] || [];
     if (!items.length) return;
-    const total = items.filter(ri => ri.marker_id || ri.markers?.is_active).length;
+    const total = items.filter(ri => ri.markers?.is_active).length;
     const voted = items.filter(ri => {
-      const mid = ri.marker_id || ri.markers?.id;
+      const mid = ri.markers?.id;
       if (!mid) return false;
-      // Try both string and number forms of category_id
-      return !!(MY_VOTES[`${mid}__${ruta.category_id}`] ||
-                MY_VOTES[`${mid}__${String(ruta.category_id)}`] ||
-                MY_VOTES[`${mid}__${Number(ruta.category_id)}`]);
+      return !!MY_VOTES[`${mid}__${ruta.category_id}`];
     }).length;
     const pct = total ? Math.round((voted / total) * 100) : 0;
     if (progressEl) {
@@ -163,27 +160,23 @@ function updateCatCardProgress() {
    PRELOAD ALL RUTA ITEMS (for progress bars)
 ══════════════════════════════ */
 async function preloadAllRutaItems() {
-  const catIds = ALL_RUTAS.map(r => r.category_id);
-  if (!catIds.length) return;
+  if (!ALL_RUTAS.length) return;
 
-  // Simple query matching selectCategory pattern exactly
-  const { data, error } = await sb.from('ruta_items')
-    .select('id, position, category_id, marker_id, markers(id, title, is_active)')
-    .in('category_id', catIds)
-    .order('position', { ascending: true });
+  // Load each ruta exactly like selectCategory does — using ruta_id
+  const promises = ALL_RUTAS.map(ruta =>
+    sb.from('ruta_items')
+      .select('id, position, markers(id,title,is_active,rating_avg,rating_count)')
+      .eq('ruta_id', ruta.id)
+      .eq('is_active', true)
+      .order('position', { ascending: true })
+      .then(({ data }) => {
+        if (data && data.length) {
+          RUTA_ITEMS_BY_CAT[ruta.category_id] = data;
+        }
+      })
+  );
 
-  if (error) { console.warn('preloadAllRutaItems error:', error.message); return; }
-  if (!data || !data.length) { console.warn('preloadAllRutaItems: no data returned'); return; }
-  console.log('preloadAllRutaItems: loaded', data.length, 'items');
-
-  // Group by category, only active markers
-  data.forEach(item => {
-    if (!item.markers?.is_active) return;
-    const cid = item.category_id;
-    if (!RUTA_ITEMS_BY_CAT[cid]) RUTA_ITEMS_BY_CAT[cid] = [];
-    RUTA_ITEMS_BY_CAT[cid].push(item);
-  });
-
+  await Promise.all(promises);
   updateCatCardProgress();
 }
 
