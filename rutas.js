@@ -177,6 +177,9 @@ async function preloadAllRutaItems() {
   );
 
   await Promise.all(promises);
+  const totalLoaded = Object.values(RUTA_ITEMS_BY_CAT).reduce((s,v)=>s+v.length,0);
+  const votedCount = Object.keys(MY_VOTES).length;
+  console.log('[RUTAS PRELOAD] items loaded:', totalLoaded, 'my votes:', votedCount, 'cats:', Object.keys(RUTA_ITEMS_BY_CAT));
   updateCatCardProgress();
 }
 
