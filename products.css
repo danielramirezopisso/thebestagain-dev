@@ -150,13 +150,7 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
 }
 .item-row:first-child { margin-top: 10px; }
 
-/* Left border color accent per score */
-.item-row.score-10, .item-row.score-9  { border-left: 3px solid #1e5c3a; }
-.item-row.score-8,  .item-row.score-7  { border-left: 3px solid #4a7c59; }
-.item-row.score-6,  .item-row.score-5  { border-left: 3px solid #c8972a; }
-.item-row.score-4,  .item-row.score-3  { border-left: 3px solid #e76f51; }
-.item-row.score-low                     { border-left: 3px solid #c1440e; }
-.item-row.score-none                    { border-left: 3px solid transparent; }
+/* No left border color — position box carries the color signal */
 
 .item {
   display: grid;
@@ -170,13 +164,31 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
 }
 .item:hover { background: rgba(26,23,20,0.02); }
 
-/* Position number */
+/* Position number — colored box */
 .item-pos {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 12px; font-weight: 700;
-  color: var(--muted); text-align: right;
+  font-size: 12px; font-weight: 900;
+  color: #fff; text-align: center;
   flex-shrink: 0;
+  width: 20px; height: 20px;
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
 }
+/* Position box color matches score */
+.score-10 .item-pos, .score-9 .item-pos { background: #1e5c3a; }
+.score-8 .item-pos,  .score-7 .item-pos { background: #4a7c59; }
+.score-6 .item-pos,  .score-5 .item-pos { background: #c8972a; }
+.score-4 .item-pos,  .score-3 .item-pos { background: #e76f51; }
+.score-low .item-pos                     { background: #c1440e; }
+.score-none .item-pos                    { background: var(--muted); }
+/* Colorblind */
+body.colorblind .score-10 .item-pos,
+body.colorblind .score-9 .item-pos  { background: #1a3f8f; }
+body.colorblind .score-8 .item-pos,
+body.colorblind .score-7 .item-pos  { background: #2d6be4; }
+body.colorblind .score-4 .item-pos,
+body.colorblind .score-3 .item-pos  { background: #e87722; }
+body.colorblind .score-low .item-pos { background: #b35c00; }
 
 .brand-ic-slot {
   width: 26px; height: 26px;
@@ -217,9 +229,8 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
 .rate-badge.rating-none { color: var(--muted) !important; font-size: 12px; }
 
 /* Journey unvoted */
-.journey-unvisited-item .item-name { color: rgba(26,23,20,0.25); }
-.journey-unvisited-item .brand-ic-slot { opacity: 0.3; }
-.journey-unvisited-item .item-bar-wrap { opacity: 0.2; }
+.journey-unvisited-item { border: 1px dashed var(--border) !important; opacity: 0.5; }
+.journey-unvisited-item .item-pos { background: var(--border) !important; color: var(--muted) !important; }
 
 /* Wishlist btn in lane */
 .wl-btn-sm {
