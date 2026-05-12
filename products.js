@@ -302,10 +302,9 @@ function ratingBadgeHtml(m){
     n     = '–';
     tip   = 'Not voted yet — click to vote';
     color = 'var(--border)';
-    const myVoteJ = hasVoted ? ' prod-voted' : '';
-    return `<div class="prod-score journey-empty${myVoteJ}" title="${escapeHtml(tip)}"
+    return `<div class="prod-score prod-score-empty" title="${escapeHtml(tip)}"
       onclick="event.preventDefault(); event.stopPropagation(); openProductVote('${m.id}', '${m.category_id}', this); return false;"
-      >${escapeHtml(n)}</div>`;
+      >–</div>`;
   } else {
     n     = cnt ? String(Math.round(avg)) : '—';
     tip   = cnt ? `${avg.toFixed(2)}/10 (${cnt} votes)` : 'No votes yet';
@@ -313,7 +312,7 @@ function ratingBadgeHtml(m){
   }
 
   const myVote = hasVoted ? ' prod-voted' : '';
-  return `<div class="prod-score${myVote}" style="color:${color}" title="${escapeHtml(tip)}"
+  return `<div class="prod-score${myVote}" style="background:${color}" title="${escapeHtml(tip)}"
     onclick="event.preventDefault(); event.stopPropagation(); openProductVote('${m.id}', '${m.category_id}', this); return false;"
     >${escapeHtml(n)}</div>`;
 }

@@ -145,12 +145,14 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
   border: 1px solid var(--border);
   border-radius: 8px;
   margin: 4px 0;
+  background: rgba(255,255,255,0.7);
   transition: background 0.15s;
   overflow: hidden;
 }
 .item-row:first-child { margin-top: 10px; }
+.item-row:hover { background: rgba(255,255,255,0.95); }
 
-/* No left border color — position box carries the color signal */
+
 
 .item {
   display: grid;
@@ -164,31 +166,12 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
 }
 .item:hover { background: rgba(26,23,20,0.02); }
 
-/* Position number — colored box */
+/* Position — plain muted number */
 .item-pos {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 12px; font-weight: 900;
-  color: #fff; text-align: center;
-  flex-shrink: 0;
-  width: 20px; height: 20px;
-  border-radius: 5px;
-  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600;
+  color: var(--muted); text-align: right;
+  flex-shrink: 0; opacity: 0.6;
 }
-/* Position box color matches score */
-.score-10 .item-pos, .score-9 .item-pos { background: #1e5c3a; }
-.score-8 .item-pos,  .score-7 .item-pos { background: #4a7c59; }
-.score-6 .item-pos,  .score-5 .item-pos { background: #c8972a; }
-.score-4 .item-pos,  .score-3 .item-pos { background: #e76f51; }
-.score-low .item-pos                     { background: #c1440e; }
-.score-none .item-pos                    { background: var(--muted); }
-/* Colorblind */
-body.colorblind .score-10 .item-pos,
-body.colorblind .score-9 .item-pos  { background: #1a3f8f; }
-body.colorblind .score-8 .item-pos,
-body.colorblind .score-7 .item-pos  { background: #2d6be4; }
-body.colorblind .score-4 .item-pos,
-body.colorblind .score-3 .item-pos  { background: #e87722; }
-body.colorblind .score-low .item-pos { background: #b35c00; }
 
 .brand-ic-slot {
   width: 26px; height: 26px;
@@ -499,14 +482,7 @@ body.colorblind .score-low .item-pos { background: #b35c00; }
 /* ── Item info with bar ── */
 .item {
 }
-/* Left border colorblind */
-body.colorblind .item-row.score-10,
-body.colorblind .item-row.score-9  { border-left: 3px solid #1a3f8f; }
-body.colorblind .item-row.score-8,
-body.colorblind .item-row.score-7  { border-left: 3px solid #2d6be4; }
-body.colorblind .item-row.score-4,
-body.colorblind .item-row.score-3  { border-left: 3px solid #e87722; }
-body.colorblind .item-row.score-low { border-left: 3px solid #b35c00; }
+
 /* Score badge — plain coloured number, no background */
 .rate-badge {
   display: block !important;
@@ -524,15 +500,25 @@ body.colorblind .item-row.score-low { border-left: 3px solid #b35c00; }
 /* ── Product score — snug pill badge ── */
 .prod-score {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 15px; font-weight: 900; line-height: 1;
-  min-width: 28px; text-align: right;
+  font-size: 13px; font-weight: 900; line-height: 1;
+  min-width: 28px; text-align: center;
   flex-shrink: 0; cursor: pointer;
-  padding: 0;
-  border: none;
-  background: none;
-  box-shadow: none;
+  padding: 4px 6px;
+  border-radius: 6px;
+  color: #fff;
+  border: none; box-shadow: none;
   transition: opacity 0.15s;
 }
+/* Score box color */
+.prod-score[style*="#1e5c3a"] { background: #1e5c3a; color: #fff; }
+.prod-score[style*="#4a7c59"] { background: #4a7c59; }
+.prod-score[style*="#c8972a"] { background: #c8972a; }
+.prod-score[style*="#e76f51"] { background: #e76f51; }
+.prod-score[style*="#c1440e"] { background: #c1440e; }
+.prod-score[style*="#1a3f8f"] { background: #1a3f8f; }
+.prod-score[style*="#2d6be4"] { background: #2d6be4; }
+.prod-score[style*="#e87722"] { background: #e87722; }
+.prod-score[style*="#b35c00"] { background: #b35c00; }
 /* Journey unvoted — clear empty pill */
 .prod-score.journey-empty {
   border-style: dashed;
@@ -570,4 +556,12 @@ body.colorblind .item-row.score-low { border-left: 3px solid #b35c00; }
   font-family: 'Playfair Display', Georgia, serif;
   font-size: 18px; font-weight: 700; color: var(--text);
   display: flex; align-items: center; gap: 8px;
+}
+
+/* Empty score in journey mode */
+.prod-score-empty, .prod-score.journey-empty {
+  background: transparent !important;
+  border: 1px dashed var(--border) !important;
+  color: var(--muted) !important;
+  font-size: 11px;
 }
