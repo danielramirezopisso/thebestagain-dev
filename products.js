@@ -467,12 +467,12 @@ function renderLane(catId, markersForCat){
     return `
       <div class="item-row ${rowScoreCls}${unvisited ? " journey-unvisited-item" : ""}">
         <a class="item" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${encodeURIComponent(catId)}">
-          ${brandIconSlotHtml(m.brand_id)}
-          <div class="item-info">
+          <div class="item-top">
+            ${brandIconSlotHtml(m.brand_id)}
             <div class="item-name">${escapeHtml(displayName)}</div>
-            ${cnt ? `<div class="item-bar-wrap"><div class="item-bar" style="width:${barPct}%"></div></div>` : ''}
+            ${ratingBadgeHtml(m)}
           </div>
-          ${ratingBadgeHtml(m)}
+          ${cnt ? `<div class="item-bar-wrap"><div class="item-bar" style="width:${barPct}%"></div></div>` : ''}
         </a>
         ${wlBtnHtml(m.id, "wl-btn-sm")}
       </div>
@@ -514,9 +514,11 @@ function renderDrawer(){
     return `
       <div class="item-row">
         <a class="item" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${encodeURIComponent(catId)}">
-          ${brandIconSlotHtml(m.brand_id)}
-          <div class="item-name">${escapeHtml(displayName)}</div>
-          ${ratingBadgeHtml(m)}
+          <div class="item-top">
+            ${brandIconSlotHtml(m.brand_id)}
+            <div class="item-name">${escapeHtml(displayName)}</div>
+            ${ratingBadgeHtml(m)}
+          </div>
         </a>
         ${wlBtnHtml(m.id, "wl-btn-sm")}
       </div>
