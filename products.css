@@ -202,8 +202,9 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
 .rate-badge.rating-none { color: var(--muted) !important; font-size: 12px; }
 
 /* Journey unvoted */
-.journey-unvisited-item .item-name { color: rgba(26,23,20,0.3); }
-.journey-empty-badge { color: rgba(26,23,20,0.2) !important; font-size: 11px; }
+.journey-unvisited-item .item-name { color: rgba(26,23,20,0.25); }
+.journey-unvisited-item .brand-ic-slot { opacity: 0.3; }
+.journey-unvisited-item .item-bar-wrap { opacity: 0.2; }
 
 /* Wishlist btn in lane */
 .wl-btn-sm {
