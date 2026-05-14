@@ -506,7 +506,7 @@ function renderDrawer(){
     const displayName = m.product_name ? `${brand} · ${m.product_name}` : brand;
     return `
       <div class="item-row">
-        <a class="item" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${encodeURIComponent(catId)}">
+        <a class="item drawer-item" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${encodeURIComponent(catId)}">
           <div class="item-pos">${rowIdx + 1}</div>
           ${brandIconSlotHtml(m.brand_id)}
           <div class="item-name">${escapeHtml(displayName)}</div>
