@@ -92,17 +92,20 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
    LANES GRID — 3 cols desktop
 ══════════════════════════════════════ */
 .lanes-grid {
-  column-count: 3;
-  column-gap: 40px;
-  column-fill: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0 40px;
+  align-items: start;
 }
-@media (max-width: 900px) { .lanes-grid { column-count: 2; column-gap: 24px; } }
-@media (max-width: 580px) { .lanes-grid { column-count: 1; } }
+.lane-col {
+  min-width: 0;
+}
+@media (max-width: 900px) { .lanes-grid { grid-template-columns: repeat(2, 1fr); gap: 0 24px; } }
+@media (max-width: 580px) { .lanes-grid { grid-template-columns: 1fr; } }
 
 /* ── Lane (category column) ── */
 .lane {
   padding: 0 0 28px;
-  break-inside: avoid;
 }
 
 .lane-head {

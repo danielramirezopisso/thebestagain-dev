@@ -564,9 +564,28 @@ function renderAll(){
   });
 
   // Hide empty lanes when filtering
-  qs("lanes").innerHTML = laneIds
-    .filter(cid => (byCat[cid] || []).length > 0)
-    .map(cid => renderLane(cid, byCat[cid] || [])).join("");
+  const activeLaneIds = laneIds.filter(cid => (byCat[cid] || []).length > 0);
+
+  // Distribute lanes into 3 columns (masonry-style: fill shortest column)
+  const cols = [[], [], []];
+  const colHeights = [0, 0, 0];
+  activeLaneIds.forEach(cid => {
+    const items = byCat[cid] || [];
+    const height = items.length + 1; // items + header
+    const shortest = colHeights.indexOf(Math.min(...colHeights));
+    cols[shortest].push(cid);
+    colHeights[shortest] += height;
+  });
+
+  // Render 3 column divs
+  const grid = qs("lanes");
+  grid.innerHTML = '';
+  cols.forEach(colCatIds => {
+    const col = document.createElement('div');
+    col.className = 'lane-col';
+    col.innerHTML = colCatIds.map(cid => renderLane(cid, byCat[cid] || [])).join('');
+    grid.appendChild(col);
+  });
   setStatus(`Loaded ${filtered.length} product(s).`);
   if (DRAWER_CAT) renderDrawer();
 }
