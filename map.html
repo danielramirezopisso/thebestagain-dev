@@ -293,6 +293,14 @@
   </script>
 
   <script>
+  function toggleAddPanel() {
+    const panel = document.getElementById('addPanel');
+    if (!panel) return;
+    const isOpen = panel.classList.contains('map-panel-open');
+    panel.classList.toggle('map-panel-collapsed', isOpen);
+    panel.classList.toggle('map-panel-open', !isOpen);
+  }
+
   function openFilterDrawer(e) {
     if (e) e.stopPropagation();
     const drawer = document.getElementById('mapFilterDrawer');
