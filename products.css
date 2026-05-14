@@ -575,3 +575,24 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
 .drawer-item .brand-ic-slot {
   width: 24px; height: 24px; flex-shrink: 0;
 }
+/* Vote count — small muted number before score */
+.prod-vote-count {
+  font-size: 10px; font-weight: 600;
+  color: var(--muted); opacity: 0.6;
+  margin-right: 4px; white-space: nowrap;
+}
+
+/* Empty score — white pill with star */
+.prod-score-empty, .prod-score.journey-empty {
+  background: rgba(255,255,255,0.8) !important;
+  border: 1.5px solid var(--border) !important;
+  color: var(--muted) !important;
+  font-size: 14px;
+  cursor: pointer;
+}
+.prod-score-empty:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+
+/* Journey unvoted row — visible but clearly unvoted */
+.journey-unvisited-item { opacity: 0.45; }
+.journey-unvisited-item:hover { opacity: 0.8; }
+.journey-unvisited-item .item-name { color: var(--text) !important; }

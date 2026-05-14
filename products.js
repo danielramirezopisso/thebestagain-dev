@@ -304,7 +304,7 @@ function ratingBadgeHtml(m){
     color = 'var(--border)';
     return `<div class="prod-score prod-score-empty" title="${escapeHtml(tip)}"
       onclick="event.preventDefault(); event.stopPropagation(); openProductVote('${m.id}', '${m.category_id}', this); return false;"
-      >–</div>`;
+      >☆</div>`;
   } else {
     n     = cnt ? String(Math.round(avg)) : '—';
     tip   = cnt ? `${avg.toFixed(2)}/10 (${cnt} votes)` : 'No votes yet';
@@ -312,7 +312,9 @@ function ratingBadgeHtml(m){
   }
 
   const myVote = hasVoted ? ' prod-voted' : '';
-  return `<div class="prod-score${myVote}" style="background:${color}" title="${escapeHtml(tip)}"
+  const voteCountHtml = (!JOURNEY_MODE_PROD && cnt > 0)
+    ? `<span class="prod-vote-count">${cnt}</span>` : '';
+  return `${voteCountHtml}<div class="prod-score${myVote}" style="background:${color}" title="${escapeHtml(tip)}"
     onclick="event.preventDefault(); event.stopPropagation(); openProductVote('${m.id}', '${m.category_id}', this); return false;"
     >${escapeHtml(n)}</div>`;
 }
@@ -669,6 +671,7 @@ async function toggleJourneyModeProd() {
     return;
   }
   JOURNEY_MODE_PROD = !JOURNEY_MODE_PROD;
+  LANE_SORT = {}; // reset sort on mode switch
   updateJourneyToggleUIProd();
   renderAll();
 }
