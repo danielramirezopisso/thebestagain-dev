@@ -446,8 +446,8 @@ function renderLane(catId, markersForCat){
     sorted = [...voted, ...unvoted];
   }
 
-  const visible = sorted.slice(0, 5);
-  const hasMore = sorted.length > 5;
+  const visible = sorted.slice(0, 10);
+  const hasMore = sorted.length > 10;
 
   const itemsHtml = visible.map((m, idx)=>{
     const brand = BRAND_BY_ID[m.brand_id]?.name || "(unknown brand)";
@@ -459,11 +459,11 @@ function renderLane(catId, markersForCat){
     const rowScoreCls = scoreRowClass(rowScore, rowHasVotes);
     const avg = Number(m.rating_avg || 0);
     const cnt = Number(m.rating_count || 0);
+    const sizeClass = idx === 0 ? 'item-rank-1' : idx === 1 ? 'item-rank-2' : idx === 2 ? 'item-rank-3' : 'item-rank-rest';
     return `
       <div class="item-row ${rowScoreCls}${unvisited ? " journey-unvisited-item" : ""}">
-        <a class="item" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${encodeURIComponent(catId)}">
+        <a class="item ${sizeClass}" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${encodeURIComponent(catId)}">
           <div class="item-pos">${idx + 1}</div>
-          ${brandIconSlotHtml(m.brand_id)}
           <div class="item-name">${escapeHtml(displayName)}</div>
           ${ratingBadgeHtml(m)}
         </a>

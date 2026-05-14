@@ -92,15 +92,17 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
    LANES GRID — 3 cols desktop
 ══════════════════════════════════════ */
 .lanes-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0 40px;
-  align-items: start;
+  column-count: 3;
+  column-gap: 40px;
+  column-fill: auto;
 }
+@media (max-width: 900px) { .lanes-grid { column-count: 2; column-gap: 24px; } }
+@media (max-width: 580px) { .lanes-grid { column-count: 1; } }
 
 /* ── Lane (category column) ── */
 .lane {
-  padding: 0 0 32px;
+  padding: 0 0 28px;
+  break-inside: avoid;
 }
 
 .lane-head {
@@ -142,29 +144,25 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
 /* ── Item rows — marker ranking style ── */
 .item-row {
   display: flex; align-items: center;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  margin: 4px 0;
-  background: rgba(255,255,255,0.7);
-  transition: background 0.15s;
-  overflow: hidden;
+  border-bottom: 1px solid var(--rule);
+  margin: 0;
+  transition: background 0.1s;
 }
-.item-row:first-child { margin-top: 10px; }
-.item-row:hover { background: rgba(255,255,255,0.95); }
+.item-row:first-child { margin-top: 8px; }
+.item-row:last-child { border-bottom: none; }
+.item-row:hover { background: rgba(26,23,20,0.02); }
 
 
 
 .item {
   display: grid;
-  grid-template-columns: 22px 28px 1fr auto;
+  grid-template-columns: 20px 1fr auto;
   align-items: center;
   gap: 8px;
-  padding: 9px 10px;
+  padding: 8px 4px;
   text-decoration: none; color: inherit;
   flex: 1; min-width: 0;
-  transition: background 0.1s;
 }
-.item:hover { background: rgba(26,23,20,0.02); }
 
 /* Position — plain muted number */
 .item-pos {
@@ -191,8 +189,22 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
   font-size: 13px; font-weight: 600;
   color: var(--text); line-height: 1.2;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  flex: 1; min-width: 0;
+  min-width: 0;
 }
+
+/* Size gradient — top items feel more important */
+.item-rank-1 .item-name { font-size: 15px; font-weight: 700; color: var(--text); }
+.item-rank-2 .item-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.item-rank-3 .item-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.item-rank-rest .item-name { font-size: 12px; font-weight: 500; color: var(--muted); }
+
+.item-rank-1 .item-pos { font-size: 13px; font-weight: 700; opacity: 0.5; }
+.item-rank-2 .item-pos { font-size: 12px; opacity: 0.5; }
+.item-rank-rest .item-pos { font-size: 11px; opacity: 0.35; }
+
+.item-rank-1 .prod-score { font-size: 15px; padding: 5px 8px; }
+.item-rank-2 .prod-score { font-size: 14px; padding: 4px 7px; }
+.item-rank-rest .prod-score { font-size: 12px; padding: 3px 6px; }
 
 /* Rating badge — simplified, editorial */
 .rate-badge {
@@ -212,8 +224,8 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
 .rate-badge.rating-none { color: var(--muted) !important; font-size: 12px; }
 
 /* Journey unvoted */
-.journey-unvisited-item { border: 1px dashed var(--border) !important; opacity: 0.5; }
-.journey-unvisited-item .item-pos { background: var(--border) !important; color: var(--muted) !important; }
+.journey-unvisited-item { opacity: 0.35; }
+.journey-unvisited-item .item-name { color: var(--muted) !important; }
 
 /* Wishlist btn in lane */
 .wl-btn-sm {
