@@ -580,6 +580,13 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
   font-size: 10px; font-weight: 600;
   color: var(--muted); opacity: 0.6;
   margin-right: 4px; white-space: nowrap;
+  flex-shrink: 0;
+}
+/* Score cell wrapper — always one line */
+.item-score-wrap {
+  display: flex; align-items: center;
+  gap: 3px; white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Empty score — white pill with star */

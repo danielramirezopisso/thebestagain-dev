@@ -302,9 +302,9 @@ function ratingBadgeHtml(m){
     n     = '–';
     tip   = 'Not voted yet — click to vote';
     color = 'var(--border)';
-    return `<div class="prod-score prod-score-empty" title="${escapeHtml(tip)}"
+    return `<div class="item-score-wrap"><div class="prod-score prod-score-empty" title="${escapeHtml(tip)}"
       onclick="event.preventDefault(); event.stopPropagation(); openProductVote('${m.id}', '${m.category_id}', this); return false;"
-      >☆</div>`;
+      >☆</div></div>`;
   } else {
     n     = cnt ? String(Math.round(avg)) : '—';
     tip   = cnt ? `${avg.toFixed(2)}/10 (${cnt} votes)` : 'No votes yet';
@@ -314,9 +314,9 @@ function ratingBadgeHtml(m){
   const myVote = hasVoted ? ' prod-voted' : '';
   const voteCountHtml = (!JOURNEY_MODE_PROD && cnt > 0)
     ? `<span class="prod-vote-count">${cnt}</span>` : '';
-  return `${voteCountHtml}<div class="prod-score${myVote}" style="background:${color}" title="${escapeHtml(tip)}"
+  return `<div class="item-score-wrap">${voteCountHtml}<div class="prod-score${myVote}" style="background:${color}" title="${escapeHtml(tip)}"
     onclick="event.preventDefault(); event.stopPropagation(); openProductVote('${m.id}', '${m.category_id}', this); return false;"
-    >${escapeHtml(n)}</div>`;
+    >${escapeHtml(n)}</div></div>`;
 }
 
 function scoreColor(score) {
