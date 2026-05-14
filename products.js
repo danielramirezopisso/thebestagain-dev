@@ -501,17 +501,16 @@ function renderDrawer(){
   const catId = DRAWER_CAT;
   let rows = MARKERS.filter(m => m.category_id === catId).filter(passesBucket);
   rows = sortMarkers(rows.slice(), DRAWER_SORT);
-  qs("drawerList").innerHTML = rows.map(m=>{
+  qs("drawerList").innerHTML = rows.map((m, rowIdx)=>{
     const brand = BRAND_BY_ID[m.brand_id]?.name || "(unknown brand)";
     const displayName = m.product_name ? `${brand} · ${m.product_name}` : brand;
     return `
       <div class="item-row">
         <a class="item" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${encodeURIComponent(catId)}">
-          <div class="item-top">
-            ${brandIconSlotHtml(m.brand_id)}
-            <div class="item-name">${escapeHtml(displayName)}</div>
-            ${ratingBadgeHtml(m)}
-          </div>
+          <div class="item-pos">${rowIdx + 1}</div>
+          ${brandIconSlotHtml(m.brand_id)}
+          <div class="item-name">${escapeHtml(displayName)}</div>
+          ${ratingBadgeHtml(m)}
         </a>
         ${wlBtnHtml(m.id, "wl-btn-sm")}
       </div>

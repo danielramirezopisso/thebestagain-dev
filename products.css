@@ -501,24 +501,24 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
 .prod-score {
   font-family: 'Playfair Display', Georgia, serif;
   font-size: 13px; font-weight: 900; line-height: 1;
-  min-width: 28px; text-align: center;
+  min-width: 30px; text-align: center;
   flex-shrink: 0; cursor: pointer;
-  padding: 4px 6px;
+  padding: 4px 7px;
   border-radius: 6px;
   color: #fff;
   border: none; box-shadow: none;
   transition: opacity 0.15s;
 }
 /* Score box color */
-.prod-score[style*="#1e5c3a"] { background: #1e5c3a; color: #fff; }
-.prod-score[style*="#4a7c59"] { background: #4a7c59; }
-.prod-score[style*="#c8972a"] { background: #c8972a; }
-.prod-score[style*="#e76f51"] { background: #e76f51; }
-.prod-score[style*="#c1440e"] { background: #c1440e; }
-.prod-score[style*="#1a3f8f"] { background: #1a3f8f; }
-.prod-score[style*="#2d6be4"] { background: #2d6be4; }
-.prod-score[style*="#e87722"] { background: #e87722; }
-.prod-score[style*="#b35c00"] { background: #b35c00; }
+.prod-score[style*="#1e5c3a"],
+.prod-score[style*="#4a7c59"],
+.prod-score[style*="#c8972a"],
+.prod-score[style*="#e76f51"],
+.prod-score[style*="#c1440e"],
+.prod-score[style*="#1a3f8f"],
+.prod-score[style*="#2d6be4"],
+.prod-score[style*="#e87722"],
+.prod-score[style*="#b35c00"] { color: #fff; }
 /* Journey unvoted — clear empty pill */
 .prod-score.journey-empty {
   border-style: dashed;
@@ -528,15 +528,7 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
   opacity: 0.5;
 }
 
-/* Score tinted background — inline style selector */
-.prod-score[style*="#1e5c3a"] { background: rgba(30,92,58,0.08); }
-.prod-score[style*="#4a7c59"] { background: rgba(74,124,89,0.08); }
-.prod-score[style*="#c8972a"] { background: rgba(200,151,42,0.08); }
-.prod-score[style*="#e76f51"] { background: rgba(231,111,81,0.08); }
-.prod-score[style*="#c1440e"] { background: rgba(193,68,14,0.08); }
-.prod-score[style*="#1a3f8f"] { background: rgba(26,63,143,0.08); }
-.prod-score[style*="#2d6be4"] { background: rgba(45,107,228,0.08); }
-.prod-score[style*="#e87722"] { background: rgba(232,119,34,0.08); }
+/* faded overrides removed */
 .prod-score[style*="#b35c00"] { background: rgba(179,92,0,0.08); }
 .prod-score:hover { opacity: 0.8; transform: scale(1.05); }
 .prod-score.prod-voted { font-size: 13px; }
