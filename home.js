@@ -92,7 +92,7 @@ function startHeroRotation() {
   if (!el) return;
   // Use curated fallback list always — DB cats may include non-photogenic names
   const cats = ROTATING_FALLBACK;
-  el.textContent = cats[0];
+  // First word already in HTML — skip setting it again
   el.classList.add("fade-in");
   setInterval(() => {
     el.classList.add("fade-out");
