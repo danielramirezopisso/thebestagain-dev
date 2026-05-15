@@ -76,7 +76,7 @@ async function loadAllData() {
 /* ══════════════════════════════════
    VOTES VIEW STATE
 ══════════════════════════════════ */
-let VOTES_SORT  = 'score';
+let VOTES_SORT  = 'category';
 let VOTES_QUERY = '';
 let VOTES_CAT   = null;   // null = all
 let VOTES_TYPE  = null;   // null | 'place' | 'product'
@@ -106,7 +106,7 @@ function renderNormalView() {
         <button class="votes-filter-btn" id="votesFilterBtn" onclick="toggleVotesFilter()">⊟ Filter</button>
       </div>
       <div class="votes-sort-pills">
-        <button class="votes-sort-pill active" data-sort="score"  onclick="setVotesSort('score')">Score ↓</button>
+        <button class="votes-sort-pill active" data-sort="category" onclick="setVotesSort('category')">Category</button>
         <button class="votes-sort-pill"        data-sort="name"   onclick="setVotesSort('name')">Name</button>
         <button class="votes-sort-pill"        data-sort="recent" onclick="setVotesSort('recent')">Recent</button>
       </div>`;
@@ -250,7 +250,7 @@ function renderVotesList() {
   let html = '';
   let lastCat = null;
   let posInCat = {};
-  const showDividers = (VOTES_SORT === "score" || VOTES_SORT === "recent");
+  const showDividers = (VOTES_SORT === 'score' || VOTES_SORT === 'category' || VOTES_SORT === 'recent');
 
   votes.forEach((v, i) => {
     const cid = v.markers.category_id;
