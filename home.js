@@ -339,17 +339,26 @@ async function loadDebatesPreview() {
   const host = document.getElementById('homeDebatesGrid');
   if (!host) return;
 
-  const { data } = await sb.from('battles')
-    .select('id,question,option_a,option_b,votes_a,votes_b,is_active')
-    .order('created_at', { ascending: false })
-    .limit(10);
+  const [battlesRes, votesRes] = await Promise.all([
+    sb.from('battles').select('id,question,option_a,option_b').eq('is_active', true)
+      .order('position', { ascending: true }).limit(2),
+    sb.from('battle_votes').select('battle_id,choice').eq('is_active', true)
+  ]);
 
-  const battles = (data || []).filter(b => b.is_active !== false).slice(0, 2);
+  const battles = battlesRes.data || [];
   if (!battles.length) { host.innerHTML = ''; host.closest('.home-section')?.style.setProperty('display','none'); return; }
 
+  const tally = {};
+  (votesRes.data || []).forEach(v => {
+    if (!tally[v.battle_id]) tally[v.battle_id] = { a: 0, b: 0 };
+    if (v.choice === 'a') tally[v.battle_id].a++;
+    else tally[v.battle_id].b++;
+  });
+
   host.innerHTML = battles.map(b => {
-    const total = (b.votes_a || 0) + (b.votes_b || 0);
-    const pctA = total ? Math.round((b.votes_a / total) * 100) : 50;
+    const t = tally[b.id] || { a: 0, b: 0 };
+    const total = t.a + t.b;
+    const pctA = total ? Math.round((t.a / total) * 100) : 50;
     const pctB = 100 - pctA;
     return `
       <a class="home-debate-card" href="battles.html">
