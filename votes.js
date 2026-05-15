@@ -73,65 +73,149 @@ async function loadAllData() {
 }
 
 /* ══════════════════════════════════ NORMAL VIEW */
+/* ══════════════════════════════════
+   VOTES VIEW STATE
+══════════════════════════════════ */
+let VOTES_SORT  = 'score'; // 'score' | 'name' | 'category' | 'recent'
+let VOTES_QUERY = '';
+
 function renderNormalView() {
   const wrap = document.getElementById("votesByCategory");
   if (!MY_VOTES.length) {
     wrap.innerHTML = `
-      <div style="text-align:center;padding:48px 20px;">
-        <div style="font-size:36px;margin-bottom:10px;">🗳️</div>
-        <h3 style="margin:0 0 6px;">No votes yet</h3>
+      <div class="votes-empty">
+        <div class="votes-empty-icon">🗳️</div>
+        <h3>No votes yet</h3>
         <p class="muted">Open any marker and cast your first vote.</p>
       </div>`;
     return;
   }
 
-  const byCat = {};
-  MY_VOTES.forEach(v => {
-    const cid = v.markers.category_id;
-    if (!byCat[cid]) byCat[cid] = [];
-    byCat[cid].push(v);
+  // Search + sort controls
+  if (!document.getElementById("votesControls")) {
+    const controls = document.createElement("div");
+    controls.id = "votesControls";
+    controls.className = "votes-controls";
+    controls.innerHTML = `
+      <input class="votes-search" id="votesSearch" placeholder="Search places…" oninput="onVotesSearch(this.value)" />
+      <div class="votes-sort-pills">
+        <button class="votes-sort-pill active" data-sort="score"    onclick="setVotesSort('score')">Score</button>
+        <button class="votes-sort-pill"        data-sort="name"     onclick="setVotesSort('name')">Name</button>
+        <button class="votes-sort-pill"        data-sort="category" onclick="setVotesSort('category')">Category</button>
+        <button class="votes-sort-pill"        data-sort="recent"   onclick="setVotesSort('recent')">Recent</button>
+      </div>`;
+    wrap.parentNode.insertBefore(controls, wrap);
+  }
+
+  renderVotesList();
+}
+
+function onVotesSearch(q) {
+  VOTES_QUERY = q.toLowerCase().trim();
+  renderVotesList();
+}
+
+function setVotesSort(sort) {
+  VOTES_SORT = sort;
+  document.querySelectorAll('.votes-sort-pill').forEach(b => {
+    b.classList.toggle('active', b.dataset.sort === sort);
   });
-  Object.values(byCat).forEach(arr => arr.sort((a, b) => b.vote - a.vote));
+  renderVotesList();
+}
 
-  const catIds = Object.keys(byCat).map(Number)
-    .sort((a, b) => (byCat[b][0]?.vote ?? 0) - (byCat[a][0]?.vote ?? 0));
+function renderVotesList() {
+  const wrap = document.getElementById("votesByCategory");
 
-  wrap.innerHTML = catIds.map(cid => {
-    const cat   = CAT_BY_ID[cid];
-    const votes = byCat[cid];
-    const iconHtml = cat?.icon_url
-      ? `<div class="cat-block-icon"><img src="${escapeHtml(cat.icon_url)}" alt=""/></div>`
-      : `<div class="cat-block-icon">📦</div>`;
+  // Filter by search
+  let votes = MY_VOTES.filter(v => {
+    if (!VOTES_QUERY) return true;
+    const name = (v.markers.title || '').toLowerCase();
+    const cat  = (CAT_BY_ID[v.markers.category_id]?.name || '').toLowerCase();
+    const brand = (BRAND_BY_ID[v.markers.brand_id]?.name || '').toLowerCase();
+    return name.includes(VOTES_QUERY) || cat.includes(VOTES_QUERY) || brand.includes(VOTES_QUERY);
+  });
 
-    const rows = votes.map((v, i) => {
-      const m     = v.markers;
-      const score = Number(v.vote);
-      const cls   = colorClass(score);
-      let info = "";
-      if (m.group_type === "product" && m.brand_id)
-        info = `<span class="muted" style="font-size:12px;"> · ${escapeHtml(BRAND_BY_ID[m.brand_id]?.name || "")}</span>`;
-      return `
-        <tr onclick="window.location.href='marker.html?id=${encodeURIComponent(m.id)}'">
-          <td><span class="rank-badge">${i + 1}</span></td>
-          <td><b>${escapeHtml(m.title)}</b>${info}</td>
-          <td><span class="score-pill ${cls}">${score.toFixed(1)}</span></td>
-        </tr>`;
-    }).join("");
+  // Sort
+  if (VOTES_SORT === 'score')    votes.sort((a, b) => b.vote - a.vote);
+  if (VOTES_SORT === 'name')     votes.sort((a, b) => (a.markers.title || '').localeCompare(b.markers.title || ''));
+  if (VOTES_SORT === 'category') votes.sort((a, b) => {
+    const ca = CAT_BY_ID[a.markers.category_id]?.name || '';
+    const cb = CAT_BY_ID[b.markers.category_id]?.name || '';
+    return ca.localeCompare(cb) || b.vote - a.vote;
+  });
+  if (VOTES_SORT === 'recent')   votes.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+
+  if (!votes.length) {
+    wrap.innerHTML = `<div class="votes-empty"><p class="muted">No votes match your search.</p></div>`;
+    return;
+  }
+
+  wrap.innerHTML = votes.map((v, i) => {
+    const m     = v.markers;
+    const score = Number(v.vote);
+    const cat   = CAT_BY_ID[m.category_id];
+    const brand = m.brand_id ? BRAND_BY_ID[m.brand_id]?.name : null;
+    const sub   = brand ? brand : (cat?.name || '');
+    const scoreColor = getScoreColor(score);
+    const sizeClass  = i === 0 ? 'vote-row-1' : i === 1 ? 'vote-row-2' : i < 4 ? 'vote-row-3' : '';
 
     return `
-      <div class="cat-block">
-        <div class="cat-block-head">
-          ${iconHtml}
-          <span class="cat-block-name">${escapeHtml(cat?.name || "Unknown")}</span>
-          <span class="cat-block-count">${votes.length} vote${votes.length === 1 ? "" : "s"}</span>
+      <div class="vote-row ${sizeClass}" id="vrow-${encodeURIComponent(v.id)}">
+        <a class="vote-row-link" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${m.category_id}">
+          <div class="vote-row-pos">${i + 1}</div>
+          <div class="vote-row-info">
+            <div class="vote-row-name">${escapeHtml(m.title)}</div>
+            <div class="vote-row-sub">${escapeHtml(sub)}</div>
+          </div>
+        </a>
+        <div class="vote-row-actions">
+          <div class="vote-inline-scores" id="vscores-${encodeURIComponent(v.id)}" style="display:none;">
+            ${[1,2,3,4,5,6,7,8,9,10].map(n => `<button class="vote-score-btn ${n === score ? 'active' : ''}" 
+              onclick="changeMyVote('${v.id}','${m.id}','${m.category_id}',${n})">${n}</button>`).join('')}
+            <button class="vote-score-remove" onclick="removeMyVote('${v.id}','${m.id}')">✕</button>
+          </div>
+          <div class="vote-score-badge" style="background:${scoreColor}"
+            onclick="toggleVoteScores('${encodeURIComponent(v.id)}')"
+            title="Click to change">${score}</div>
         </div>
-        <table class="votes-table">
-          <colgroup><col class="col-rank"/><col class="col-title"/><col class="col-score"/></colgroup>
-          <thead><tr><th>#</th><th>Title</th><th>Score</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
       </div>`;
-  }).join("");
+  }).join('');
+}
+
+function getScoreColor(s) {
+  if (s >= 9) return '#1e5c3a';
+  if (s >= 7) return '#4a7c59';
+  if (s >= 5) return '#c8972a';
+  if (s >= 3) return '#e76f51';
+  return '#c1440e';
+}
+
+function toggleVoteScores(id) {
+  // Close all others first
+  document.querySelectorAll('.vote-inline-scores').forEach(el => {
+    if (el.id !== 'vscores-' + id) el.style.display = 'none';
+  });
+  const el = document.getElementById('vscores-' + id);
+  if (el) el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+}
+
+async function changeMyVote(voteId, markerId, categoryId, newScore) {
+  const { error } = await sb.from('votes')
+    .update({ vote: newScore, updated_at: new Date().toISOString() })
+    .eq('id', voteId);
+  if (error) { alert('Could not update vote'); return; }
+  // Update local data
+  const v = MY_VOTES.find(x => x.id === voteId);
+  if (v) v.vote = newScore;
+  renderVotesList();
+}
+
+async function removeMyVote(voteId, markerId) {
+  if (!confirm('Remove this vote?')) return;
+  const { error } = await sb.from('votes').update({ is_active: false }).eq('id', voteId);
+  if (error) { alert('Could not remove vote'); return; }
+  MY_VOTES = MY_VOTES.filter(v => v.id !== voteId);
+  renderVotesList();
 }
 
 /* ══════════════════════════════════ EDIT MODE: ENTRY/EXIT */

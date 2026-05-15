@@ -127,3 +127,123 @@
   .user-stat-val { font-size: 22px; }
   .user-tab { padding: 12px 14px; font-size: 12px; }
 }
+
+/* ══════════════════════════════════════════════════════
+   VOTES VIEW — Editorial flat list
+══════════════════════════════════════════════════════ */
+
+/* Controls: search + sort */
+.votes-controls {
+  display: flex; flex-direction: column; gap: 12px;
+  margin-bottom: 20px;
+}
+.votes-search {
+  width: 100%; padding: 10px 14px;
+  border: 1.5px solid var(--border); border-radius: 999px;
+  background: var(--card); font-size: 14px; color: var(--text);
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.votes-search:focus { outline: none; border-color: var(--accent); }
+
+.votes-sort-pills {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.votes-sort-pill {
+  padding: 5px 14px; border-radius: 999px;
+  font-size: 12px; font-weight: 700;
+  border: 1.5px solid var(--border);
+  background: var(--card); color: var(--muted);
+  cursor: pointer; box-shadow: none;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+.votes-sort-pill:hover { border-color: var(--accent); color: var(--accent); transform: none; box-shadow: none; }
+.votes-sort-pill.active { border-color: var(--text); background: var(--text); color: var(--page-bg); }
+
+/* Vote rows */
+.vote-row {
+  display: flex; align-items: center;
+  border-bottom: 1px solid var(--rule);
+  gap: 0;
+}
+.vote-row:last-child { border-bottom: none; }
+
+.vote-row-link {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 10px 0;
+  flex: 1; min-width: 0;
+  text-decoration: none; color: inherit;
+  transition: opacity 0.1s;
+}
+.vote-row-link:hover { opacity: 0.75; text-decoration: none; }
+
+.vote-row-pos {
+  font-size: 11px; font-weight: 600;
+  color: var(--muted); text-align: right; opacity: 0.5;
+}
+.vote-row-info { min-width: 0; }
+.vote-row-name {
+  font-size: 14px; font-weight: 600; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  line-height: 1.3;
+}
+.vote-row-sub {
+  font-size: 11px; color: var(--muted);
+  font-weight: 600; letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Size gradient for top votes */
+.vote-row-1 .vote-row-name { font-size: 16px; font-weight: 700; }
+.vote-row-2 .vote-row-name { font-size: 15px; font-weight: 700; }
+.vote-row-3 .vote-row-name { font-size: 14px; font-weight: 600; }
+
+/* Score badge + actions */
+.vote-row-actions {
+  display: flex; align-items: center; gap: 6px;
+  flex-shrink: 0;
+}
+.vote-score-badge {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 14px; font-weight: 900;
+  color: #fff; padding: 4px 8px;
+  border-radius: 6px; cursor: pointer;
+  min-width: 30px; text-align: center;
+  transition: transform 0.1s, opacity 0.1s;
+  flex-shrink: 0;
+}
+.vote-score-badge:hover { transform: scale(1.08); opacity: 0.85; }
+
+/* Inline score selector */
+.vote-inline-scores {
+  display: flex; align-items: center; gap: 3px;
+  flex-wrap: wrap; max-width: 200px;
+}
+.vote-score-btn {
+  width: 26px; height: 26px; border-radius: 5px;
+  border: 1.5px solid var(--border); background: var(--faint);
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: none; transition: background 0.1s, border-color 0.1s;
+}
+.vote-score-btn:hover, .vote-score-btn.active {
+  background: var(--accent); border-color: var(--accent);
+  color: #fff; transform: none; box-shadow: none;
+}
+.vote-score-remove {
+  width: 26px; height: 26px; border-radius: 5px;
+  border: 1.5px solid var(--border); background: none;
+  font-size: 11px; cursor: pointer; color: var(--muted);
+  box-shadow: none;
+}
+.vote-score-remove:hover { border-color: #e05252; color: #e05252; transform: none; box-shadow: none; }
+
+/* Empty state */
+.votes-empty {
+  text-align: center; padding: 48px 20px;
+}
+.votes-empty-icon { font-size: 36px; margin-bottom: 10px; }
+.votes-empty h3 { margin: 0 0 6px; }
