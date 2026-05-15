@@ -139,7 +139,7 @@ async function initHomeMap() {
     dragging: false, doubleClickZoom: false,
     boxZoom: false, keyboard: false,
     touchZoom: false, attributionControl: false,
-  }).setView([41.3874, 2.1686], 14);
+  }).setView([41.3889, 2.1618], 13);
 
   L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
     maxZoom: 19, attribution: "&copy; OpenStreetMap &copy; CARTO"
