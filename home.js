@@ -15,13 +15,8 @@ const ROTATING_FALLBACK = [
   "Bikini",
   "Cheesecake",
   "Tiramisú",
-  "Jamón",
   "Ensaladilla",
-  "Flan",
   "Croissant",
-  "Buñuelo",
-  "Gambas",
-  "Pulpo",
 ];
 
 function escapeHtml(s) {
