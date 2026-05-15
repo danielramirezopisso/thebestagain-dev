@@ -78,6 +78,7 @@ async function loadAllData() {
 ══════════════════════════════════ */
 let VOTES_SORT  = 'score'; // 'score' | 'name' | 'category' | 'recent'
 let VOTES_QUERY = '';
+let VOTES_CAT   = null;  // null = all categories
 
 function renderNormalView() {
   const wrap = document.getElementById("votesByCategory");
@@ -96,17 +97,37 @@ function renderNormalView() {
     const controls = document.createElement("div");
     controls.id = "votesControls";
     controls.className = "votes-controls";
+    // Build category pills from my votes
+    const myCats = [...new Set(MY_VOTES.map(v => v.markers.category_id))];
+    const catPills = myCats.map(cid => {
+      const name = CAT_BY_ID[cid]?.name || 'Unknown';
+      return `<button class="votes-cat-pill" data-cat="${cid}" onclick="setVotesCat(${cid})">${escapeHtml(name)}</button>`;
+    }).join('');
+
     controls.innerHTML = `
       <input class="votes-search" id="votesSearch" placeholder="Search places…" oninput="onVotesSearch(this.value)" />
+      <div class="votes-cat-pills" id="votesCatPills">
+        <button class="votes-cat-pill active" data-cat="all" onclick="setVotesCat(null)">All</button>
+        ${catPills}
+      </div>
       <div class="votes-sort-pills">
         <button class="votes-sort-pill active" data-sort="score"    onclick="setVotesSort('score')">Score</button>
         <button class="votes-sort-pill"        data-sort="name"     onclick="setVotesSort('name')">Name</button>
-        <button class="votes-sort-pill"        data-sort="category" onclick="setVotesSort('category')">Category</button>
         <button class="votes-sort-pill"        data-sort="recent"   onclick="setVotesSort('recent')">Recent</button>
       </div>`;
     wrap.parentNode.insertBefore(controls, wrap);
   }
 
+  renderVotesList();
+}
+
+function setVotesCat(cid) {
+  VOTES_CAT = cid;
+  document.querySelectorAll('.votes-cat-pill').forEach(b => {
+    b.classList.toggle('active',
+      cid === null ? b.dataset.cat === 'all' : String(b.dataset.cat) === String(cid)
+    );
+  });
   renderVotesList();
 }
 
@@ -128,9 +149,12 @@ function renderVotesList() {
 
   // Filter by search
   let votes = MY_VOTES.filter(v => {
+    // Category filter
+    if (VOTES_CAT !== null && v.markers.category_id !== VOTES_CAT) return false;
+    // Search filter
     if (!VOTES_QUERY) return true;
-    const name = (v.markers.title || '').toLowerCase();
-    const cat  = (CAT_BY_ID[v.markers.category_id]?.name || '').toLowerCase();
+    const name  = (v.markers.title || '').toLowerCase();
+    const cat   = (CAT_BY_ID[v.markers.category_id]?.name || '').toLowerCase();
     const brand = (BRAND_BY_ID[v.markers.brand_id]?.name || '').toLowerCase();
     return name.includes(VOTES_QUERY) || cat.includes(VOTES_QUERY) || brand.includes(VOTES_QUERY);
   });

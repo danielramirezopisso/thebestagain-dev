@@ -247,3 +247,19 @@
 }
 .votes-empty-icon { font-size: 36px; margin-bottom: 10px; }
 .votes-empty h3 { margin: 0 0 6px; }
+
+/* Category filter pills */
+.votes-cat-pills {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.votes-cat-pill {
+  padding: 5px 14px; border-radius: 999px;
+  font-size: 12px; font-weight: 700;
+  border: 1.5px solid var(--border);
+  background: var(--card); color: var(--muted);
+  cursor: pointer; box-shadow: none;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+  white-space: nowrap;
+}
+.votes-cat-pill:hover { border-color: var(--accent); color: var(--accent); transform: none; box-shadow: none; }
+.votes-cat-pill.active { border-color: var(--accent); background: var(--accent); color: #fff; }
