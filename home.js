@@ -10,19 +10,18 @@ const DEFAULT_ICON_URL = "https://danielramirezopisso.github.io/thebestagain/ico
 const ROTATING_FALLBACK = [
   "Tortilla",
   "Croqueta",
-  "Vermouth",
+  "Vermut",
   "Bravas",
   "Bikini",
   "Cheesecake",
   "Tiramisú",
   "Jamón",
   "Ensaladilla",
-  "Pizza",
   "Flan",
-  "Margarita",
   "Croissant",
-  "Vermut",
-  "Bocata",
+  "Buñuelo",
+  "Gambas",
+  "Pulpo",
 ];
 
 function escapeHtml(s) {
