@@ -8,44 +8,32 @@
   <meta property="og:title" content="The Best Again — Find the best food in town" />
   <meta property="og:description" content="Curated Rutas, honest rankings. Find the best pizza, tortilla, bravas and more." />
   <meta property="og:type" content="website" />
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-VYVTQPBTPC");</script>
-
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="base.css?v=1778169939" />
-  <link rel="stylesheet" href="home.css" />
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "The Best Again",
-    "url": "https://thebestagain.com",
-    "description": "Discover the best-rated restaurants, bars and food products in Barcelona, ranked by the community.",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://thebestagain.com/map.html?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
-  }
-  </script>
   <meta property="og:image" content="https://thebestagain.com/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:site_name" content="The Best Again">
-  <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://thebestagain.com/og-image.png">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-VYVTQPBTPC");</script>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="base.css?v=2" />
+  <link rel="stylesheet" href="home.css?v=2" />
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"Organization",
-   "name":"The Best Again","url":"https://thebestagain.com",
-   "logo":"https://thebestagain.com/logo.png"}
+  {"@context":"https://schema.org","@type":"WebSite","name":"The Best Again","url":"https://thebestagain.com",
+   "potentialAction":{"@type":"SearchAction","target":"https://thebestagain.com/map.html?q={search_term_string}","query-input":"required name=search_term_string"}}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Organization","name":"The Best Again","url":"https://thebestagain.com","logo":"https://thebestagain.com/logo.png"}
   </script>
 </head>
 <body onload="initHomePage()">
 
-  <!-- Header hidden until scroll -->
   <header class="topbar topbar-sticky home-header" id="siteHeader">
     <a class="brand" href="index.html">TBA</a>
     <nav class="nav" id="mainNav">
@@ -58,41 +46,76 @@
     </nav>
     <div class="nav-right">
       <span id="authStatus" class="auth-pill"></span>
-      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu">&#9776;</button>
     </div>
   </header>
 
-  <main class="container home-main">
+  <main class="home-main">
 
-    <!-- ══ HERO — full viewport ══ -->
+    <!-- ══ 1. HERO ══ -->
     <section class="home-hero">
-      <div class="home-hero-left">
-        <h1 class="home-hero-brand">The Best Again</h1>
-        <div class="home-hero-tagline">
-          <span class="home-hero-verb">Find the best</span>
+      <div class="home-hero-inner">
+        <div class="home-hero-eyebrow">Barcelona · Madrid</div>
+        <h1 class="home-hero-title">
+          Find the best<br>
           <span class="home-hero-rotating-wrap">
             <span class="home-hero-rotating" id="heroRotating"></span>
-          </span>
-          <span class="home-hero-verb">in town.</span>
-        </div>
+          </span><br>
+          in town.
+        </h1>
+        <p class="home-hero-sub" id="heroStat">The best food, ranked by the community.</p>
         <div class="home-hero-actions">
-          <a class="tba-btn tba-btn-primary" href="map.html">🗺 Explore the map</a>
-          <a class="tba-btn" href="rutas.html">Start a Ruta →</a>
-        </div>
-        <div class="home-hero-stat" id="heroStat"></div>
-      </div>
-      <div class="home-hero-right">
-        <div class="home-hero-map-wrap">
-          <div id="homeMap"></div>
-          <a href="map.html" class="home-map-pill">Open full map →</a>
+          <a class="home-cta-primary" href="map.html">🗺 Explore the map</a>
+          <a class="home-cta-ghost" href="rutas.html">Start a Ruta →</a>
         </div>
       </div>
     </section>
 
-    <!-- ══ RUTAS — full viewport ══ -->
-    <section class="home-section home-rutas">
-      <div class="home-section-label">Curated journeys</div>
-      <div class="home-section-header">
+    <!-- ══ 2. TOP RANKED NOW ══ -->
+    <section class="home-section">
+      <div class="home-section-head">
+        <div class="home-section-label">Right now</div>
+        <h2 class="home-section-title">Highest rated</h2>
+        <a href="products.html" class="home-section-more">See all →</a>
+      </div>
+      <div class="home-top-grid" id="homeTopGrid">
+        <div class="home-top-skel"></div>
+        <div class="home-top-skel"></div>
+        <div class="home-top-skel"></div>
+        <div class="home-top-skel"></div>
+      </div>
+    </section>
+
+    <!-- ══ 3. MAP ══ -->
+    <section class="home-section home-map-section">
+      <div class="home-section-head">
+        <div class="home-section-label">Explore</div>
+        <h2 class="home-section-title">The map</h2>
+        <a href="map.html" class="home-section-more">Open full map →</a>
+      </div>
+      <div class="home-map-wrap">
+        <div id="homeMap"></div>
+        <a href="map.html" class="home-map-overlay-btn">Open full map →</a>
+      </div>
+    </section>
+
+    <!-- ══ 4. DEBATES ══ -->
+    <section class="home-section">
+      <div class="home-section-head">
+        <div class="home-section-label">Community</div>
+        <h2 class="home-section-title">Debates</h2>
+        <a href="battles.html" class="home-section-more">All debates →</a>
+      </div>
+      <div class="home-debates-grid" id="homeDebatesGrid">
+        <div class="home-debate-skel"></div>
+        <div class="home-debate-skel"></div>
+      </div>
+    </section>
+
+    <!-- ══ 5. RUTAS ══ -->
+    <section class="home-section home-section-last">
+      <div class="home-section-head">
+        <div class="home-section-label">Curated journeys</div>
         <h2 class="home-section-title">Rutas</h2>
         <a href="rutas.html" class="home-section-more">See all →</a>
       </div>
@@ -104,21 +127,6 @@
       </div>
     </section>
 
-    <!-- ══ RANKINGS — full viewport ══ -->
-    <section class="home-section home-rankings">
-      <div class="home-section-label">The Best Again 2025</div>
-      <div class="home-section-header">
-        <h2 class="home-section-title">Rankings</h2>
-        <a href="ranking.html" class="home-section-more">Full rankings →</a>
-      </div>
-      <p class="home-section-sub">The definitive annual selection — curated, frozen, worth arguing about.</p>
-      <div class="home-rankings-list" id="homeRankingPreview">
-        <div class="home-rank-skel"></div>
-        <div class="home-rank-skel"></div>
-        <div class="home-rank-skel"></div>
-      </div>
-    </section>
-
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -127,29 +135,24 @@
   <script src="auth.js"></script>
   <script src="header-auth.js"></script>
   <script>renderAuthHeader();</script>
-  <script src="home.js?v=5"></script>
+  <script src="home.js?v=6"></script>
   <script>
   window.addEventListener('scroll', () => {
-    document.getElementById('siteHeader')
-      if (window.scrollY > 60) document.getElementById('siteHeader').classList.add('home-header-visible');
+    if (window.scrollY > 60) document.getElementById('siteHeader').classList.add('home-header-visible');
   }, { passive: true });
-
   function toggleNav() {
     const nav = document.getElementById('mainNav');
     const btn = document.getElementById('burgerBtn');
     const open = nav.classList.toggle('nav-open');
     btn.innerHTML = open ? '&#10005;' : '&#9776;';
-    btn.setAttribute('aria-expanded', open);
   }
   document.addEventListener('DOMContentLoaded', () => {
     const nav = document.getElementById('mainNav');
     if (nav) nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
       nav.classList.remove('nav-open');
-      const btn = document.getElementById('burgerBtn');
-      if (btn) { btn.innerHTML = '&#9776;'; btn.setAttribute('aria-expanded', false); }
+      document.getElementById('burgerBtn').innerHTML = '&#9776;';
     }));
   });
   </script>
-
 </body>
 </html>

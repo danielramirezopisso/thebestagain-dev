@@ -65,8 +65,9 @@ async function initHomePage() {
   startHeroRotation();
   loadHeroStat();
   initHomeMap();
+  loadTopRanked();
+  loadDebatesPreview();
   loadRutasPreview();
-  loadRankingsPreview();
 }
 
 async function loadLookups() {
@@ -274,4 +275,100 @@ async function loadRankingsPreview() {
         <span class="home-rank-score ${cls}">${escapeHtml(score)}</span>
       </a>`;
   }).join("");
+}
+
+/* ══════════════════════════════
+   TOP RANKED NOW
+══════════════════════════════ */
+function scoreColor(avg) {
+  const s = Number(avg);
+  if (s >= 9) return '#1e5c3a';
+  if (s >= 7) return '#4a7c59';
+  if (s >= 5) return '#c8972a';
+  if (s >= 3) return '#e76f51';
+  return '#c1440e';
+}
+
+async function loadTopRanked() {
+  const host = document.getElementById('homeTopGrid');
+  if (!host) return;
+
+  // Get top-rated markers by avg rating
+  const { data } = await sb.from('markers')
+    .select('id,title,group_type,category_id,brand_id,rating_avg,rating_count')
+    .eq('is_active', true)
+    .gte('rating_count', 2)
+    .order('rating_avg', { ascending: false })
+    .limit(8);
+
+  if (!data?.length) { host.innerHTML = ''; return; }
+
+  // Pick 4 from different categories
+  const seen = new Set();
+  const top = [];
+  for (const m of data) {
+    if (!seen.has(m.category_id)) {
+      seen.add(m.category_id);
+      top.push(m);
+      if (top.length >= 4) break;
+    }
+  }
+
+  host.innerHTML = top.map(m => {
+    const cat = CAT[String(m.category_id)];
+    const avg = Number(m.rating_avg ?? 0);
+    const cnt = Number(m.rating_count ?? 0);
+    const color = scoreColor(avg);
+    const isProduct = m.group_type === 'product';
+    const brand = isProduct ? (BRAND[String(m.brand_id)]?.name || '') : '';
+    const name = brand ? `${brand}` : m.title;
+    return `
+      <a class="home-top-card" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${m.category_id}">
+        <div class="home-top-card-cat">${escapeHtml(cat?.name || '')}</div>
+        <div class="home-top-card-name">${escapeHtml(name)}</div>
+        <div class="home-top-card-foot">
+          <div class="home-top-card-votes">${cnt} votes</div>
+          <div class="home-top-card-score" style="background:${color}">${avg.toFixed(1)}</div>
+        </div>
+      </a>`;
+  }).join('');
+}
+
+/* ══════════════════════════════
+   DEBATES PREVIEW
+══════════════════════════════ */
+async function loadDebatesPreview() {
+  const host = document.getElementById('homeDebatesGrid');
+  if (!host) return;
+
+  const { data } = await sb.from('battles')
+    .select('id,question,option_a,option_b,votes_a,votes_b')
+    .eq('is_active', true)
+    .order('created_at', { ascending: false })
+    .limit(2);
+
+  if (!data?.length) { host.innerHTML = ''; host.closest('.home-section')?.style.setProperty('display','none'); return; }
+
+  host.innerHTML = data.map(b => {
+    const total = (b.votes_a || 0) + (b.votes_b || 0);
+    const pctA = total ? Math.round((b.votes_a / total) * 100) : 50;
+    const pctB = 100 - pctA;
+    return `
+      <a class="home-debate-card" href="battles.html">
+        <div class="home-debate-question">${escapeHtml(b.question)}</div>
+        <div class="home-debate-options">
+          <div class="home-debate-opt">
+            <div class="home-debate-opt-label">${escapeHtml(b.option_a)}</div>
+            <div class="home-debate-bar-wrap"><div class="home-debate-bar-fill" style="width:${pctA}%"></div></div>
+            <div class="home-debate-pct">${pctA}%</div>
+          </div>
+          <div class="home-debate-opt">
+            <div class="home-debate-opt-label">${escapeHtml(b.option_b)}</div>
+            <div class="home-debate-bar-wrap"><div class="home-debate-bar-fill opt-b" style="width:${pctB}%"></div></div>
+            <div class="home-debate-pct">${pctB}%</div>
+          </div>
+        </div>
+        <div class="home-debate-votes">${total.toLocaleString()} votes</div>
+      </a>`;
+  }).join('');
 }
