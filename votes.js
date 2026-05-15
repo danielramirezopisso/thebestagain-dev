@@ -76,9 +76,12 @@ async function loadAllData() {
 /* ══════════════════════════════════
    VOTES VIEW STATE
 ══════════════════════════════════ */
-let VOTES_SORT  = 'score'; // 'score' | 'name' | 'category' | 'recent'
+let VOTES_SORT  = 'score';
 let VOTES_QUERY = '';
-let VOTES_CAT   = null;  // null = all categories
+let VOTES_CAT   = null;   // null = all
+let VOTES_TYPE  = null;   // null | 'place' | 'product'
+let VOTES_MIN   = null;   // null | 1-10
+let VOTES_MAX   = null;   // null | 1-10
 
 function renderNormalView() {
   const wrap = document.getElementById("votesByCategory");
@@ -97,38 +100,106 @@ function renderNormalView() {
     const controls = document.createElement("div");
     controls.id = "votesControls";
     controls.className = "votes-controls";
-    // Build category pills from my votes
-    const myCats = [...new Set(MY_VOTES.map(v => v.markers.category_id))];
-    const catPills = myCats.map(cid => {
-      const name = CAT_BY_ID[cid]?.name || 'Unknown';
-      return `<button class="votes-cat-pill" data-cat="${cid}" onclick="setVotesCat(${cid})">${escapeHtml(name)}</button>`;
-    }).join('');
-
     controls.innerHTML = `
-      <input class="votes-search" id="votesSearch" placeholder="Search places…" oninput="onVotesSearch(this.value)" />
-      <div class="votes-cat-pills" id="votesCatPills">
-        <button class="votes-cat-pill active" data-cat="all" onclick="setVotesCat(null)">All</button>
-        ${catPills}
+      <div class="votes-controls-row">
+        <input class="votes-search" id="votesSearch" placeholder="Search…" oninput="onVotesSearch(this.value)" />
+        <button class="votes-filter-btn" id="votesFilterBtn" onclick="toggleVotesFilter()">⊟ Filter</button>
       </div>
       <div class="votes-sort-pills">
-        <button class="votes-sort-pill active" data-sort="score"    onclick="setVotesSort('score')">Score</button>
-        <button class="votes-sort-pill"        data-sort="name"     onclick="setVotesSort('name')">Name</button>
-        <button class="votes-sort-pill"        data-sort="recent"   onclick="setVotesSort('recent')">Recent</button>
+        <button class="votes-sort-pill active" data-sort="score"  onclick="setVotesSort('score')">Score ↓</button>
+        <button class="votes-sort-pill"        data-sort="name"   onclick="setVotesSort('name')">Name</button>
+        <button class="votes-sort-pill"        data-sort="recent" onclick="setVotesSort('recent')">Recent</button>
       </div>`;
     wrap.parentNode.insertBefore(controls, wrap);
+
+    // Filter drawer
+    if (!document.getElementById('votesFilterDrawer')) {
+      const myCats = [...new Set(MY_VOTES.map(v => v.markers.category_id))];
+      const catOpts = myCats.map(cid => {
+        const name = CAT_BY_ID[cid]?.name || 'Unknown';
+        return `<button class="vf-chip" data-type="cat" data-val="${cid}" onclick="setVotesCat(${cid})">${escapeHtml(name)}</button>`;
+      }).join('');
+
+      const drawer = document.createElement('div');
+      drawer.id = 'votesFilterDrawer';
+      drawer.className = 'votes-filter-drawer';
+      drawer.style.display = 'none';
+      drawer.innerHTML = `
+        <div class="vf-section">
+          <div class="vf-label">Category</div>
+          <div class="vf-chips">
+            <button class="vf-chip active" data-type="cat" data-val="all" onclick="setVotesCat(null)">All</button>
+            ${catOpts}
+          </div>
+        </div>
+        <div class="vf-section">
+          <div class="vf-label">Type</div>
+          <div class="vf-chips">
+            <button class="vf-chip active" data-type="type" data-val="all" onclick="setVotesType(null)">All</button>
+            <button class="vf-chip" data-type="type" data-val="place"   onclick="setVotesType('place')">🗺 Places</button>
+            <button class="vf-chip" data-type="type" data-val="product" onclick="setVotesType('product')">🛒 Products</button>
+          </div>
+        </div>
+        <div class="vf-section">
+          <div class="vf-label">Min score</div>
+          <div class="vf-chips">
+            ${[null,7,8,9].map(n => `<button class="vf-chip ${n===null?'active':''}" data-type="min" data-val="${n??'all'}" onclick="setVotesMin(${n})">${n===null?'Any':'≥'+n}</button>`).join('')}
+          </div>
+        </div>
+        <div class="vf-footer">
+          <button class="vf-clear" onclick="clearVotesFilters()">✕ Clear filters</button>
+        </div>`;
+      wrap.parentNode.insertBefore(drawer, wrap);
+    }
   }
 
+  updateVotesFilterBtn();
   renderVotesList();
+}
+
+function toggleVotesFilter() {
+  const d = document.getElementById('votesFilterDrawer');
+  if (d) d.style.display = d.style.display === 'none' ? 'block' : 'none';
+}
+
+function updateVotesFilterBtn() {
+  const btn = document.getElementById('votesFilterBtn');
+  if (!btn) return;
+  const active = VOTES_CAT !== null || VOTES_TYPE !== null || VOTES_MIN !== null;
+  btn.classList.toggle('active', active);
+  btn.textContent = active ? '⊟ Filter •' : '⊟ Filter';
 }
 
 function setVotesCat(cid) {
   VOTES_CAT = cid;
-  document.querySelectorAll('.votes-cat-pill').forEach(b => {
-    b.classList.toggle('active',
-      cid === null ? b.dataset.cat === 'all' : String(b.dataset.cat) === String(cid)
-    );
+  document.querySelectorAll('[data-type="cat"]').forEach(b =>
+    b.classList.toggle('active', cid === null ? b.dataset.val === 'all' : String(b.dataset.val) === String(cid))
+  );
+  updateVotesFilterBtn(); renderVotesList();
+}
+
+function setVotesType(type) {
+  VOTES_TYPE = type;
+  document.querySelectorAll('[data-type="type"]').forEach(b =>
+    b.classList.toggle('active', type === null ? b.dataset.val === 'all' : b.dataset.val === type)
+  );
+  updateVotesFilterBtn(); renderVotesList();
+}
+
+function setVotesMin(min) {
+  VOTES_MIN = min;
+  document.querySelectorAll('[data-type="min"]').forEach(b =>
+    b.classList.toggle('active', min === null ? b.dataset.val === 'all' : String(b.dataset.val) === String(min))
+  );
+  updateVotesFilterBtn(); renderVotesList();
+}
+
+function clearVotesFilters() {
+  VOTES_CAT = null; VOTES_TYPE = null; VOTES_MIN = null;
+  document.querySelectorAll('.vf-chip').forEach(b => {
+    b.classList.toggle('active', b.dataset.val === 'all');
   });
-  renderVotesList();
+  updateVotesFilterBtn(); renderVotesList();
 }
 
 function onVotesSearch(q) {
@@ -149,9 +220,9 @@ function renderVotesList() {
 
   // Filter by search
   let votes = MY_VOTES.filter(v => {
-    // Category filter
-    if (VOTES_CAT !== null && v.markers.category_id !== VOTES_CAT) return false;
-    // Search filter
+    if (VOTES_CAT  !== null && v.markers.category_id !== VOTES_CAT) return false;
+    if (VOTES_TYPE !== null && v.markers.group_type  !== VOTES_TYPE) return false;
+    if (VOTES_MIN  !== null && Number(v.vote) < VOTES_MIN) return false;
     if (!VOTES_QUERY) return true;
     const name  = (v.markers.title || '').toLowerCase();
     const cat   = (CAT_BY_ID[v.markers.category_id]?.name || '').toLowerCase();

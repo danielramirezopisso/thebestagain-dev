@@ -248,18 +248,55 @@
 .votes-empty-icon { font-size: 36px; margin-bottom: 10px; }
 .votes-empty h3 { margin: 0 0 6px; }
 
-/* Category filter pills */
-.votes-cat-pills {
-  display: flex; gap: 6px; flex-wrap: wrap;
+/* Controls row */
+.votes-controls-row {
+  display: flex; gap: 8px; align-items: center;
 }
-.votes-cat-pill {
-  padding: 5px 14px; border-radius: 999px;
-  font-size: 12px; font-weight: 700;
+.votes-search { flex: 1; }
+
+/* Filter button */
+.votes-filter-btn {
+  padding: 10px 16px; border-radius: 999px;
+  font-size: 13px; font-weight: 700;
   border: 1.5px solid var(--border);
-  background: var(--card); color: var(--muted);
-  cursor: pointer; box-shadow: none;
-  transition: border-color 0.12s, color 0.12s, background 0.12s;
-  white-space: nowrap;
+  background: var(--card); color: var(--text);
+  cursor: pointer; box-shadow: none; white-space: nowrap;
+  transition: border-color 0.12s, background 0.12s;
 }
-.votes-cat-pill:hover { border-color: var(--accent); color: var(--accent); transform: none; box-shadow: none; }
-.votes-cat-pill.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+.votes-filter-btn:hover { border-color: var(--accent); transform: none; box-shadow: none; }
+.votes-filter-btn.active { border-color: var(--accent); background: rgba(45,74,138,0.08); color: var(--accent); }
+
+/* Filter drawer */
+.votes-filter-drawer {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.vf-section { margin-bottom: 16px; }
+.vf-section:last-of-type { margin-bottom: 0; }
+.vf-label {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px;
+}
+.vf-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.vf-chip {
+  padding: 5px 12px; border-radius: 999px;
+  font-size: 12px; font-weight: 600;
+  border: 1.5px solid var(--border);
+  background: var(--faint); color: var(--muted);
+  cursor: pointer; box-shadow: none; white-space: nowrap;
+  transition: border-color 0.1s, color 0.1s, background 0.1s;
+}
+.vf-chip:hover { border-color: var(--accent); color: var(--accent); transform: none; box-shadow: none; }
+.vf-chip.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+.vf-footer { margin-top: 12px; border-top: 1px solid var(--rule); padding-top: 12px; }
+.vf-clear {
+  background: none; border: none; box-shadow: none;
+  font-size: 12px; font-weight: 700; color: var(--muted);
+  cursor: pointer; padding: 0;
+  transition: color 0.12s;
+}
+.vf-clear:hover { color: #e05252; transform: none; box-shadow: none; }
