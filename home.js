@@ -8,21 +8,21 @@ let rotatingIdx = 0;
 const DEFAULT_ICON_URL = "https://danielramirezopisso.github.io/thebestagain/icons/default.svg";
 
 const ROTATING_FALLBACK = [
-  "tortilla",
-  "croqueta",
-  "vermouth",
-  "bravas",
-  "bikini",
-  "cheesecake",
-  "tiramisú",
-  "jamón",
-  "ensaladilla",
-  "pizza",
-  "flan",
-  "margarita",
-  "croissant",
-  "vermut",
-  "bocata",
+  "Tortilla",
+  "Croqueta",
+  "Vermouth",
+  "Bravas",
+  "Bikini",
+  "Cheesecake",
+  "Tiramisú",
+  "Jamón",
+  "Ensaladilla",
+  "Pizza",
+  "Flan",
+  "Margarita",
+  "Croissant",
+  "Vermut",
+  "Bocata",
 ];
 
 function escapeHtml(s) {
