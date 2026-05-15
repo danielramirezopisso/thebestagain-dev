@@ -245,7 +245,29 @@ function renderVotesList() {
     return;
   }
 
-  wrap.innerHTML = votes.map((v, i) => {
+  // Insert category dividers when sorted by score/recent/name
+  // Group into sections with category headers
+  let html = '';
+  let lastCat = null;
+  let posInCat = {};
+  const showDividers = (VOTES_SORT === "score" || VOTES_SORT === "recent");
+
+  votes.forEach((v, i) => {
+    const cid = v.markers.category_id;
+    if (showDividers && cid !== lastCat) {
+      const catName = CAT_BY_ID[cid]?.name || "";
+      html += `<div class="vote-cat-divider">${escapeHtml(catName)}</div>`;
+      lastCat = cid;
+      posInCat[cid] = 0;
+    }
+    posInCat[cid] = (posInCat[cid] || 0) + 1;
+    html += renderVoteRow(v, i, posInCat[cid] || i + 1);
+  });
+  wrap.innerHTML = html;
+}
+
+function renderVoteRow(v, globalIdx, posInCat) {
+  const i = globalIdx;
     const m     = v.markers;
     const score = Number(v.vote);
     const cat   = CAT_BY_ID[m.category_id];
@@ -254,7 +276,7 @@ function renderVotesList() {
     const scoreColor = getScoreColor(score);
     const sizeClass  = i === 0 ? 'vote-row-1' : i === 1 ? 'vote-row-2' : i < 4 ? 'vote-row-3' : '';
 
-    return `
+  return `
       <div class="vote-row ${sizeClass}" id="vrow-${encodeURIComponent(v.id)}">
         <a class="vote-row-link" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${m.category_id}">
           <div class="vote-row-pos">${i + 1}</div>
@@ -274,7 +296,7 @@ function renderVotesList() {
             title="Click to change">${score}</div>
         </div>
       </div>`;
-  }).join('');
+
 }
 
 function getScoreColor(s) {
