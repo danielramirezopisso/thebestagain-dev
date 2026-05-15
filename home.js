@@ -340,19 +340,27 @@ async function loadDebatesPreview() {
   if (!host) return;
 
   const [battlesRes, votesRes] = await Promise.all([
-    sb.from('battles').select('id,question,option_a,option_b').eq('is_active', true)
-      .order('position', { ascending: true }).limit(2),
-    sb.from('battle_votes').select('battle_id,choice').eq('is_active', true)
+    sb.from('battles').select('id,question,option_a,option_b')
+      .eq('is_active', true)
+      .order('position', { ascending: true })
+      .limit(2),
+    sb.from('battle_votes').select('battle_id,choice')
+      .limit(100000)  // no is_active filter — matches battles.js
   ]);
 
   const battles = battlesRes.data || [];
-  if (!battles.length) { host.innerHTML = ''; host.closest('.home-section')?.style.setProperty('display','none'); return; }
+  if (!battles.length) {
+    host.innerHTML = '';
+    host.closest('.home-section')?.style.setProperty('display', 'none');
+    return;
+  }
 
+  // Tally votes
   const tally = {};
   (votesRes.data || []).forEach(v => {
+    if (v.choice !== 'a' && v.choice !== 'b') return;
     if (!tally[v.battle_id]) tally[v.battle_id] = { a: 0, b: 0 };
-    if (v.choice === 'a') tally[v.battle_id].a++;
-    else tally[v.battle_id].b++;
+    tally[v.battle_id][v.choice]++;
   });
 
   host.innerHTML = battles.map(b => {
@@ -360,22 +368,31 @@ async function loadDebatesPreview() {
     const total = t.a + t.b;
     const pctA = total ? Math.round((t.a / total) * 100) : 50;
     const pctB = 100 - pctA;
+    const leading = pctA >= pctB ? b.option_a : b.option_b;
+    const leadPct = Math.max(pctA, pctB);
     return `
       <a class="home-debate-card" href="battles.html">
         <div class="home-debate-question">${escapeHtml(b.question)}</div>
         <div class="home-debate-options">
           <div class="home-debate-opt">
             <div class="home-debate-opt-label">${escapeHtml(b.option_a)}</div>
-            <div class="home-debate-bar-wrap"><div class="home-debate-bar-fill" style="width:${pctA}%"></div></div>
+            <div class="home-debate-bar-wrap">
+              <div class="home-debate-bar-fill" style="width:${pctA}%"></div>
+            </div>
             <div class="home-debate-pct">${pctA}%</div>
           </div>
           <div class="home-debate-opt">
             <div class="home-debate-opt-label">${escapeHtml(b.option_b)}</div>
-            <div class="home-debate-bar-wrap"><div class="home-debate-bar-fill opt-b" style="width:${pctB}%"></div></div>
+            <div class="home-debate-bar-wrap">
+              <div class="home-debate-bar-fill opt-b" style="width:${pctB}%"></div>
+            </div>
             <div class="home-debate-pct">${pctB}%</div>
           </div>
         </div>
-        <div class="home-debate-votes">${total.toLocaleString()} votes</div>
+        <div class="home-debate-foot">
+          <span class="home-debate-votes">${total.toLocaleString()} votes</span>
+          <span class="home-debate-cta">Vote now →</span>
+        </div>
       </a>`;
   }).join('');
 }
