@@ -340,14 +340,14 @@ async function loadDebatesPreview() {
   if (!host) return;
 
   const { data } = await sb.from('battles')
-    .select('id,question,option_a,option_b,votes_a,votes_b')
-    .eq('is_active', true)
+    .select('id,question,option_a,option_b,votes_a,votes_b,is_active')
     .order('created_at', { ascending: false })
-    .limit(2);
+    .limit(10);
 
-  if (!data?.length) { host.innerHTML = ''; host.closest('.home-section')?.style.setProperty('display','none'); return; }
+  const battles = (data || []).filter(b => b.is_active !== false).slice(0, 2);
+  if (!battles.length) { host.innerHTML = ''; host.closest('.home-section')?.style.setProperty('display','none'); return; }
 
-  host.innerHTML = data.map(b => {
+  host.innerHTML = battles.map(b => {
     const total = (b.votes_a || 0) + (b.votes_b || 0);
     const pctA = total ? Math.round((b.votes_a / total) * 100) : 50;
     const pctB = 100 - pctA;
