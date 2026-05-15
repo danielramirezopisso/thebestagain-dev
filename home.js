@@ -206,7 +206,7 @@ async function loadRutasPreview() {
     const pct = total ? Math.round((voted / total) * 100) : 0;
     const city = ruta.city === "BCN" ? "Barcelona" : "Madrid";
     return `
-      <a class="home-ruta-card" href="rutas.html">
+      <a class="home-ruta-card" href="rutas.html?city=${encodeURIComponent(ruta.city)}&ruta=${encodeURIComponent(ruta.id)}">
         <img class="home-ruta-icon" src="${escapeHtml(icon)}" alt="" />
         <div class="home-ruta-name">${escapeHtml(cat?.name || ruta.name)}</div>
         <div class="home-ruta-city">${escapeHtml(city)}</div>
