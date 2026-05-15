@@ -70,6 +70,9 @@ async function initUserPage() {
   await Promise.all([ loadStats(), loadAllData() ]);
   renderNormalView();
 
+  // Hide tabs with no content
+  hideEmptyTabs();
+
   // Check URL tab param
   const tab = new URLSearchParams(location.search).get("tab");
   if (tab) switchTab(tab);
@@ -616,4 +619,19 @@ async function loadPhotos() {
         <div class="user-photo-label">${esc(titleMap[p.marker_id] || "")}</div>
       </a>`;
   }).join("");
+}
+
+function hideEmptyTabs() {
+  // Hide comments tab if no comments
+  const comments = document.getElementById("commentsList");
+  const commentsTab = document.querySelector('[data-tab="comments"]');
+  if (commentsTab && comments && !comments.children.length) {
+    commentsTab.style.display = "none";
+  }
+  // Hide photos tab if no photos
+  const photos = document.getElementById("photosList");
+  const photosTab = document.querySelector('[data-tab="photos"]');
+  if (photosTab && photos && !photos.children.length) {
+    photosTab.style.display = "none";
+  }
 }

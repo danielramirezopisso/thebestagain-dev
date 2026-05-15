@@ -72,7 +72,7 @@
     <div class="user-tabs">
       <button class="user-tab active" data-tab="votes"    onclick="switchTab('votes')">Votes</button>
       <button class="user-tab"        data-tab="wishlist" onclick="switchTab('wishlist')">Wishlist</button>
-      <button class="user-tab"        data-tab="places"   onclick="switchTab('places')">My Places</button>
+      <button class="user-tab"        data-tab="places"   onclick="switchTab('places')">Places</button>
       <button class="user-tab"        data-tab="comments" onclick="switchTab('comments')">Comments</button>
       <button class="user-tab"        data-tab="photos"   onclick="switchTab('photos')">Photos</button>
     </div>
@@ -84,7 +84,7 @@
       <div id="normalView">
         <div class="user-panel-head">
           <p id="votesStatus" class="user-panel-status"></p>
-          <button class="user-action-btn" onclick="enterEditMode()">✏️ Edit votes</button>
+          <!-- Edit votes button hidden — new ranking method coming -->
         </div>
         <div id="votesByCategory"></div>
       </div>

@@ -71,11 +71,10 @@
   display: flex; gap: 0;
   border-bottom: 1px solid var(--rule);
   margin-bottom: 0;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  flex-wrap: wrap;
 }
 .user-tab {
-  padding: 16px 20px;
+  padding: 14px 16px;
   font-size: 13px; font-weight: 700;
   color: var(--muted); background: none;
   border: none; border-bottom: 2px solid transparent;
@@ -83,11 +82,13 @@
   transition: color 0.15s, border-color 0.15s;
   margin-bottom: -1px;
   box-shadow: none;
+  flex-shrink: 0;
 }
 .user-tab:hover { color: var(--text); transform: none; box-shadow: none; }
-.user-tab.active {
-  color: var(--text);
-  border-bottom-color: var(--text);
+.user-tab.active { color: var(--text); border-bottom-color: var(--text); }
+
+@media (max-width: 480px) {
+  .user-tab { padding: 12px 12px; font-size: 12px; }
 }
 
 /* ── Tab panels ── */
