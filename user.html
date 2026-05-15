@@ -2,35 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Area — The Best Again</title>
-  <meta name="description" content="Your personal area on The Best Again. See your votes, wishlist and more." />
-  <meta property="og:title" content="My Area — The Best Again" />
-  <meta property="og:description" content="Your personal area on The Best Again. See your votes, wishlist and more." />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet" />
+  <title>My Profile — The Best Again</title>
+  <meta name="description" content="Your food profile on The Best Again." />
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYVTQPBTPC"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag("js", new Date());
-    gtag("config", "G-VYVTQPBTPC");
-  </script>
-  <link rel="stylesheet" href="base.css?v=1778169939" />
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-VYVTQPBTPC");</script>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="base.css?v=2" />
   <link rel="stylesheet" href="votes.css" />
-  <link rel="stylesheet" href="user.css" />
+  <link rel="stylesheet" href="user.css?v=2" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <meta property="og:image" content="https://thebestagain.com/og-image.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
   <meta property="og:site_name" content="The Best Again">
-  <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://thebestagain.com/og-image.png">
 </head>
 
 <body onload="initUserPage()">
+
   <header class="topbar topbar-sticky">
     <a class="brand" href="index.html">TBA</a>
     <nav class="nav" id="mainNav">
@@ -43,87 +33,71 @@
     </nav>
     <div class="nav-right">
       <span id="authStatus" class="auth-pill"></span>
-      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu">&#9776;</button>
     </div>
   </header>
 
-  <main class="container user-area">
+  <main class="user-main">
 
-    <!-- ── USER HERO ── -->
-    <div class="user-hero">
-      <div class="user-avatar" id="userAvatar">?</div>
-      <div class="user-hero-body">
-        <h1 id="userName">—</h1>
-        <p class="muted" id="userJoined"></p>
+    <!-- ── HERO ── -->
+    <section class="user-hero">
+      <div class="user-hero-inner">
+        <div class="user-avatar" id="userAvatar">?</div>
+        <div class="user-hero-body">
+          <h1 class="user-name" id="userName">—</h1>
+          <p class="user-joined" id="userJoined"></p>
+        </div>
       </div>
-      <span class="user-badge" id="statBadge"></span>
-    </div>
 
-    <!-- ── STATS BAR ── -->
-    <div class="user-stats-bar">
-      <div class="user-stat">
-        <span class="user-stat-val" id="statVotes">—</span>
-        <span class="user-stat-label">votes</span>
+      <!-- Stats row -->
+      <div class="user-stats">
+        <div class="user-stat">
+          <span class="user-stat-val" id="statVotes">—</span>
+          <span class="user-stat-label">votes</span>
+        </div>
+        <div class="user-stat-sep"></div>
+        <div class="user-stat">
+          <span class="user-stat-val" id="statAvg">—</span>
+          <span class="user-stat-label">avg score</span>
+        </div>
+        <div class="user-stat-sep"></div>
+        <div class="user-stat">
+          <span class="user-stat-val" id="statMarkers">—</span>
+          <span class="user-stat-label">places added</span>
+        </div>
       </div>
-      <div class="user-stat">
-        <span class="user-stat-val" id="statAvg">—</span>
-        <span class="user-stat-label">avg score</span>
-      </div>
-      <div class="user-stat">
-        <span class="user-stat-val" id="statMarkers">—</span>
-        <span class="user-stat-label">places added</span>
-      </div>
-      <div class="user-stat">
-        <span class="user-stat-val" id="statComments">—</span>
-        <span class="user-stat-label">comments</span>
-      </div>
-      <div class="user-stat">
-        <span class="user-stat-val" id="statPhotos">—</span>
-        <span class="user-stat-label">photos</span>
-      </div>
-    </div>
+    </section>
 
     <!-- ── TABS ── -->
     <div class="user-tabs">
-      <button class="user-tab active" data-tab="votes"    onclick="switchTab('votes')">🗳️ Votes</button>
-      <button class="user-tab"        data-tab="wishlist" onclick="switchTab('wishlist')">❤️ Wishlist</button>
-      <button class="user-tab"        data-tab="places"   onclick="switchTab('places')">📍 My Places</button>
-      <button class="user-tab"        data-tab="comments" onclick="switchTab('comments')">💬 Comments</button>
-      <button class="user-tab"        data-tab="photos"   onclick="switchTab('photos')">📷 Photos</button>
-    </div>
-
-    <!-- ── ADMIN QUICK LINKS (dropisso only) ── -->
-    <div id="adminBar" style="display:none;" class="admin-quick-bar">
-      <a class="tba-btn tba-btn-ghost" href="admin.html">⚙️ Admin</a>
-      <a class="tba-btn tba-btn-ghost" href="traction-admin.html">📊 Traction</a>
+      <button class="user-tab active" data-tab="votes"    onclick="switchTab('votes')">Votes</button>
+      <button class="user-tab"        data-tab="wishlist" onclick="switchTab('wishlist')">Wishlist</button>
+      <button class="user-tab"        data-tab="places"   onclick="switchTab('places')">My Places</button>
+      <button class="user-tab"        data-tab="comments" onclick="switchTab('comments')">Comments</button>
+      <button class="user-tab"        data-tab="photos"   onclick="switchTab('photos')">Photos</button>
     </div>
 
     <!-- ── TAB PANELS ── -->
 
     <!-- VOTES -->
     <div class="user-tab-panel active" id="panel-votes">
-      <!-- Normal view: read-only list by category -->
       <div id="normalView">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin:10px 0 12px;">
-          <p id="votesStatus" class="muted" style="font-size:13px;margin:0;"></p>
-          <button class="tba-btn tba-btn-primary" onclick="enterEditMode()" style="font-size:13px;">✏️ Edit my votes</button>
+        <div class="user-panel-head">
+          <p id="votesStatus" class="user-panel-status"></p>
+          <button class="user-action-btn" onclick="enterEditMode()">✏️ Edit votes</button>
         </div>
         <div id="votesByCategory"></div>
       </div>
-
-      <!-- Edit view: sidebar + score cards + distribute -->
       <div id="editView" style="display:none;">
         <div class="edit-votes-header">
           <h2 style="margin:0;font-size:17px;">Edit votes</h2>
           <button class="tba-btn" onclick="exitEditMode()">← Back</button>
         </div>
         <div class="edit-votes-layout">
-          <!-- Sidebar: categories -->
           <div class="edit-votes-sidebar">
             <div class="edit-sidebar-title">Category</div>
             <div id="editCatList"></div>
           </div>
-          <!-- Main: cards + distribute + save -->
           <div class="edit-votes-main">
             <div id="distributeBar" class="distribute-bar" style="display:none;">
               <span class="distribute-label">Distribute</span>
@@ -147,9 +121,9 @@
 
     <!-- WISHLIST -->
     <div class="user-tab-panel" id="panel-wishlist">
-      <div class="wishlist-tab-header">
-        <p class="muted" id="wishlistStatus" style="font-size:13px;margin:0;"></p>
-        <a id="wishlistShareLink" class="tba-btn tba-btn-ghost" href="#" target="_blank" style="font-size:13px;">🔗 Share my wishlist</a>
+      <div class="user-panel-head">
+        <p class="user-panel-status" id="wishlistStatus"></p>
+        <a id="wishlistShareLink" class="user-action-btn" href="#" target="_blank">🔗 Share wishlist</a>
       </div>
       <div id="wishlistItems"></div>
     </div>
@@ -171,49 +145,34 @@
 
   </main>
 
-  <!-- ══════════════════════════════════════════
-       EDIT PLACE MODAL
-  ══════════════════════════════════════════ -->
+  <!-- Edit place modal -->
   <div class="edit-modal-overlay" id="editModalOverlay" onclick="if(event.target===this)closeEditModal()">
     <div class="edit-modal-box">
-
       <div class="edit-modal-head">
         <h2 class="edit-modal-title">Edit place</h2>
         <button class="edit-modal-close" onclick="closeEditModal()">✕</button>
       </div>
-
       <div class="edit-modal-body">
-
-        <!-- Title -->
         <div class="edit-field">
           <label class="edit-label">Name</label>
           <input class="edit-input" id="editTitle" type="text" placeholder="Place name" />
         </div>
-
-        <!-- Category -->
         <div class="edit-field">
           <label class="edit-label">Category</label>
           <select class="edit-input" id="editCategory"></select>
         </div>
-
-        <!-- Address -->
         <div class="edit-field">
           <label class="edit-label">Address</label>
           <input class="edit-input" id="editAddress" type="text" placeholder="Street address" />
         </div>
-
-        <!-- Map pin -->
         <div class="edit-field">
-          <label class="edit-label">
-            Pin location
+          <label class="edit-label">Pin location
             <span class="edit-label-hint" id="editMapHint">Tap the map to move the pin</span>
           </label>
           <div id="editMap" class="edit-map"></div>
           <p class="edit-coords-display" id="editCoordsDisplay"></p>
         </div>
-
       </div>
-
       <div class="edit-modal-foot">
         <p class="edit-status muted" id="editModalStatus"></p>
         <div class="edit-modal-actions">
@@ -221,13 +180,10 @@
           <button class="tba-btn tba-btn-primary" id="editSaveBtn" onclick="saveEditModal()">Save changes</button>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       DEACTIVATE CONFIRM MODAL
-  ══════════════════════════════════════════ -->
+  <!-- Deactivate modal -->
   <div class="edit-modal-overlay" id="deactivateOverlay" onclick="if(event.target===this)closeDeactivate()">
     <div class="edit-modal-box edit-modal-box--small">
       <div class="edit-modal-head">
@@ -235,7 +191,7 @@
         <button class="edit-modal-close" onclick="closeDeactivate()">✕</button>
       </div>
       <div class="edit-modal-body">
-        <p>This will remove <strong id="deactivateName"></strong> from the map and all lists. You can't undo this from here.</p>
+        <p>This will remove <strong id="deactivateName"></strong> from the map and all lists.</p>
       </div>
       <div class="edit-modal-foot">
         <p class="edit-status muted" id="deactivateStatus"></p>
@@ -255,8 +211,7 @@
   <script>renderAuthHeader();</script>
   <script src="wishlist-btn.js"></script>
   <script src="votes.js?v=3"></script>
-  <script src="user.js?v=8"></script>
-
+  <script src="user.js?v=9"></script>
   <script>
   function toggleNav() {
     const nav = document.getElementById('mainNav');
@@ -268,10 +223,11 @@
     const nav = document.getElementById('mainNav');
     if (nav) nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
       nav.classList.remove('nav-open');
-      const btn = document.getElementById('burgerBtn');
-      if (btn) btn.innerHTML = '&#9776;';
+      document.getElementById('burgerBtn').innerHTML = '&#9776;';
     }));
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeEditModal(); closeDeactivate(); } });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { closeEditModal(); closeDeactivate(); }
+    });
   });
   </script>
 </body>

@@ -63,7 +63,7 @@ async function initUserPage() {
     : "";
   if (joined) document.getElementById("userJoined").textContent = `Member since ${joined}`;
 
-  if (IS_ADMIN) document.getElementById("adminBar").style.display = "";
+  // Admin: use admin.html and traction-admin.html directly
 
   // Load wishlist state + stats + votes in parallel
   wlInit();
@@ -96,11 +96,14 @@ async function loadStats() {
     ? (votes.reduce((s,v) => s + Number(v.vote), 0) / votes.length).toFixed(1)
     : "—";
 
-  document.getElementById("statVotes").textContent    = voteCount;
-  document.getElementById("statAvg").textContent      = avg;
-  document.getElementById("statMarkers").textContent  = markerCount;
-  document.getElementById("statComments").textContent = commentCount;
-  document.getElementById("statPhotos").textContent   = photoCount;
+  document.getElementById("statVotes").textContent = voteCount;
+  document.getElementById("statAvg").textContent   = avg;
+  const smEl = document.getElementById("statMarkers");
+  if (smEl) smEl.textContent = markerCount;
+  const scEl = document.getElementById("statComments");
+  if (scEl) scEl.textContent = commentCount;
+  const spEl = document.getElementById("statPhotos");
+  if (spEl) spEl.textContent = photoCount;
 
   const score = voteCount + (markerCount*3) + commentCount + (photoCount*2);
   const badge = getBadge(score);
