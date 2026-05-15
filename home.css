@@ -9,8 +9,8 @@
 }
 
 /* ── Sticky header — hidden until scroll ── */
-.home-header { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-.home-header-visible { opacity: 1; pointer-events: auto; }
+.home-header { opacity: 1; pointer-events: auto; }
+.home-header-visible { opacity: 1; }
 
 /* ══════════════════════════════
    1. HERO
@@ -39,13 +39,18 @@
 
 .home-hero-rotating-wrap {
   display: inline-block;
-  min-width: 300px;
+  min-width: 200px;
+}
+/* Fixed line height so page never jumps */
+.home-hero-title {
+  min-height: 0; /* reset */
 }
 .home-hero-rotating {
   font-style: italic;
   color: var(--accent);
   display: inline-block;
   transition: opacity 0.3s, transform 0.3s;
+  white-space: nowrap;
 }
 .home-hero-rotating.fade-out { opacity: 0; transform: translateY(-8px); }
 .home-hero-rotating.fade-in  { opacity: 1; transform: translateY(0); }
@@ -318,4 +323,13 @@
   .home-rutas-grid { grid-template-columns: 1fr; }
   .home-map-wrap { height: 280px; }
   .home-section { padding: 40px 0; }
+}
+
+/* Home map — simple accent dots */
+.home-dot {
+  width: 10px; height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+  opacity: 0.55;
+  border: 1.5px solid rgba(255,255,255,0.6);
 }

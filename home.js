@@ -8,18 +8,18 @@ let rotatingIdx = 0;
 const DEFAULT_ICON_URL = "https://danielramirezopisso.github.io/thebestagain/icons/default.svg";
 
 const ROTATING_FALLBACK = [
-  "Pizza Margherita",
-  "Tortilla de Patatas",
-  "Croqueta de Pollo",
-  "Patatas Bravas",
-  "Ensaladilla Rusa",
-  "Cheesecake",
-  "Tiramisu",
-  "Bloody Mary",
-  "Flan",
-  "Lemon Pie",
-  "Pasta Carbonara",
-  "Bikini",
+  "tortilla",
+  "croqueta",
+  "vermouth",
+  "bravas",
+  "bikini",
+  "cheesecake",
+  "tiramisu",
+  "jamón",
+  "ensaladilla",
+  "pizza",
+  "flan",
+  "gin tonic",
 ];
 
 function escapeHtml(s) {
@@ -142,7 +142,7 @@ async function initHomeMap() {
     dragging: false, doubleClickZoom: false,
     boxZoom: false, keyboard: false,
     touchZoom: false, attributionControl: false,
-  }).setView([41.3888, 2.1589], 13);
+  }).setView([41.3874, 2.1686], 14);
 
   L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
     maxZoom: 19, attribution: "&copy; OpenStreetMap &copy; CARTO"
@@ -155,12 +155,10 @@ async function initHomeMap() {
     .slice(0, 80);
 
   places.forEach(m => {
-    const icon = iconForCategory(m.category_id);
-    // Monochrome on home — elegant, not a dashboard
     const leafIcon = L.divIcon({
-      className: "tba-marker home-map-marker",
-      html: `<div class="tba-marker-inner"><img src="${escapeHtml(icon)}" alt="" onerror="this.style.display='none'" /></div>`,
-      iconSize: [28, 28], iconAnchor: [14, 14],
+      className: "",
+      html: `<div class="home-dot"></div>`,
+      iconSize: [10, 10], iconAnchor: [5, 5],
     });
     L.marker([m.lat, m.lon], { icon: leafIcon })
       .addTo(HOME_MAP)
