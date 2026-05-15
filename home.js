@@ -288,13 +288,14 @@ async function loadTopRanked() {
   const host = document.getElementById('homeTopGrid');
   if (!host) return;
 
-  // Get top-rated markers by avg rating
+  // Places only, top rated, min 2 votes
   const { data } = await sb.from('markers')
-    .select('id,title,group_type,category_id,brand_id,rating_avg,rating_count')
+    .select('id,title,group_type,category_id,address,city,rating_avg,rating_count')
     .eq('is_active', true)
+    .eq('group_type', 'place')
     .gte('rating_count', 2)
     .order('rating_avg', { ascending: false })
-    .limit(8);
+    .limit(12);
 
   if (!data?.length) { host.innerHTML = ''; return; }
 
@@ -314,13 +315,15 @@ async function loadTopRanked() {
     const avg = Number(m.rating_avg ?? 0);
     const cnt = Number(m.rating_count ?? 0);
     const color = scoreColor(avg);
-    const isProduct = m.group_type === 'product';
-    const brand = isProduct ? (BRAND[String(m.brand_id)]?.name || '') : '';
-    const name = brand ? `${brand}` : m.title;
+    const cityLabel = m.city === 'BCN' ? 'Barcelona' : m.city === 'MAD' ? 'Madrid' : '';
+    // Extract neighbourhood from address (first part before comma)
+    const neighbourhood = m.address ? m.address.split(',').slice(-2,-1)[0]?.trim() : '';
+    const location = neighbourhood ? `${neighbourhood} · ${cityLabel}` : cityLabel;
     return `
       <a class="home-top-card" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${m.category_id}">
         <div class="home-top-card-cat">${escapeHtml(cat?.name || '')}</div>
-        <div class="home-top-card-name">${escapeHtml(name)}</div>
+        <div class="home-top-card-name">${escapeHtml(m.title)}</div>
+        ${location ? `<div class="home-top-card-location">${escapeHtml(location)}</div>` : ''}
         <div class="home-top-card-foot">
           <div class="home-top-card-votes">${cnt} votes</div>
           <div class="home-top-card-score" style="background:${color}">${avg.toFixed(1)}</div>
