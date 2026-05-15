@@ -51,6 +51,9 @@
   display: inline-block;
   transition: opacity 0.3s, transform 0.3s;
   white-space: nowrap;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
 }
 .home-hero-rotating.fade-out { opacity: 0; transform: translateY(-8px); }
 .home-hero-rotating.fade-in  { opacity: 1; transform: translateY(0); }

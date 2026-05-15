@@ -14,12 +14,15 @@ const ROTATING_FALLBACK = [
   "bravas",
   "bikini",
   "cheesecake",
-  "tiramisu",
+  "tiramisú",
   "jamón",
   "ensaladilla",
   "pizza",
   "flan",
-  "gin tonic",
+  "margarita",
+  "croissant",
+  "vermut",
+  "bocata",
 ];
 
 function escapeHtml(s) {
