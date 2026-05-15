@@ -189,38 +189,32 @@ async function loadWishlist() {
   const catMap   = Object.fromEntries((CATEGORIES_CACHE || []).map(c => [c.id, c]));
   const brandMap = Object.fromEntries((BRANDS_CACHE    || []).map(b => [b.id, b]));
 
-  host.innerHTML = items.map(r => {
+  host.innerHTML = items.map((r, i) => {
     const m   = r.markers;
     const cat = catMap[m.category_id];
     const avg = Number(m.rating_avg ?? 0);
     const cnt = Number(m.rating_count ?? 0);
-    const ratingTxt = cnt ? avg.toFixed(1) : "—";
-    const isPlace   = m.group_type === "place";
-    const sub       = isPlace
-      ? (m.address || cat?.name || "")
-      : (brandMap[m.brand_id]?.name || cat?.name || "");
-    const iconUrl   = cat?.icon_url
-      ? cat.icon_url
-      : (isPlace ? "icons/default-place.svg" : "icons/default-product.svg");
-    const colorCls  = cnt >= 3
-      ? (avg >= 9 ? "rating-9-10" : avg >= 7 ? "rating-7-8" : avg >= 5 ? "rating-5-6" : avg >= 3 ? "rating-3-4" : "rating-1-2")
-      : "rating-none";
+    const isPlace = m.group_type === "place";
+    const sub = cat?.name || "";
+    const scoreColor = cnt
+      ? (avg >= 9 ? "#1e5c3a" : avg >= 7 ? "#4a7c59" : avg >= 5 ? "#c8972a" : avg >= 3 ? "#e76f51" : "#c1440e")
+      : null;
+    const sizeClass = i === 0 ? "vote-row-1" : i === 1 ? "vote-row-2" : i < 4 ? "vote-row-3" : "";
 
     return `
-      <div class="wishlist-item">
-        <a class="wishlist-item-link" href="marker.html?id=${encodeURIComponent(m.id)}">
-          <div class="wishlist-item-icon">
-            <img src="${escapeHtml(iconUrl)}" alt="" onerror="this.style.display='none'" />
+      <div class="vote-row ${sizeClass}">
+        <a class="vote-row-link" href="marker.html?id=${encodeURIComponent(m.id)}&cat=${m.category_id}">
+          <div class="vote-row-pos">${i + 1}</div>
+          <div class="vote-row-info">
+            <div class="vote-row-name">${escapeHtml(m.title)}</div>
+            <div class="vote-row-sub">${escapeHtml(sub)}</div>
           </div>
-          <div class="wishlist-item-body">
-            <div class="wishlist-item-title">${escapeHtml(m.title)}</div>
-            <div class="wishlist-item-sub muted">${escapeHtml(sub)}</div>
-          </div>
-          <div class="wishlist-item-rating rating-badge ${colorCls}">${escapeHtml(ratingTxt)}</div>
         </a>
-        ${wlBtnHtml(m.id)}
-      </div>
-    `;
+        <div class="vote-row-actions">
+          ${scoreColor ? `<div class="vote-score-badge" style="background:${scoreColor}">${avg.toFixed(1)}</div>` : ""}
+          ${wlBtnHtml(m.id)}
+        </div>
+      </div>`;
   }).join("");
 
   // After rendering, refresh all heart states
