@@ -67,14 +67,15 @@
 }
 
 /* ── Tabs ── */
-.user-tabs {
-  display: flex; gap: 0;
+.user-tabs-wrap {
   border-bottom: 1px solid var(--rule);
   margin-bottom: 0;
-  flex-wrap: wrap;
+}
+.user-tabs {
+  display: flex; gap: 0;
 }
 .user-tab {
-  padding: 14px 16px;
+  padding: 14px 18px;
   font-size: 13px; font-weight: 700;
   color: var(--muted); background: none;
   border: none; border-bottom: 2px solid transparent;
@@ -82,13 +83,32 @@
   transition: color 0.15s, border-color 0.15s;
   margin-bottom: -1px;
   box-shadow: none;
-  flex-shrink: 0;
 }
 .user-tab:hover { color: var(--text); transform: none; box-shadow: none; }
 .user-tab.active { color: var(--text); border-bottom-color: var(--text); }
 
-@media (max-width: 480px) {
-  .user-tab { padding: 12px 12px; font-size: 12px; }
+/* Mobile dropdown — hidden on desktop */
+.user-tabs-select { display: none; }
+
+@media (max-width: 580px) {
+  .user-tabs { display: none; }
+  .user-tabs-select {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px; font-weight: 700;
+    color: var(--text);
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    cursor: pointer;
+    margin: 16px 0;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+  }
 }
 
 /* ── Tab panels ── */

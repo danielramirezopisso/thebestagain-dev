@@ -68,13 +68,24 @@
       </div>
     </section>
 
-    <!-- ── TABS ── -->
-    <div class="user-tabs">
-      <button class="user-tab active" data-tab="votes"    onclick="switchTab('votes')">Votes</button>
-      <button class="user-tab"        data-tab="wishlist" onclick="switchTab('wishlist')">Wishlist</button>
-      <button class="user-tab"        data-tab="places"   onclick="switchTab('places')">Places</button>
-      <button class="user-tab"        data-tab="comments" onclick="switchTab('comments')">Comments</button>
-      <button class="user-tab"        data-tab="photos"   onclick="switchTab('photos')">Photos</button>
+    <!-- ── TABS — desktop pills, mobile dropdown ── -->
+    <div class="user-tabs-wrap">
+      <!-- Desktop: pill tabs -->
+      <div class="user-tabs">
+        <button class="user-tab active" data-tab="votes"    onclick="switchTab('votes')">Votes</button>
+        <button class="user-tab"        data-tab="wishlist" onclick="switchTab('wishlist')">Wishlist</button>
+        <button class="user-tab"        data-tab="places"   onclick="switchTab('places')">Places</button>
+        <button class="user-tab"        data-tab="comments" onclick="switchTab('comments')">Comments</button>
+        <button class="user-tab"        data-tab="photos"   onclick="switchTab('photos')">Photos</button>
+      </div>
+      <!-- Mobile: dropdown -->
+      <select class="user-tabs-select" id="userTabSelect" onchange="switchTab(this.value)">
+        <option value="votes">Votes</option>
+        <option value="wishlist">Wishlist</option>
+        <option value="places">Places</option>
+        <option value="comments">Comments</option>
+        <option value="photos">Photos</option>
+      </select>
     </div>
 
     <!-- ── TAB PANELS ── -->

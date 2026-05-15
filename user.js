@@ -131,6 +131,9 @@ function getBadge(score) {
    TABS
 ══════════════════════════════════════════ */
 function switchTab(name) {
+  // Sync mobile dropdown
+  const sel = document.getElementById('userTabSelect');
+  if (sel && sel.value !== name) sel.value = name;
   document.querySelectorAll(".user-tab").forEach(btn =>
     btn.classList.toggle("active", btn.dataset.tab === name));
   document.querySelectorAll(".user-tab-panel").forEach(p =>
