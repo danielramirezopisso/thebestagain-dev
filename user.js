@@ -547,6 +547,8 @@ async function confirmDeactivate() {
 ══════════════════════════════════════════ */
 async function loadComments() {
   const host = document.getElementById("commentsList");
+  if (!host) return;
+  if (!USER_ID) { host.innerHTML = `<p class="muted" style="padding:20px 0;">Please log in to see your comments.</p>`; return; }
   host.innerHTML = `<p class="muted" style="padding:20px 0;">Loading…</p>`;
 
   const { data, error } = await sb
@@ -565,21 +567,34 @@ async function loadComments() {
     return;
   }
 
-  // Fetch marker titles separately
+  // Fetch marker titles + ratings
   const mids = [...new Set(data.map(c => c.marker_id))];
-  const { data: mData } = await sb.from("markers").select("id,title").in("id", mids);
-  const titleMap = Object.fromEntries((mData || []).map(m => [m.id, m.title]));
+  const { data: mData } = await sb.from("markers")
+    .select("id,title,rating_avg,rating_count,category_id")
+    .in("id", mids);
+  const markerMap = Object.fromEntries((mData || []).map(m => [m.id, m]));
 
-  host.innerHTML = data.map(c => `
-    <a class="comment-card" href="marker.html?id=${esc(c.marker_id)}">
-      <div class="comment-card-head">
-        <span class="comment-card-place">${esc(titleMap[c.marker_id] || "Unknown place")}</span>
-        <span class="comment-card-time">${timeAgo(c.created_at)}</span>
-      </div>
-      <p class="comment-card-body">"${esc(c.body)}"</p>
-      <div class="comment-card-foot">Open →</div>
-    </a>
-  `).join("");
+  host.innerHTML = data.map(d => {
+    const m = markerMap[d.marker_id] || {};
+    const avg = Number(m.rating_avg ?? 0);
+    const cnt = Number(m.rating_count ?? 0);
+    const scoreColor = cnt ? (avg >= 9 ? "#1e5c3a" : avg >= 7 ? "#4a7c59" : avg >= 5 ? "#c8972a" : avg >= 3 ? "#e76f51" : "#c1440e") : null;
+    const scoreBadge = scoreColor
+      ? `<div class="vote-score-badge" style="background:${scoreColor};font-size:13px;">${avg.toFixed(1)}</div>`
+      : "";
+    return `
+      <a class="comment-card" href="marker.html?id=${esc(d.marker_id)}">
+        <div class="comment-card-head">
+          <span class="comment-card-place">${esc(m.title || "Unknown place")}</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${scoreBadge}
+            <span class="comment-card-time">${timeAgo(d.created_at)}</span>
+          </div>
+        </div>
+        <p class="comment-card-body">"${esc(d.body)}"</p>
+        <div class="comment-card-foot">Open →</div>
+      </a>`;
+  }).join("");
 }
 
 /* ══════════════════════════════════════════
@@ -613,12 +628,23 @@ async function loadPhotos() {
     .in("id", mids);
   const titleMap = Object.fromEntries((mData || []).map(m => [m.id, m.title]));
 
-  host.innerHTML = data.map(p => {
+  // Group photos by marker — show first photo, badge for count
+  const grouped = {};
+  data.forEach(p => {
+    if (!grouped[p.marker_id]) grouped[p.marker_id] = [];
+    grouped[p.marker_id].push(p);
+  });
+
+  host.innerHTML = Object.entries(grouped).map(([mid, photos]) => {
+    const p = photos[0];
     const url = `${SUPABASE_URL_USER}/storage/v1/object/public/marker-photos/${p.storage_path}`;
+    const count = photos.length;
     return `
-      <a class="photo-tile" href="marker.html?id=${esc(p.marker_id)}">
-        <div class="photo-tile-img" style="background-image:url('${esc(url)}')"></div>
-        <div class="photo-tile-label">${esc(titleMap[p.marker_id] || "")}</div>
+      <a class="photo-tile" href="marker.html?id=${esc(mid)}">
+        <div class="photo-tile-img" style="background-image:url('${esc(url)}')">
+          ${count > 1 ? `<div class="photo-tile-count">${count}</div>` : ""}
+        </div>
+        <div class="photo-tile-label">${esc(titleMap[mid] || "")}</div>
       </a>`;
   }).join("");
 }
