@@ -286,35 +286,16 @@ async function loadPlaces() {
   const active   = markers.filter(m => m.is_active);
   const inactive = markers.filter(m => !m.is_active);
 
-  const renderRow = m => {
+  const renderRow = (m, idx) => {
     const cat      = catMap[m.category_id];
     const score    = voteMap[m.id];
-    const photos   = photoCount[m.id]   || 0;
-    const comments = commentCount[m.id] || 0;
-    const icon = cat?.icon_url
-      ? `<img src="${esc(cat.icon_url)}" class="places-row-icon" alt="" />`
-      : `<span class="places-row-icon-fallback">📍</span>`;
-
-    const scorePill = score != null
-      ? `<span class="score-pill ${colorClass(score)}" style="font-size:12px;flex:0 0 auto;">${Number(score).toFixed(1)}</span>`
-      : `<span class="places-no-vote" title="You haven't voted yet">—</span>`;
-
-    const inactiveBadge = !m.is_active
-      ? `<span class="places-inactive-badge">inactive</span>`
-      : "";
-
-    const counters = (photos || comments) ? `
-      <span class="places-counters">
-        ${photos   ? `<span class="places-counter" title="${photos} photo${photos>1?"s":""}">📷 ${photos}</span>`     : ""}
-        ${comments ? `<span class="places-counter" title="${comments} comment${comments>1?"s":""}">💬 ${comments}</span>` : ""}
-      </span>` : "";
-
-    const actions = !m.is_active
-      ? `<div class="places-row-actions"><span class="muted" style="font-size:12px;padding:0 14px;">Deactivated</span></div>`
-      : `<div class="places-row-actions">
-          <button class="places-action-btn" onclick="openEditModal('${esc(m.id)}')" title="Edit">✏️ Edit</button>
-          <button class="places-action-btn places-action-btn--danger" onclick="openDeactivate('${esc(m.id)}','${esc(m.title)}')" title="Remove">🗑 Remove</button>
-        </div>`;
+    const inactive = !m.is_active;
+    const scoreColor = score != null
+      ? (score >= 9 ? "#1e5c3a" : score >= 7 ? "#4a7c59" : score >= 5 ? "#c8972a" : score >= 3 ? "#e76f51" : "#c1440e")
+      : null;
+    const scoreBadge = scoreColor
+      ? `<div class="vote-score-badge" style="background:${scoreColor}">${Number(score).toFixed(0)}</div>`
+      : `<div class="vote-score-badge" style="background:var(--border);color:var(--muted)">—</div>`;
 
     return `
       <div class="vote-row${inactive ? ' places-inactive' : ''}" data-id="${esc(m.id)}">
