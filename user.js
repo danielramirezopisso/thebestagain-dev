@@ -583,6 +583,8 @@ async function loadComments() {
 ══════════════════════════════════════════ */
 async function loadPhotos() {
   const host = document.getElementById("photosList");
+  if (!host) return;
+  if (!USER_ID) { host.innerHTML = `<p class="muted" style="padding:20px 0;">Please log in to see your photos.</p>`; return; }
   host.innerHTML = `<p class="muted" style="padding:20px 0;">Loading…</p>`;
 
   const { data, error } = await sb
