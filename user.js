@@ -381,7 +381,9 @@ async function openEditModal(markerId) {
     `${EDIT_LAT.toFixed(5)}, ${EDIT_LNG.toFixed(5)}`;
 
   // Show modal first (map needs visible container)
+  window._editScrollY = window.scrollY;
   document.getElementById("editModalOverlay").classList.add("active");
+  document.body.style.overflow = "hidden";
 
   // Init map after brief delay for layout
   setTimeout(() => initEditMap(EDIT_LAT, EDIT_LNG), 80);
@@ -436,6 +438,8 @@ function initEditMap(lat, lng) {
 
 function closeEditModal() {
   document.getElementById("editModalOverlay").classList.remove("active");
+  document.body.style.overflow = "";
+  if (window._editScrollY !== undefined) window.scrollTo(0, window._editScrollY);
   if (EDIT_MAP_INST) { EDIT_MAP_INST.remove(); EDIT_MAP_INST = null; EDIT_PIN = null; }
   EDIT_MARKER_ID = null;
 }
@@ -488,11 +492,15 @@ function openDeactivate(markerId, markerTitle) {
   document.getElementById("deactivateName").textContent      = markerTitle;
   document.getElementById("deactivateStatus").textContent    = "";
   document.getElementById("deactivateConfirmBtn").disabled   = false;
+  window._editScrollY = window.scrollY;
   document.getElementById("deactivateOverlay").classList.add("active");
+  document.body.style.overflow = "hidden";
 }
 
 function closeDeactivate() {
   document.getElementById("deactivateOverlay").classList.remove("active");
+  document.body.style.overflow = "";
+  if (window._editScrollY !== undefined) window.scrollTo(0, window._editScrollY);
   DEACTIVATE_ID = null;
 }
 

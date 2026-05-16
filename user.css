@@ -478,3 +478,92 @@
   box-shadow: none;
 }
 .lb-btn:hover { background: rgba(255,255,255,0.25); transform: none; box-shadow: none; }
+
+/* ══════════════════════════════════════
+   EDIT PLACE MODAL
+══════════════════════════════════════ */
+.edit-modal-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(26,23,20,0.5);
+  display: none;
+  align-items: flex-end; justify-content: center;
+}
+.edit-modal-overlay.active {
+  display: flex;
+}
+.edit-modal-box {
+  background: var(--card);
+  border-radius: 20px 20px 0 0;
+  width: 100%; max-width: 560px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 -4px 32px rgba(26,23,20,0.15);
+}
+.edit-modal-box--small { max-height: 50vh; }
+
+.edit-modal-head {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 0;
+  position: sticky; top: 0;
+  background: var(--card);
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 16px;
+}
+.edit-modal-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px; font-weight: 700;
+  color: var(--text); margin: 0;
+}
+.edit-modal-close {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--faint); border: none; box-shadow: none;
+  font-size: 13px; cursor: pointer; color: var(--muted);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.edit-modal-body { padding: 20px 24px; }
+
+.edit-field { margin-bottom: 16px; }
+.edit-label {
+  display: block; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px;
+}
+.edit-label-hint {
+  font-size: 11px; font-weight: 400;
+  text-transform: none; letter-spacing: 0;
+  color: var(--muted); margin-left: 8px;
+}
+.edit-input {
+  width: 100%; padding: 10px 12px;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  background: var(--faint); font-size: 14px; color: var(--text);
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.edit-input:focus { outline: none; border-color: var(--accent); }
+
+.edit-map {
+  width: 100%; height: 220px;
+  border-radius: 8px; overflow: hidden;
+  border: 1.5px solid var(--border);
+  margin-top: 6px;
+}
+.edit-coords-display {
+  font-size: 11px; color: var(--muted);
+  margin: 4px 0 0; font-style: italic;
+}
+
+.edit-modal-foot {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px 32px;
+  border-top: 1px solid var(--rule);
+  gap: 12px;
+}
+.edit-status { font-size: 12px; color: var(--muted); margin: 0; flex: 1; }
+.edit-modal-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.tba-btn-danger {
+  background: #e05252; color: #fff; border-color: #e05252;
+}
+.tba-btn-danger:hover { background: #c73d3d; border-color: #c73d3d; }
