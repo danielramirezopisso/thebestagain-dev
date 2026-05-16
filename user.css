@@ -375,3 +375,34 @@
 .comment-card-time { font-size: 11px; color: var(--muted); opacity: 0.6; }
 .comment-card-body { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 15px; color: var(--text); line-height: 1.6; margin: 0 0 12px; }
 .comment-card-foot { font-size: 12px; font-weight: 700; color: var(--accent); text-align: right; }
+
+/* ── Photos grid ── */
+.user-photos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding-top: 4px;
+}
+.photo-tile {
+  display: flex; flex-direction: column;
+  text-decoration: none; color: inherit;
+  border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--border);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.photo-tile:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26,23,20,0.1); text-decoration: none; }
+.photo-tile-img {
+  width: 100%; aspect-ratio: 1;
+  background-size: cover; background-position: center;
+  background-color: var(--faint);
+}
+.photo-tile-label {
+  font-size: 11px; font-weight: 600;
+  color: var(--muted); padding: 6px 8px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  background: var(--card);
+}
+
+@media (max-width: 480px) {
+  .user-photos-grid { grid-template-columns: repeat(2, 1fr); }
+}

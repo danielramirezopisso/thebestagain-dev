@@ -616,9 +616,9 @@ async function loadPhotos() {
   host.innerHTML = data.map(p => {
     const url = `${SUPABASE_URL_USER}/storage/v1/object/public/marker-photos/${p.storage_path}`;
     return `
-      <a class="user-photo-tile" href="marker.html?id=${esc(p.marker_id)}">
-        <img src="${esc(url)}" alt="" loading="lazy" />
-        <div class="user-photo-label">${esc(titleMap[p.marker_id] || "")}</div>
+      <a class="photo-tile" href="marker.html?id=${esc(p.marker_id)}">
+        <div class="photo-tile-img" style="background-image:url('${esc(url)}')"></div>
+        <div class="photo-tile-label">${esc(titleMap[p.marker_id] || "")}</div>
       </a>`;
   }).join("");
 }
