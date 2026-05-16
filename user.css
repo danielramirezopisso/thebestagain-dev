@@ -335,3 +335,19 @@
 
 /* Edit votes view — hidden until we rebuild the ranking feature */
 #editView { display: none !important; }
+
+/* Places action buttons */
+.places-edit-btn, .places-del-btn {
+  width: 26px; height: 26px; border-radius: 5px;
+  border: 1.5px solid var(--border); background: var(--faint);
+  font-size: 12px; cursor: pointer; color: var(--muted);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: none; transition: border-color 0.1s, color 0.1s;
+  opacity: 0; flex-shrink: 0;
+}
+.vote-row:hover .places-edit-btn,
+.vote-row:hover .places-del-btn { opacity: 1; }
+.places-edit-btn:hover { border-color: var(--accent); color: var(--accent); transform: none; box-shadow: none; }
+.places-del-btn:hover  { border-color: #e05252; color: #e05252; transform: none; box-shadow: none; }
+.places-inactive { opacity: 0.4; }
+.places-inactive-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; }

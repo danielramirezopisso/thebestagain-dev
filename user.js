@@ -317,21 +317,25 @@ async function loadPlaces() {
         </div>`;
 
     return `
-      <div class="places-row${!m.is_active ? " places-row--inactive" : ""}" data-id="${esc(m.id)}">
-        <a class="places-row-main" href="marker.html?id=${esc(m.id)}">
-          ${icon}
-          <div class="places-row-body">
-            <span class="places-row-title">${esc(m.title)} ${inactiveBadge}</span>
-            <span class="places-row-sub">${esc(cat?.name || "")} · ${timeAgo(m.created_at)}</span>
-            ${counters}
+      <div class="vote-row${inactive ? ' places-inactive' : ''}" data-id="${esc(m.id)}">
+        <a class="vote-row-link" href="marker.html?id=${esc(m.id)}&cat=${m.category_id}">
+          <div class="vote-row-pos">${idx + 1}</div>
+          <div class="vote-row-info">
+            <div class="vote-row-name">${esc(m.title)}</div>
+            <div class="vote-row-sub">${esc(cat?.name || '')}</div>
           </div>
-          ${scorePill}
         </a>
-        ${actions}
+        <div class="vote-row-actions">
+          ${scoreBadge}
+          ${!inactive ? `
+          <button class="places-edit-btn" onclick="event.stopPropagation();openEditModal('${esc(m.id)}')" title="Edit">✏</button>
+          <button class="places-del-btn"  onclick="event.stopPropagation();openDeactivate('${esc(m.id)}','${esc(m.title)}')" title="Remove">✕</button>
+          ` : '<span class="places-inactive-label">inactive</span>'}
+        </div>
       </div>`;
   };
 
-  let html = active.map(renderRow).join("");
+  let html = active.map((m,i) => renderRow(m,i)).join("");
 
   if (inactive.length) {
     html += `
@@ -341,7 +345,7 @@ async function loadPlaces() {
         </button>
       </div>
       <div class="places-inactive-section" style="display:none;">
-        ${inactive.map(renderRow).join("")}
+        ${inactive.map((m,i) => renderRow(m,i)).join("")}
       </div>`;
   }
 
