@@ -332,3 +332,6 @@
   margin-bottom: 0;
 }
 .vote-cat-divider:first-child { padding-top: 4px; }
+
+/* Edit votes view — hidden until we rebuild the ranking feature */
+#editView { display: none !important; }
