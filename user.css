@@ -443,3 +443,40 @@
   box-shadow: none; transition: border-color 0.1s, color 0.1s;
 }
 .photo-delete-btn:hover { border-color: #e05252; color: #e05252; transform: none; box-shadow: none; }
+
+/* ── Photo lightbox ── */
+.lb-overlay {
+  position: fixed; inset: 0; z-index: 9000;
+  background: rgba(0,0,0,0.92);
+  display: flex; align-items: center; justify-content: center;
+}
+.lb-img {
+  max-width: 90vw; max-height: 85vh;
+  border-radius: 8px; object-fit: contain;
+}
+.lb-close {
+  position: absolute; top: 16px; right: 16px;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,0.15); border: none;
+  color: #fff; font-size: 16px; cursor: pointer;
+  box-shadow: none;
+}
+.lb-counter {
+  position: absolute; bottom: 20px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px; color: rgba(255,255,255,0.6);
+  font-weight: 600;
+}
+.lb-nav {
+  position: absolute; bottom: 20px;
+  display: flex; gap: 12px;
+  left: 50%; transform: translateX(-50%);
+  margin-top: 32px;
+}
+.lb-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,0.15); border: none;
+  color: #fff; font-size: 18px; cursor: pointer;
+  box-shadow: none;
+}
+.lb-btn:hover { background: rgba(255,255,255,0.25); transform: none; box-shadow: none; }

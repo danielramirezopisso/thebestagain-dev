@@ -623,25 +623,65 @@ async function loadPhotos() {
     const url   = `${SUPABASE_URL_USER}/storage/v1/object/public/marker-photos/${first.storage_path}`;
     const count = photos.length;
 
-    // All photo delete buttons for this place
-    const deleteBtns = photos.map(p => `
-      <button class="photo-delete-btn" data-photo-id="${esc(p.id)}" data-path="${esc(p.storage_path)}"
-        onclick="event.preventDefault();deletePhoto('${esc(p.id)}','${esc(p.storage_path)}',this)"
+    // Build all photo URLs for lightbox
+    const allUrls = photos.map(p =>
+      `${SUPABASE_URL_USER}/storage/v1/object/public/marker-photos/${p.storage_path}`
+    );
+    const allIds  = photos.map(p => p.id);
+    const allPaths = photos.map(p => p.storage_path);
+
+    const deleteBtns = photos.map((p, pi) => `
+      <button class="photo-delete-btn"
+        onclick="event.stopPropagation();deletePhoto('${esc(p.id)}','${esc(p.storage_path)}',this)"
         title="Delete photo">✕</button>`).join('');
+
+    const urlsJson  = esc(JSON.stringify(allUrls));
+    const idsJson   = esc(JSON.stringify(allIds));
+    const pathsJson = esc(JSON.stringify(allPaths));
 
     return `
       <div class="photo-tile">
-        <a href="marker.html?id=${esc(mid)}" class="photo-tile-link">
-          <div class="photo-tile-img" style="background-image:url('${esc(url)}')">
+        <div class="photo-tile-link" onclick="openLightbox(${JSON.stringify(allUrls)},${JSON.stringify(allIds)},${JSON.stringify(allPaths)},0)">
+          <div class="photo-tile-img" style="background-image:url('${esc(url)}');cursor:pointer;">
             ${count > 1 ? `<div class="photo-tile-count">${count}</div>` : ""}
           </div>
         </a>
         <div class="photo-tile-footer">
-          <div class="photo-tile-label">${esc(titleMap[mid] || "")}</div>
+          <a href="marker.html?id=${esc(mid)}" class="photo-tile-label" onclick="event.stopPropagation()">${esc(titleMap[mid] || "")}</a>
           <div class="photo-tile-actions">${deleteBtns}</div>
         </div>
       </a>`;
   }).join("");
+}
+
+/* ── Photo lightbox ── */
+let LB_URLS = [], LB_IDS = [], LB_PATHS = [], LB_IDX = 0;
+
+function openLightbox(urls, ids, paths, idx) {
+  LB_URLS = urls; LB_IDS = ids; LB_PATHS = paths; LB_IDX = idx;
+  const lb = document.getElementById('photoLightbox');
+  if (!lb) return;
+  lb.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  renderLightbox();
+}
+
+function closeLightbox() {
+  const lb = document.getElementById('photoLightbox');
+  if (lb) lb.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function lbNav(dir) {
+  LB_IDX = (LB_IDX + dir + LB_URLS.length) % LB_URLS.length;
+  renderLightbox();
+}
+
+function renderLightbox() {
+  document.getElementById('lbImg').src = LB_URLS[LB_IDX];
+  document.getElementById('lbCounter').textContent = LB_URLS.length > 1
+    ? `${LB_IDX + 1} / ${LB_URLS.length}` : '';
+  document.getElementById('lbNav').style.display = LB_URLS.length > 1 ? 'flex' : 'none';
 }
 
 async function deletePhoto(photoId, storagePath, btn) {
