@@ -52,6 +52,26 @@ async function wlToggle(markerId, btn) {
     if (wasLiked) { WL_SET.add(markerId); } else { WL_SET.delete(markerId); }
     _wlRefreshAll();
     console.error("Wishlist error:", error.message);
+    return;
+  }
+
+  // If we removed an item and wishlist tab is active, remove row from DOM
+  if (wasLiked) {
+    const panel = document.getElementById("panel-wishlist");
+    if (panel && panel.classList.contains("active")) {
+      const row = document.querySelector(`.vote-row [data-wl-id="${markerId}"]`)?.closest(".vote-row");
+      if (row) {
+        row.style.opacity = "0";
+        row.style.transition = "opacity 0.2s";
+        setTimeout(() => {
+          row.remove();
+          // Reindex position numbers
+          document.querySelectorAll("#wishlistItems .vote-row-pos").forEach((el, i) => {
+            el.textContent = i + 1;
+          });
+        }, 200);
+      }
+    }
   }
 }
 
