@@ -354,3 +354,24 @@
 .places-del-btn:hover  { border-color: #e05252; color: #e05252; transform: none; box-shadow: none; }
 .places-inactive { opacity: 0.4; }
 .places-inactive-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* ── Comment cards ── */
+#commentsList {
+  display: flex; flex-direction: column; gap: 12px;
+  padding-top: 4px;
+}
+.comment-card {
+  display: block;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  text-decoration: none; color: inherit;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.comment-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,23,20,0.08); text-decoration: none; }
+.comment-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.comment-card-place { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.comment-card-time { font-size: 11px; color: var(--muted); opacity: 0.6; }
+.comment-card-body { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 15px; color: var(--text); line-height: 1.6; margin: 0 0 12px; }
+.comment-card-foot { font-size: 12px; font-weight: 700; color: var(--accent); text-align: right; }
