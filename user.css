@@ -424,3 +424,22 @@
 /* Will be shown programmatically when needed */
 #editModalOverlay.open,
 #deactivateOverlay.open { display: flex !important; }
+
+/* Photo tile with footer */
+.photo-tile { display: flex; flex-direction: column; }
+.photo-tile-link { display: block; }
+.photo-tile-footer {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  background: var(--card);
+}
+.photo-tile-actions { display: flex; gap: 4px; }
+.photo-delete-btn {
+  width: 22px; height: 22px; border-radius: 4px;
+  border: 1px solid var(--border); background: var(--faint);
+  font-size: 10px; color: var(--muted); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: none; transition: border-color 0.1s, color 0.1s;
+}
+.photo-delete-btn:hover { border-color: #e05252; color: #e05252; transform: none; box-shadow: none; }

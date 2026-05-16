@@ -619,17 +619,60 @@ async function loadPhotos() {
   });
 
   host.innerHTML = Object.entries(grouped).map(([mid, photos]) => {
-    const p = photos[0];
-    const url = `${SUPABASE_URL_USER}/storage/v1/object/public/marker-photos/${p.storage_path}`;
+    const first = photos[0];
+    const url   = `${SUPABASE_URL_USER}/storage/v1/object/public/marker-photos/${first.storage_path}`;
     const count = photos.length;
+
+    // All photo delete buttons for this place
+    const deleteBtns = photos.map(p => `
+      <button class="photo-delete-btn" data-photo-id="${esc(p.id)}" data-path="${esc(p.storage_path)}"
+        onclick="event.preventDefault();deletePhoto('${esc(p.id)}','${esc(p.storage_path)}',this)"
+        title="Delete photo">✕</button>`).join('');
+
     return `
-      <a class="photo-tile" href="marker.html?id=${esc(mid)}">
-        <div class="photo-tile-img" style="background-image:url('${esc(url)}')">
-          ${count > 1 ? `<div class="photo-tile-count">${count}</div>` : ""}
+      <div class="photo-tile">
+        <a href="marker.html?id=${esc(mid)}" class="photo-tile-link">
+          <div class="photo-tile-img" style="background-image:url('${esc(url)}')">
+            ${count > 1 ? `<div class="photo-tile-count">${count}</div>` : ""}
+          </div>
+        </a>
+        <div class="photo-tile-footer">
+          <div class="photo-tile-label">${esc(titleMap[mid] || "")}</div>
+          <div class="photo-tile-actions">${deleteBtns}</div>
         </div>
-        <div class="photo-tile-label">${esc(titleMap[mid] || "")}</div>
       </a>`;
   }).join("");
+}
+
+async function deletePhoto(photoId, storagePath, btn) {
+  if (!confirm("Delete this photo?")) return;
+  btn.disabled = true;
+  btn.textContent = "…";
+
+  // Soft delete in DB
+  const { error } = await sb.from("marker_photos")
+    .update({ is_active: false })
+    .eq("id", photoId);
+
+  if (error) { btn.textContent = "✕"; btn.disabled = false; alert("Could not delete photo"); return; }
+
+  // Remove tile from DOM — if last photo for this place, remove whole tile
+  const tile = btn.closest(".photo-tile");
+  const remaining = tile.querySelectorAll(".photo-delete-btn:not([disabled])").length;
+  if (remaining <= 1) {
+    tile.style.opacity = "0";
+    tile.style.transition = "opacity 0.2s";
+    setTimeout(() => tile.remove(), 200);
+  } else {
+    btn.closest(".photo-delete-btn").remove();
+    // Update count badge
+    const countBadge = tile.querySelector(".photo-tile-count");
+    if (countBadge) {
+      const newCount = remaining - 1;
+      if (newCount > 1) countBadge.textContent = newCount;
+      else countBadge.remove();
+    }
+  }
 }
 
 function hideEmptyTabs() {
