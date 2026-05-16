@@ -389,6 +389,7 @@
   border-radius: 8px; overflow: hidden;
   border: 1px solid var(--border);
   transition: transform 0.15s, box-shadow 0.15s;
+  min-width: 0;
 }
 .photo-tile:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26,23,20,0.1); text-decoration: none; }
 .photo-tile-img {
@@ -425,9 +426,6 @@
 #editModalOverlay.active,
 #deactivateOverlay.active { display: flex !important; }
 
-/* Photo tile with footer */
-.photo-tile { display: flex; flex-direction: column; }
-.photo-tile-link { display: block; }
 .photo-tile-footer {
   display: flex; align-items: center;
   justify-content: space-between;
