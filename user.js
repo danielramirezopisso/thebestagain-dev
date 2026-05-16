@@ -571,12 +571,13 @@ async function loadComments() {
   const titleMap = Object.fromEntries((mData || []).map(m => [m.id, m.title]));
 
   host.innerHTML = data.map(c => `
-    <a class="user-comment-row" href="marker.html?id=${esc(c.marker_id)}">
-      <div class="user-comment-meta">
-        <span class="user-comment-place">${esc(titleMap[c.marker_id] || "Unknown place")}</span>
-        <span class="user-comment-time muted">${timeAgo(c.created_at)}</span>
+    <a class="comment-card" href="marker.html?id=${esc(c.marker_id)}">
+      <div class="comment-card-head">
+        <span class="comment-card-place">${esc(titleMap[c.marker_id] || "Unknown place")}</span>
+        <span class="comment-card-time">${timeAgo(c.created_at)}</span>
       </div>
-      <p class="user-comment-body">${esc(c.body)}</p>
+      <p class="comment-card-body">"${esc(c.body)}"</p>
+      <div class="comment-card-foot">Open →</div>
     </a>
   `).join("");
 }
