@@ -653,12 +653,12 @@ async function loadPhotos() {
           <div class="photo-tile-img" style="background-image:url('${esc(url)}');cursor:pointer;">
             ${count > 1 ? `<div class="photo-tile-count">${count}</div>` : ""}
           </div>
-        </a>
+        </div>
         <div class="photo-tile-footer">
           <a href="marker.html?id=${esc(mid)}" class="photo-tile-label" onclick="event.stopPropagation()">${esc(titleMap[mid] || "")}</a>
           <div class="photo-tile-actions">${deleteBtns}</div>
         </div>
-      </a>`;
+      </div>`;
   }).join("");
 }
 
@@ -693,7 +693,23 @@ function renderLightbox() {
 }
 
 async function deletePhoto(photoId, storagePath, btn) {
-  if (!confirm("Delete this photo?")) return;
+  // Inline confirmation — change button to confirm state
+  if (btn.dataset.confirming !== "1") {
+    btn.dataset.confirming = "1";
+    btn.textContent = "Sure?";
+    btn.style.borderColor = "#e05252";
+    btn.style.color = "#e05252";
+    setTimeout(() => {
+      if (btn.dataset.confirming === "1") {
+        btn.dataset.confirming = "";
+        btn.textContent = "✕";
+        btn.style.borderColor = "";
+        btn.style.color = "";
+      }
+    }, 2500);
+    return;
+  }
+  btn.dataset.confirming = "";
   btn.disabled = true;
   btn.textContent = "…";
 
