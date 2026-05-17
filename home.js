@@ -94,7 +94,8 @@ function startHeroRotation() {
   const cats = ROTATING_FALLBACK;
   // First word already in HTML — skip setting it again
   el.classList.add("fade-in");
-  setInterval(() => {
+  // First rotation sooner, then regular interval
+  const rotate = () => {
     el.classList.add("fade-out");
     el.classList.remove("fade-in");
     setTimeout(() => {
@@ -103,6 +104,10 @@ function startHeroRotation() {
       el.classList.remove("fade-out");
       el.classList.add("fade-in");
     }, 320);
+  };
+  setTimeout(() => {
+    rotate();
+    setInterval(rotate, 2500);
   }, 1500);
 }
 
