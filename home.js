@@ -103,7 +103,7 @@ function startHeroRotation() {
       el.classList.remove("fade-out");
       el.classList.add("fade-in");
     }, 320);
-  }, 2500);
+  }, 1500);
 }
 
 /* ══════════════════════════════
