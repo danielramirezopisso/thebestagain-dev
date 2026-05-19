@@ -17,7 +17,7 @@ async function generateSitemap() {
 
   const { data: markers, error } = await sb
     .from('markers')
-    .select('id,updated_at,group_type,category_id')
+    .select('id,created_at,group_type,category_id')
     .eq('is_active', true)
     .order('created_at', { ascending: false });
 
@@ -49,7 +49,7 @@ async function generateSitemap() {
 
     // Marker pages
     ...markers.map(m => {
-      const lastmod = m.updated_at ? m.updated_at.split('T')[0] : today;
+      const lastmod = m.created_at ? m.created_at.split('T')[0] : today;
       const cat = m.category_id ? `&cat=${m.category_id}` : '';
       return `
   <url>
