@@ -318,6 +318,10 @@ function animateBars(battleId) {
 
 // Vote from feed
 async function castFeedVote(battleId, choice) {
+  // If already voted, treat as change vote instead
+  if (MY_VOTES[battleId] && MY_VOTES[battleId] !== 'no_opinion') {
+    return changeFeedVote(battleId, choice);
+  }
   if (!TALLY[battleId]) TALLY[battleId] = { a: 0, b: 0 };
   TALLY[battleId][choice] = (TALLY[battleId][choice] || 0) + 1;
   MY_VOTES[battleId] = choice;
