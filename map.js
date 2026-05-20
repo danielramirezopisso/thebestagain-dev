@@ -65,34 +65,56 @@ function getZoomLevel() {
 }
 
 function makeMarkerIcon(iconUrl, avg, count, greyed, isSparkle) {
-  const cls   = greyed ? "rating-none journey-unvisited" : colorClassForRating(avg, count);
-  const url   = isSparkle ? SPARKLE_ICON_URL : (iconUrl || DEFAULT_ICON_URL);
-  const zoom  = getZoomLevel();
+  const cls  = greyed ? "rating-none journey-unvisited" : colorClassForRating(avg, count);
+  const url  = isSparkle ? SPARKLE_ICON_URL : (iconUrl || DEFAULT_ICON_URL);
+  const zoom = getZoomLevel();
   const extraCls = isSparkle ? " tba-marker-sparkle" : "";
 
-  // Zoom-based reveal:
-  // ≤12: tiny dot only
-  // 13-14: medium dot + icon
-  // ≥15: full marker
   if (zoom <= 12) {
+    // Tiny colored dot — no icon, no wrapper class confusion
+    // Get color directly from rating
+    const dotColor = greyed ? "#ccc" : ratingToColor(avg, count);
     return L.divIcon({
-      className: `tba-marker tba-marker-dot ${cls}${extraCls}`,
-      html: `<div class="tba-dot"></div>`,
+      className: "",
+      html: `<div style="width:10px;height:10px;border-radius:50%;background:${dotColor};border:2px solid rgba(255,255,255,0.85);box-shadow:0 1px 4px rgba(0,0,0,0.3);"></div>`,
       iconSize: [10, 10], iconAnchor: [5, 5], popupAnchor: [0, -8],
     });
   } else if (zoom <= 14) {
+    // Medium circle + icon
+    const bgColor = greyed ? "#ccc" : ratingToColor(avg, count);
     return L.divIcon({
-      className: `tba-marker tba-marker-mid ${cls}${extraCls}`,
-      html: `<div class="tba-mid-inner"><img src="${escapeHtml(url)}" alt="" /></div>`,
+      className: "",
+      html: `<div style="width:22px;height:22px;border-radius:50%;background:${bgColor};border:2px solid rgba(255,255,255,0.8);box-shadow:0 2px 6px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;overflow:hidden;"><img src="${escapeHtml(url)}" style="width:13px;height:13px;object-fit:contain;filter:brightness(0) invert(1);" alt=""/></div>`,
       iconSize: [22, 22], iconAnchor: [11, 11], popupAnchor: [0, -14],
     });
   } else {
+    // Full circle + icon
+    const bgColor = greyed ? "#ccc" : ratingToColor(avg, count);
     return L.divIcon({
-      className: `tba-marker tba-marker-full ${cls}${extraCls}`,
-      html: `<div class="tba-marker-inner"><img src="${escapeHtml(url)}" alt="" /></div>`,
+      className: `tba-marker ${extraCls}`,
+      html: `<div style="width:34px;height:34px;border-radius:50%;background:${bgColor};border:2.5px solid rgba(255,255,255,0.85);box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;"><img src="${escapeHtml(url)}" style="width:20px;height:20px;object-fit:contain;filter:brightness(0) invert(1);" alt=""/></div>`,
       iconSize: [34, 34], iconAnchor: [17, 17], popupAnchor: [0, -34],
     });
   }
+}
+
+function ratingToColor(avg, count) {
+  const cb = document.body.classList.contains("colorblind");
+  const cnt = Number(count ?? 0);
+  if (!cnt) return "#aaa";
+  const x = Number(avg ?? 0);
+  if (cb) {
+    if (x >= 9) return "#1a3f8f";
+    if (x >= 7) return "#2d6be4";
+    if (x >= 5) return "#c8972a";
+    if (x >= 3) return "#e87722";
+    return "#b35c00";
+  }
+  if (x >= 9) return "#1e5c3a";
+  if (x >= 7) return "#4a7c59";
+  if (x >= 5) return "#c8972a";
+  if (x >= 3) return "#e76f51";
+  return "#c1440e";
 }
 
 // Refresh all marker icons when zoom changes
