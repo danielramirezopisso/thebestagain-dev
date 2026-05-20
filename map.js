@@ -266,6 +266,109 @@ async function reverseGeocodeAddress(lat, lon) {
   return json.display_name || "";
 }
 
+/* ══════════════════════════════════
+   SEARCH-TO-ADD FLOW
+══════════════════════════════════ */
+let addSearchDebounce = null;
+let addSearchResults = [];
+
+function onAddPlaceSearch(val) {
+  clearTimeout(addSearchDebounce);
+  const res = document.getElementById('addPlaceResults');
+  if (!val.trim()) { res.style.display = 'none'; return; }
+  addSearchDebounce = setTimeout(() => searchPlaceToAdd(val), 350);
+}
+
+async function searchPlaceToAdd(q) {
+  const res = document.getElementById('addPlaceResults');
+  res.style.display = 'block';
+  res.innerHTML = '<div class="add-place-loading">Searching…</div>';
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=6&addressdetails=1&countrycodes=es`;
+    const r = await fetch(url, { headers: { 'Accept-Language': 'es,en' } });
+    const data = await r.json();
+    addSearchResults = data;
+    if (!data.length) { res.innerHTML = '<div class="add-place-empty">No results. Try a different name.</div>'; return; }
+    res.innerHTML = data.map((d, i) => {
+      const parts = (d.display_name || '').split(', ');
+      const name = parts[0];
+      const addr = parts.slice(1, 3).join(', ');
+      return `<div class="add-place-result" onmousedown="selectPlaceToAdd(${i})">
+        <div class="add-pr-name">${escapeHtml(name)}</div>
+        ${addr ? `<div class="add-pr-addr">${escapeHtml(addr)}</div>` : ''}
+      </div>`;
+    }).join('');
+  } catch(e) { res.innerHTML = '<div class="add-place-empty">Search unavailable.</div>'; }
+}
+
+function selectPlaceToAdd(idx) {
+  const d = addSearchResults[idx];
+  if (!d) return;
+
+  // Hide search, show form
+  showAddForm(d);
+
+  // Fly map to location
+  const lat = parseFloat(d.lat);
+  const lon = parseFloat(d.lon);
+  MAP.flyTo([lat, lon], 17, { duration: 0.8 });
+
+  // Drop preview pin
+  if (PREVIEW_MARKER) MAP.removeLayer(PREVIEW_MARKER);
+  PREVIEW_MARKER = L.marker([lat, lon], { opacity: 0.8 }).addTo(MAP);
+  LAST_CLICK = { lat, lon };
+}
+
+function showAddForm(nominatimResult) {
+  // Hide step 1
+  document.getElementById('addStep1').style.display = 'none';
+  document.getElementById('addPlaceResults').style.display = 'none';
+
+  // Show form
+  const form = document.getElementById('addForm');
+  form.style.display = 'block';
+
+  if (nominatimResult) {
+    const parts = (nominatimResult.display_name || '').split(', ');
+    const name  = parts[0];
+    const addr  = parts.slice(0, 4).join(', ');
+    const lat   = parseFloat(nominatimResult.lat).toFixed(6);
+    const lon   = parseFloat(nominatimResult.lon).toFixed(6);
+
+    // Show found place summary
+    const found = document.getElementById('addPlaceFound');
+    found.style.display = 'block';
+    document.getElementById('addPlaceFoundName').textContent = name;
+    document.getElementById('addPlaceFoundAddr').textContent = addr;
+
+    // Fill fields
+    document.getElementById('m_title').value   = name;
+    document.getElementById('m_address').value = addr;
+    document.getElementById('m_lat').value     = lat;
+    document.getElementById('m_lon').value     = lon;
+
+    LAST_CLICK = { lat: parseFloat(lat), lon: parseFloat(lon) };
+  } else {
+    // Manual mode — enable ADD_MODE
+    document.getElementById('addPlaceFound').style.display = 'none';
+    ADD_MODE = true;
+    document.getElementById('m_title').value = '';
+    document.getElementById('m_address').value = '';
+    document.getElementById('m_lat').value = '';
+    document.getElementById('m_lon').value = '';
+  }
+}
+
+function resetAddForm() {
+  document.getElementById('addStep1').style.display = 'block';
+  document.getElementById('addForm').style.display = 'none';
+  document.getElementById('addPlaceSearch').value = '';
+  document.getElementById('addPlaceResults').style.display = 'none';
+  if (PREVIEW_MARKER) { MAP.removeLayer(PREVIEW_MARKER); PREVIEW_MARKER = null; }
+  LAST_CLICK = null;
+  ADD_MODE = false;
+}
+
 async function toggleAddMode() {
   const user = await maybeUser();
   if (!user) { alert("Please login to add places."); window.location.href = "login.html?redirect=" + encodeURIComponent(window.location.href); return; }

@@ -159,17 +159,34 @@
           <div class="panel-title">Add a place</div>
           <button class="map-panel-close" onclick="toggleAddPanel()">✕</button>
         </div>
-        <div class="panel-sub muted">Enable adding mode, then click anywhere on the map to drop a pin.</div>
 
-        <button id="toggleAdd" class="tba-btn add-toggle-btn" onclick="toggleAddMode()" style="margin-top:12px; width:100%;">
-          ＋ Start adding
-        </button>
+        <!-- Step 1: Search -->
+        <div id="addStep1">
+          <p class="panel-sub muted" style="margin:10px 0 8px;">Search for the place to add:</p>
+          <div style="position:relative;">
+            <input id="addPlaceSearch" class="add-place-search"
+              placeholder="e.g. Bar Calders, Barcelona…"
+              oninput="onAddPlaceSearch(this.value)"
+              autocomplete="off" />
+            <div id="addPlaceResults" class="add-place-results" style="display:none;"></div>
+          </div>
+          <p class="panel-sub muted" style="margin-top:8px;font-size:11px;">
+            Or <button class="add-manual-btn" onclick="showAddForm(null)">place pin manually on map ↓</button>
+          </p>
+        </div>
 
+        <!-- Step 2: Fill details (hidden until place selected) -->
         <div id="addForm" style="display:none; margin-top:14px;">
-          <label>Title</label>
-          <input id="m_title" placeholder="e.g., Best croissant at XYZ" />
+          <div class="add-place-found" id="addPlaceFound" style="display:none;">
+            <div class="add-place-found-name" id="addPlaceFoundName"></div>
+            <div class="add-place-found-addr" id="addPlaceFoundAddr"></div>
+            <button class="add-change-btn" onclick="resetAddForm()">↩ Change place</button>
+          </div>
 
-          <div class="row2">
+          <label style="margin-top:10px;">Name <span class="muted" style="font-weight:400;">(edit if needed)</span></label>
+          <input id="m_title" placeholder="Place name" />
+
+          <div class="row2" style="margin-top:10px;">
             <div>
               <label>Category</label>
               <select id="m_category"></select>
@@ -181,22 +198,16 @@
           </div>
 
           <label style="margin-top:10px;">Address</label>
-          <input id="m_address" placeholder="Auto-filled (optional)" />
+          <input id="m_address" placeholder="Auto-filled" />
 
-          <div class="row2">
-            <div>
-              <label>Lat</label>
-              <input id="m_lat" disabled />
-            </div>
-            <div>
-              <label>Lon</label>
-              <input id="m_lon" disabled />
-            </div>
+          <div class="row2" style="margin-top:8px;">
+            <div><label>Lat</label><input id="m_lat" placeholder="auto" /></div>
+            <div><label>Lon</label><input id="m_lon" placeholder="auto" /></div>
           </div>
 
-          <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
-            <button class="tba-btn tba-btn-primary" onclick="saveMapMarker()">Save</button>
-            <span id="saveStatus" class="muted"></span>
+          <div style="margin-top:12px; display:flex; gap:10px; align-items:center;">
+            <button class="tba-btn tba-btn-primary" onclick="saveMapMarker()">Save place</button>
+            <span id="saveStatus" class="muted" style="font-size:12px;"></span>
           </div>
         </div>
       </div>
@@ -300,6 +311,8 @@
     const isOpen = panel.classList.contains('map-panel-open');
     panel.classList.toggle('map-panel-collapsed', isOpen);
     panel.classList.toggle('map-panel-open', !isOpen);
+    // Reset to step 1 when opening
+    if (!isOpen && typeof resetAddForm === 'function') resetAddForm();
   }
 
   function openFilterDrawer(e) {
