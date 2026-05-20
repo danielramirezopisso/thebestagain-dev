@@ -250,10 +250,7 @@ body.map-page{
   .journey-opt {
     padding: 4px 9px;
   }
-  /* Hide add-place panel on mobile — too fiddly on small screens */
-  #addPanel {
-    display: none !important;
-  }
+  /* Add panel works on mobile too */
 }
 
 /* ══════════════════════════════
