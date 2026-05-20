@@ -60,14 +60,46 @@ function colorClassForRating(avg, count) {
   return "rating-1-2";
 }
 
+function getZoomLevel() {
+  return MAP ? MAP.getZoom() : 15;
+}
+
 function makeMarkerIcon(iconUrl, avg, count, greyed, isSparkle) {
-  const cls = greyed ? "rating-none journey-unvisited" : colorClassForRating(avg, count);
-  const url = isSparkle ? SPARKLE_ICON_URL : (iconUrl || DEFAULT_ICON_URL);
+  const cls   = greyed ? "rating-none journey-unvisited" : colorClassForRating(avg, count);
+  const url   = isSparkle ? SPARKLE_ICON_URL : (iconUrl || DEFAULT_ICON_URL);
+  const zoom  = getZoomLevel();
   const extraCls = isSparkle ? " tba-marker-sparkle" : "";
-  return L.divIcon({
-    className: `tba-marker ${cls}${extraCls}`,
-    html: `<div class="tba-marker-inner"><img src="${escapeHtml(url)}" alt="" /></div>`,
-    iconSize: [34, 34], iconAnchor: [17, 17], popupAnchor: [0, -34],
+
+  // Zoom-based reveal:
+  // ≤12: tiny dot only
+  // 13-14: medium dot + icon
+  // ≥15: full marker
+  if (zoom <= 12) {
+    return L.divIcon({
+      className: `tba-marker tba-marker-dot ${cls}${extraCls}`,
+      html: `<div class="tba-dot"></div>`,
+      iconSize: [10, 10], iconAnchor: [5, 5], popupAnchor: [0, -8],
+    });
+  } else if (zoom <= 14) {
+    return L.divIcon({
+      className: `tba-marker tba-marker-mid ${cls}${extraCls}`,
+      html: `<div class="tba-mid-inner"><img src="${escapeHtml(url)}" alt="" /></div>`,
+      iconSize: [22, 22], iconAnchor: [11, 11], popupAnchor: [0, -14],
+    });
+  } else {
+    return L.divIcon({
+      className: `tba-marker tba-marker-full ${cls}${extraCls}`,
+      html: `<div class="tba-marker-inner"><img src="${escapeHtml(url)}" alt="" /></div>`,
+      iconSize: [34, 34], iconAnchor: [17, 17], popupAnchor: [0, -34],
+    });
+  }
+}
+
+// Refresh all marker icons when zoom changes
+function refreshAllMarkerIcons() {
+  if (!window._allLeafletMarkers) return;
+  window._allLeafletMarkers.forEach(({ leafletMarker, iconUrl, avg, count, greyed, isSparkle }) => {
+    leafletMarker.setIcon(makeMarkerIcon(iconUrl, avg, count, greyed, isSparkle));
   });
 }
 
@@ -382,6 +414,7 @@ async function initMap() {
     await reloadMarkers();
   }
 
+  MAP.on("zoomend", refreshAllMarkerIcons);
   MAP.on("click", async (e) => {
     const user = await maybeUser();
     if (!user || !ADD_MODE) return;

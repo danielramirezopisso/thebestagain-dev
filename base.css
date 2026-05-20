@@ -312,17 +312,57 @@ input:focus, select:focus, textarea:focus {
   display: grid !important;
   place-items: center !important;
 }
+/* ── Dot (zoom ≤12) ── */
+.tba-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.8);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.tba-marker-dot { background: transparent !important; }
+.tba-marker-dot.rating-9-10 .tba-dot { background: #1e5c3a; }
+.tba-marker-dot.rating-7-8  .tba-dot { background: #4a7c59; }
+.tba-marker-dot.rating-5-6  .tba-dot { background: #c8972a; }
+.tba-marker-dot.rating-3-4  .tba-dot { background: #e76f51; }
+.tba-marker-dot.rating-1-2  .tba-dot { background: #c1440e; }
+.tba-marker-dot.rating-none .tba-dot { background: #ccc; }
+body.colorblind .tba-marker-dot.rating-9-10 .tba-dot { background: #1a3f8f; }
+body.colorblind .tba-marker-dot.rating-7-8  .tba-dot { background: #2d6be4; }
+body.colorblind .tba-marker-dot.rating-3-4  .tba-dot { background: #e87722; }
+body.colorblind .tba-marker-dot.rating-1-2  .tba-dot { background: #b35c00; }
+
+/* ── Mid (zoom 13-14) ── */
+.tba-mid-inner {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.75);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+.tba-mid-inner img {
+  width: 58%; height: 58%;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+/* ── Full marker (zoom ≥15) ── */
 .tba-marker-inner {
-  width: 22px !important;
-  height: 22px !important;
-  display: grid !important;
-  place-items: center !important;
+  width: 100%; height: 100%;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden;
+  border: 2.5px solid rgba(255,255,255,0.75);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.28);
 }
 .tba-marker-inner img {
-  width: 22px !important;
-  height: 22px !important;
+  width: 60% !important;
+  height: 60% !important;
   object-fit: contain !important;
   display: block !important;
+  filter: brightness(0) invert(1);
 }
 
 /* ── ANIMATION ── */
