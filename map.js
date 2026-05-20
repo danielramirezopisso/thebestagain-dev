@@ -301,8 +301,8 @@ async function searchPlaceToAdd(q) {
   } catch(e) { res.innerHTML = '<div class="add-place-empty">Search unavailable.</div>'; }
 }
 
-function selectPlaceToAdd(idx) {
-  const d = addSearchResults[idx];
+function selectPlaceToAdd(idx, direct) {
+  const d = direct || addSearchResults[idx];
   if (!d) return;
 
   // Hide search, show form
@@ -320,6 +320,7 @@ function selectPlaceToAdd(idx) {
 }
 
 function showAddForm(nominatimResult) {
+  window._lastSearchResult = null; // consumed
   // Hide step 1
   document.getElementById('addStep1').style.display = 'none';
   document.getElementById('addPlaceResults').style.display = 'none';
@@ -858,6 +859,7 @@ function highlightResult(idx) {
 
 function selectSearchResult(idx) {
   const d = searchResults[idx]; if (!d) return;
+  window._lastSearchResult = d; // remember for add panel
   if (d.boundingbox) { const [s,n,w,e] = d.boundingbox.map(Number); MAP.fitBounds([[s,w],[n,e]], { maxZoom:17, padding:[30,30] }); }
   else MAP.setView([parseFloat(d.lat), parseFloat(d.lon)], 16);
   if (window._searchPin) window._searchPin.remove();
