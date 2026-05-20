@@ -350,8 +350,10 @@ function showAddForm(nominatimResult) {
 
     LAST_CLICK = { lat: parseFloat(lat), lon: parseFloat(lon) };
   } else {
-    // Manual mode — enable ADD_MODE
+    // Manual mode — enable ADD_MODE, show address field
     document.getElementById('addPlaceFound').style.display = 'none';
+    const aw = document.getElementById('m_address_wrap');
+    if (aw) aw.style.display = 'block';
     ADD_MODE = true;
     document.getElementById('m_title').value = '';
     document.getElementById('m_address').value = '';

@@ -197,13 +197,13 @@
             </div>
           </div>
 
-          <label style="margin-top:10px;">Address</label>
-          <input id="m_address" placeholder="Auto-filled" />
-
-          <div class="row2" style="margin-top:8px;">
-            <div><label>Lat</label><input id="m_lat" placeholder="auto" /></div>
-            <div><label>Lon</label><input id="m_lon" placeholder="auto" /></div>
+          <div id="m_address_wrap" style="display:none;">
+            <label style="margin-top:10px;">Address</label>
+            <input id="m_address" placeholder="Auto-filled" />
           </div>
+
+          <input type="hidden" id="m_lat" />
+          <input type="hidden" id="m_lon" />
 
           <div style="margin-top:12px; display:flex; gap:10px; align-items:center;">
             <button class="tba-btn tba-btn-primary" onclick="saveMapMarker()">Save place</button>
