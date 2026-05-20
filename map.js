@@ -573,7 +573,12 @@ async function initMap() {
     const user = await maybeUser();
     const panelOpen = document.getElementById("addPanel")?.classList.contains("map-panel-open");
     const inManualMode = ADD_MODE || panelOpen;
-    console.log("MAP CLICK", {user: !!user, panelOpen, ADD_MODE, inManualMode});
+    // Debug toast
+    const dbg = document.createElement("div");
+    dbg.style.cssText = "position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:8px 16px;border-radius:8px;z-index:9999;font-size:13px;";
+    dbg.textContent = "Click! user:" + !!user + " panel:" + panelOpen + " mode:" + ADD_MODE;
+    document.body.appendChild(dbg);
+    setTimeout(() => dbg.remove(), 3000);
     if (!user || !inManualMode) return;
 
     // If came from search result already, don't override
