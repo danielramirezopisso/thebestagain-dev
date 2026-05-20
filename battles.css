@@ -296,8 +296,12 @@
   transition: border-color 0.3s, opacity 0.3s;
 }
 .debate-img.is-winner {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(45,74,138,0.15);
+  border-color: #c8972a;
+  box-shadow: 0 0 0 2px rgba(200,151,42,0.25);
+}
+.debate-img.is-winner-b {
+  border-color: #4a7c59;
+  box-shadow: 0 0 0 2px rgba(74,124,89,0.25);
 }
 /* loser: no fade — winner border is enough signal */
 

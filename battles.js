@@ -217,7 +217,7 @@ function buildDebateBodyHtml(battle) {
   const imgsHtml = (hasImgA || hasImgB) ? `
     <div class="debate-imgs">
       ${hasImgA ? `<div class="debate-img${winnerA ? ' is-winner' : (hasVoted && !winnerA ? ' is-loser' : '')}" style="background-image:url('${esc(battle.image_a_url)}')"></div>` : ''}
-      ${hasImgB ? `<div class="debate-img${winnerB ? ' is-winner' : (hasVoted && !winnerB ? ' is-loser' : '')}" style="background-image:url('${esc(battle.image_b_url)}')"></div>` : ''}
+      ${hasImgB ? `<div class="debate-img${winnerB ? ' is-winner is-winner-b' : (hasVoted && !winnerB ? ' is-loser' : '')}" style="background-image:url('${esc(battle.image_b_url)}')"></div>` : ''}
     </div>` : '';
 
   const noOpLink = noOp
