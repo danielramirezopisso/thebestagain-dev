@@ -329,6 +329,10 @@ function showAddForm(nominatimResult) {
   const form = document.getElementById('addForm');
   form.style.display = 'block';
 
+  // Always hide address by default
+  const aw = document.getElementById('m_address_wrap');
+  if (aw) aw.style.display = 'none';
+
   if (nominatimResult) {
     const parts = (nominatimResult.display_name || '').split(', ');
     const name  = parts[0];
@@ -342,7 +346,7 @@ function showAddForm(nominatimResult) {
     document.getElementById('addPlaceFoundName').textContent = name;
     document.getElementById('addPlaceFoundAddr').textContent = addr;
 
-    // Fill fields
+    // Fill hidden fields
     document.getElementById('m_title').value   = name;
     document.getElementById('m_address').value = addr;
     document.getElementById('m_lat').value     = lat;
@@ -350,15 +354,18 @@ function showAddForm(nominatimResult) {
 
     LAST_CLICK = { lat: parseFloat(lat), lon: parseFloat(lon) };
   } else {
-    // Manual mode — enable ADD_MODE, show address field
+    // Manual mode — show address + instruction
     document.getElementById('addPlaceFound').style.display = 'none';
-    const aw = document.getElementById('m_address_wrap');
     if (aw) aw.style.display = 'block';
     ADD_MODE = true;
-    document.getElementById('m_title').value = '';
+    document.getElementById('m_title').value   = '';
     document.getElementById('m_address').value = '';
-    document.getElementById('m_lat').value = '';
-    document.getElementById('m_lon').value = '';
+    document.getElementById('m_lat').value     = '';
+    document.getElementById('m_lon').value     = '';
+
+    // Show tap-map instruction
+    const status = document.getElementById('saveStatus');
+    if (status) status.textContent = 'Tap the map to place the pin';
   }
 }
 
@@ -569,11 +576,9 @@ async function initMap() {
     qs("m_lat").value = LAST_CLICK.lat.toFixed(6);
     qs("m_lon").value = LAST_CLICK.lon.toFixed(6);
     if (PREVIEW_MARKER) PREVIEW_MARKER.setLatLng([LAST_CLICK.lat, LAST_CLICK.lon]);
-    else PREVIEW_MARKER = L.marker([LAST_CLICK.lat, LAST_CLICK.lon], { opacity: 0.7 }).addTo(MAP).bindPopup("New place location").openPopup();
-    qs("m_address").value = "";
-    setSaveStatus("Location selected ✅ Looking up address…");
-    try { const addr = await reverseGeocodeAddress(LAST_CLICK.lat, LAST_CLICK.lon); qs("m_address").value = addr; setSaveStatus("Address filled ✅ Now click Save."); }
-    catch { setSaveStatus("Address lookup failed (you can type it manually)."); }
+    else PREVIEW_MARKER = L.marker([LAST_CLICK.lat, LAST_CLICK.lon], { opacity: 0.7 }).addTo(MAP);
+    setSaveStatus("📍 Location set. Fill in name and save.");
+    try { const addr = await reverseGeocodeAddress(LAST_CLICK.lat, LAST_CLICK.lon); qs("m_address").value = addr; } catch {}
   });
 }
 
