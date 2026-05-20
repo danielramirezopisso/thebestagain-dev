@@ -311,12 +311,8 @@
     const isOpen = panel.classList.contains('map-panel-open');
     panel.classList.toggle('map-panel-collapsed', isOpen);
     panel.classList.toggle('map-panel-open', !isOpen);
-    if (!isOpen && typeof resetAddForm === 'function') {
-      resetAddForm();
-      // If user already searched on the main bar, pre-fill from that result
-      if (window._lastSearchResult) {
-        setTimeout(() => selectPlaceToAdd(-1, window._lastSearchResult), 150);
-      }
+    if (!isOpen) {
+      if (typeof resetAddForm === 'function') resetAddForm();
     }
   }
 
