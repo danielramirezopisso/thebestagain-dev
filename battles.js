@@ -178,7 +178,7 @@ function buildDebateRow(battle) {
   row.id = 'debate-' + battle.id;
 
   const voted = MY_VOTES[battle.id];
-  const desc  = getDescription(battle.question);
+  const desc  = battle.description || getDescription(battle.question);
 
   row.innerHTML = `
     <div class="debate-question">${esc(battle.question)}</div>

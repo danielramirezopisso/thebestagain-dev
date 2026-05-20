@@ -416,21 +416,58 @@
 
   <!-- Battle Modal -->
   <div id="battleModal" class="modal-overlay" style="display:none;" onclick="closeModalOnBg(event,'battleModal')">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width:560px;max-height:90vh;overflow-y:auto;">
       <div class="modal-head">
         <span id="battleModalTitle">New Battle</span>
         <button class="modal-close" onclick="closeModal('battleModal')">✕</button>
       </div>
       <input type="hidden" id="battle_id" />
+
+      <label>Category / Section</label>
+      <select id="battle_category_order" style="width:100%;margin-bottom:12px;">
+        <option value="1">1 — Tortilla</option>
+        <option value="2">2 — Croqueta</option>
+        <option value="3">3 — Vermut</option>
+        <option value="4">4 — Bravas</option>
+        <option value="5">5 — Cheesecake</option>
+        <option value="6">6 — General</option>
+        <option value="7">7 — Bebidas</option>
+        <option value="8">8 — Postres</option>
+        <option value="99">99 — Other</option>
+      </select>
+
       <label>Question</label>
       <input id="battle_question" placeholder="e.g. ¿Tortilla con o sin cebolla?" />
-      <label>Option A</label>
-      <input id="battle_option_a" placeholder="e.g. Con cebolla" />
-      <label>Option B</label>
-      <input id="battle_option_b" placeholder="e.g. Sin cebolla" />
-      <label>Position (order)</label>
-      <input id="battle_position" type="number" placeholder="1" />
-      <span id="battleModalStatus" class="muted"></span>
+
+      <label>Description <span class="muted" style="font-weight:400;">(shown below the question)</span></label>
+      <textarea id="battle_description" rows="2" placeholder="e.g. La pregunta que divide familias…" style="width:100%;box-sizing:border-box;padding:8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;resize:vertical;"></textarea>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
+        <div>
+          <label>Option A</label>
+          <input id="battle_option_a" placeholder="e.g. Con cebolla" />
+          <label style="margin-top:8px;">Image A URL</label>
+          <input id="battle_image_a" placeholder="https://thebestagain.com/icons/battles/…" />
+          <div id="battle_preview_a" style="margin-top:6px;"></div>
+        </div>
+        <div>
+          <label>Option B</label>
+          <input id="battle_option_b" placeholder="e.g. Sin cebolla" />
+          <label style="margin-top:8px;">Image B URL</label>
+          <input id="battle_image_b" placeholder="https://thebestagain.com/icons/battles/…" />
+          <div id="battle_preview_b" style="margin-top:6px;"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:8px;">
+        <label>Available battle images</label>
+        <div id="battleImgPicker" class="battle-img-picker"></div>
+      </div>
+
+      <label style="margin-top:8px;">Position (order within category)</label>
+      <input id="battle_position" type="number" placeholder="1" style="width:80px;" />
+
+      <span id="battleModalStatus" class="muted" style="display:block;margin-top:8px;"></span>
       <div style="display:flex;gap:10px;margin-top:12px;">
         <button class="tba-btn tba-btn-primary" onclick="saveBattle()">Save</button>
         <button onclick="closeModal('battleModal')">Cancel</button>

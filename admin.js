@@ -800,26 +800,73 @@ async function loadBattlesAdmin() {
     </table>`;
 }
 
+// Available battle images from repo
+const BATTLE_IMGS = [
+  'tortilla_con_cebolla.jpeg','tortilla_sin_cebolla.jpg','tortilla_babosa.jpg','tortilla_seca.jpg',
+  'cheeseburguer_mcdonalds.jpg','cheesebuguer_burguerking.png','fries_mcdonalds.jpg','fries_burguerking.jpg',
+  'cerveza.jpg','vino.jpeg','cocacola.jpg','pepsi.jpg','kas.jpg','fanta.jpg',
+  'croqueta_jamon.jpg','croqueta_pollo.jpg','nocilla.jpg','nutella.jpg',
+  'colacao.jpg','nesquick.jpeg','churros.jpg','porras.jpg',
+  'pizza_con_piña.jpg','pickles.jpg','desayno_dulce.jpg','bordes_pizza.jpg'
+];
+const BATTLE_IMG_BASE = 'https://thebestagain.com/icons/battles/';
+
 async function openBattleModal(battleId) {
   document.getElementById('battleModalTitle').textContent = battleId ? 'Edit Battle' : 'New Battle';
-  document.getElementById('battle_id').value       = battleId || '';
-  document.getElementById('battle_question').value = '';
-  document.getElementById('battle_option_a').value = '';
-  document.getElementById('battle_option_b').value = '';
-  document.getElementById('battle_position').value = '';
+  document.getElementById('battle_id').value            = battleId || '';
+  document.getElementById('battle_question').value      = '';
+  document.getElementById('battle_description').value   = '';
+  document.getElementById('battle_option_a').value      = '';
+  document.getElementById('battle_option_b').value      = '';
+  document.getElementById('battle_image_a').value       = '';
+  document.getElementById('battle_image_b').value       = '';
+  document.getElementById('battle_position').value      = '';
+  document.getElementById('battle_category_order').value = '6';
   document.getElementById('battleModalStatus').textContent = '';
+  document.getElementById('battle_preview_a').innerHTML = '';
+  document.getElementById('battle_preview_b').innerHTML = '';
+
+  // Build image picker
+  const picker = document.getElementById('battleImgPicker');
+  picker.innerHTML = BATTLE_IMGS.map(img => `
+    <img src="${BATTLE_IMG_BASE}${img}" title="${img}"
+      class="battle-img-thumb"
+      onclick="pickBattleImg('${img}')"
+      onerror="this.style.display='none'" />`).join('');
 
   if (battleId) {
     const { data } = await sb.from('battles').select('*').eq('id', battleId).single();
     if (data) {
-      document.getElementById('battle_question').value = data.question || '';
-      document.getElementById('battle_option_a').value = data.option_a || '';
-      document.getElementById('battle_option_b').value = data.option_b || '';
-      document.getElementById('battle_position').value = data.position ?? '';
+      document.getElementById('battle_question').value       = data.question      || '';
+      document.getElementById('battle_description').value    = data.description   || '';
+      document.getElementById('battle_option_a').value       = data.option_a      || '';
+      document.getElementById('battle_option_b').value       = data.option_b      || '';
+      document.getElementById('battle_image_a').value        = data.image_a_url   || '';
+      document.getElementById('battle_image_b').value        = data.image_b_url   || '';
+      document.getElementById('battle_position').value       = data.position      ?? '';
+      document.getElementById('battle_category_order').value = data.category_order ?? '6';
+      updateBattlePreview('a');
+      updateBattlePreview('b');
     }
   }
 
   document.getElementById('battleModal').style.display = 'flex';
+}
+
+let battleImgTarget = 'a'; // which option we are picking for
+function pickBattleImg(img) {
+  const url = BATTLE_IMG_BASE + img;
+  // Toggle between a and b on each click
+  document.getElementById('battle_image_' + battleImgTarget).value = url;
+  updateBattlePreview(battleImgTarget);
+  battleImgTarget = battleImgTarget === 'a' ? 'b' : 'a';
+}
+
+function updateBattlePreview(side) {
+  const url  = document.getElementById('battle_image_' + side)?.value.trim();
+  const prev = document.getElementById('battle_preview_' + side);
+  if (!prev) return;
+  prev.innerHTML = url ? `<img src="${url}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--border);" onerror="this.alt='Not found'" />` : '';
 }
 
 async function saveBattle() {
@@ -835,7 +882,11 @@ async function saveBattle() {
     return;
   }
 
-  const payload = { question, option_a, option_b, position };
+  const description  = document.getElementById('battle_description').value.trim() || null;
+  const image_a_url  = document.getElementById('battle_image_a').value.trim() || null;
+  const image_b_url  = document.getElementById('battle_image_b').value.trim() || null;
+  const category_order = parseInt(document.getElementById('battle_category_order').value) || 6;
+  const payload = { question, option_a, option_b, position, description, image_a_url, image_b_url, category_order };
   let error;
 
   if (id) {
