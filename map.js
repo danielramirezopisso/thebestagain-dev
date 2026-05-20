@@ -571,13 +571,28 @@ async function initMap() {
   MAP.on("zoomend", refreshAllMarkerIcons);
   MAP.on("click", async (e) => {
     const user = await maybeUser();
-    if (!user || !ADD_MODE) return;
+    const panelOpen = document.getElementById("addPanel")?.classList.contains("map-panel-open");
+    const inManualMode = ADD_MODE || panelOpen;
+    if (!user || !inManualMode) return;
+
+    // If came from search result already, don't override
+    if (LAST_CLICK && !ADD_MODE) return;
+
     LAST_CLICK = { lat: e.latlng.lat, lon: e.latlng.lng };
     qs("m_lat").value = LAST_CLICK.lat.toFixed(6);
     qs("m_lon").value = LAST_CLICK.lon.toFixed(6);
+
     if (PREVIEW_MARKER) PREVIEW_MARKER.setLatLng([LAST_CLICK.lat, LAST_CLICK.lon]);
-    else PREVIEW_MARKER = L.marker([LAST_CLICK.lat, LAST_CLICK.lon], { opacity: 0.7 }).addTo(MAP);
-    setSaveStatus("📍 Location set. Fill in name and save.");
+    else PREVIEW_MARKER = L.marker([LAST_CLICK.lat, LAST_CLICK.lon], { opacity: 0.8 }).addTo(MAP);
+
+    // Show the form with manual mode
+    const form = document.getElementById("addForm");
+    if (form) form.style.display = "block";
+    document.getElementById("addStep1").style.display = "none";
+    const aw = document.getElementById("m_address_wrap");
+    if (aw) aw.style.display = "block";
+
+    setSaveStatus("📍 Location set — fill in the name and save.");
     try { const addr = await reverseGeocodeAddress(LAST_CLICK.lat, LAST_CLICK.lon); qs("m_address").value = addr; } catch {}
   });
 }
