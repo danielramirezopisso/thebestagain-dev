@@ -70,7 +70,7 @@ function makeMarkerIcon(iconUrl, avg, count, greyed, isSparkle) {
   const zoom = getZoomLevel();
   const extraCls = isSparkle ? " tba-marker-sparkle" : "";
 
-  if (zoom <= 13) {
+  if (zoom <= 12) {
     // Tiny colored dot — no icon, no wrapper class confusion
     // Get color directly from rating
     const dotColor = greyed ? "#ccc" : ratingToColor(avg, count);
@@ -79,7 +79,7 @@ function makeMarkerIcon(iconUrl, avg, count, greyed, isSparkle) {
       html: `<div style="width:10px;height:10px;border-radius:50%;background:${dotColor};border:2px solid rgba(255,255,255,0.85);box-shadow:0 1px 4px rgba(0,0,0,0.3);"></div>`,
       iconSize: [10, 10], iconAnchor: [5, 5], popupAnchor: [0, -8],
     });
-  } else if (zoom === 14) {
+  } else if (zoom <= 14) {
     // Medium circle + icon
     const bgColor = greyed ? "#ccc" : ratingToColor(avg, count);
     return L.divIcon({
@@ -597,6 +597,8 @@ async function reloadMarkers() {
 
   setMapStatus(`Loaded ${markers.length} place(s).`);
   tryFocusMarker();
+  // Apply correct icon size for current zoom
+  refreshAllMarkerIcons();
 }
 
 async function saveMapMarker() {
