@@ -228,7 +228,7 @@ function buildDebateBodyHtml(battle) {
     <div class="debate-body-wrap${hasVoted ? ' has-voted' : ''}">
       ${imgsHtml}
       <div class="debate-options">
-        <div class="debate-option${chosenA ? ' is-chosen' : ''}" onclick="toggleFeedVote('${battle.id}','a')">
+        <div class="debate-option${chosenA ? ' is-chosen' : ''}" data-choice="a" onclick="toggleFeedVote('${battle.id}','a')">
           <div class="debate-option-dot debate-option-dot-a"></div>
           <div class="debate-option-info">
             <div class="debate-option-label">${esc(battle.option_a)}</div>
@@ -239,7 +239,7 @@ function buildDebateBodyHtml(battle) {
             <div class="debate-option-radio${chosenA ? ' is-filled' : ''}"></div>
           </div>
         </div>
-        <div class="debate-option${chosenB ? ' is-chosen' : ''}" onclick="toggleFeedVote('${battle.id}','b')">
+        <div class="debate-option${chosenB ? ' is-chosen' : ''}" data-choice="b" onclick="toggleFeedVote('${battle.id}','b')">
           <div class="debate-option-dot debate-option-dot-b"></div>
           <div class="debate-option-info">
             <div class="debate-option-label">${esc(battle.option_b)}</div>
