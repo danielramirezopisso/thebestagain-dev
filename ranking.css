@@ -3,7 +3,7 @@
    Editorial magazine aesthetic
 ══════════════════════════════════════ */
 
-.ranking-page { background: var(--bg, #fafaf8); min-height: 100dvh; }
+.ranking-page { background: var(--page-bg); min-height: 100dvh; }
 
 .ranking-main {
   max-width: 1100px;

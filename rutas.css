@@ -2,7 +2,7 @@
    RUTAS PAGE v2
 ══════════════════════════════════════ */
 
-.rutas-page { background: var(--bg, #fafaf8); min-height: 100dvh; }
+.rutas-page { background: var(--page-bg); min-height: 100dvh; }
 
 .rutas-main {
   max-width: 960px;
