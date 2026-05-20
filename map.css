@@ -989,10 +989,7 @@ body.map-page{
   100% { transform: translate(-50%,-50%) scale(2);   opacity: 0; }
 }
 
-/* Hide Leaflet zoom controls on mobile — pinch to zoom instead */
-@media (max-width: 768px) {
-  .leaflet-control-zoom { display: none !important; }
-}
+/* Zoom controls visible on all screen sizes */
 /* ══════════════════════════════
    SEARCH-TO-ADD PANEL
 ══════════════════════════════ */
