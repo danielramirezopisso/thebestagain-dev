@@ -251,6 +251,12 @@ body.map-page{
     padding: 4px 9px;
   }
   /* Add panel works on mobile too */
+  /* iOS auto-zoom fix — inputs must be 16px+ */
+  .map-panel input,
+  .map-panel select,
+  .add-place-search {
+    font-size: 16px !important;
+  }
 }
 
 /* ══════════════════════════════
@@ -1038,10 +1044,12 @@ body.map-page{
 
 /* Leaflet attribution — behind all panels */
 .leaflet-control-attribution {
-  z-index: 100 !important;
+  z-index: 1 !important;
   font-size: 9px !important;
-  opacity: 0.6;
+  opacity: 0.5;
+  position: relative !important;
 }
+.leaflet-bottom { z-index: 1 !important; }
 
 /* Add panel on mobile — scroll when keyboard appears */
 @media (max-width: 768px) {
