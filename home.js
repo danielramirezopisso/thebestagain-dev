@@ -154,7 +154,7 @@ async function initHomeMap() {
   const places = ALL_MARKERS
     .filter(m => m.group_type === "place" && m.lat && m.lon)
     .sort((a, b) => Number(b.rating_avg ?? 0) - Number(a.rating_avg ?? 0))
-    .slice(0, 80);
+    .slice(0, 300);
 
   places.forEach(m => {
     const leafIcon = L.divIcon({
