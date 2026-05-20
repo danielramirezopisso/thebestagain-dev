@@ -848,9 +848,142 @@ async function saveBattle() {
 
   closeModal('battleModal');
   loadBattlesAdmin();
+  loadAnalytics();
 }
 
 async function toggleBattleActive(battleId, currentActive) {
   await sb.from('battles').update({ is_active: !currentActive }).eq('id', battleId);
   loadBattlesAdmin();
+  loadAnalytics();
+}
+
+/* ══════════════════════════════════════════════════════
+   ANALYTICS SECTION
+══════════════════════════════════════════════════════ */
+async function loadAnalytics() {
+  const sub = document.getElementById('analyticsSub');
+  if (sub) sub.textContent = 'Loading…';
+
+  // Fetch votes and markers in parallel
+  const [votesRes, markersRes] = await Promise.all([
+    sb.from('votes')
+      .select('id,user_id,created_at,vote,is_active')
+      .eq('is_active', true)
+      .order('created_at', { ascending: true })
+      .limit(100000),
+    sb.from('markers')
+      .select('id,created_by,created_at,rating_avg,is_active')
+      .eq('is_active', true)
+      .order('created_at', { ascending: true })
+  ]);
+
+  const votes   = votesRes.data   || [];
+  const markers = markersRes.data || [];
+
+  // ── KPIs ──
+  const uniqueUsers = new Set(votes.map(v => v.user_id));
+  const avgScore = votes.length
+    ? (votes.reduce((s, v) => s + Number(v.vote), 0) / votes.length).toFixed(2)
+    : '—';
+
+  document.getElementById('kpiUsers').textContent   = uniqueUsers.size;
+  document.getElementById('kpiVotes').textContent   = votes.length.toLocaleString();
+  document.getElementById('kpiMarkers').textContent = markers.length.toLocaleString();
+  document.getElementById('kpiAvg').textContent     = avgScore;
+  if (sub) sub.textContent = `${uniqueUsers.size} users · ${votes.length} votes`;
+
+  // ── Weekly buckets ──
+  function weekKey(iso) {
+    const d = new Date(iso);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    const mon = new Date(d.setDate(diff));
+    return mon.toISOString().split('T')[0];
+  }
+
+  const votesByWeek = {};
+  votes.forEach(v => {
+    const k = weekKey(v.created_at);
+    votesByWeek[k] = (votesByWeek[k] || 0) + 1;
+  });
+
+  // New users by week (first vote date per user)
+  const firstVote = {};
+  votes.forEach(v => {
+    if (!firstVote[v.user_id] || v.created_at < firstVote[v.user_id])
+      firstVote[v.user_id] = v.created_at;
+  });
+  const usersByWeek = {};
+  Object.values(firstVote).forEach(iso => {
+    const k = weekKey(iso);
+    usersByWeek[k] = (usersByWeek[k] || 0) + 1;
+  });
+
+  // Build labels — last 16 weeks
+  const weeks = [...new Set([...Object.keys(votesByWeek), ...Object.keys(usersByWeek)])].sort().slice(-16);
+  const labels = weeks.map(w => w.slice(5)); // MM-DD
+
+  const accent = '#2d4a8a';
+  const soft   = 'rgba(45,74,138,0.15)';
+
+  // ── Votes chart ──
+  const ctxV = document.getElementById('chartVotes')?.getContext('2d');
+  if (ctxV) {
+    new Chart(ctxV, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{ label: 'Votes', data: weeks.map(w => votesByWeek[w] || 0),
+          backgroundColor: accent, borderRadius: 4 }]
+      },
+      options: { plugins: { legend: { display: false } }, scales: {
+        x: { grid: { display: false } },
+        y: { beginAtZero: true, grid: { color: soft } }
+      }}
+    });
+  }
+
+  // ── Users chart ──
+  const ctxU = document.getElementById('chartUsers')?.getContext('2d');
+  if (ctxU) {
+    new Chart(ctxU, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{ label: 'New users', data: weeks.map(w => usersByWeek[w] || 0),
+          backgroundColor: '#2d8653', borderRadius: 4 }]
+      },
+      options: { plugins: { legend: { display: false } }, scales: {
+        x: { grid: { display: false } },
+        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: soft } }
+      }}
+    });
+  }
+
+  // ── Users table ──
+  const userVotes   = {};
+  const userMarkers = {};
+  const userFirst   = {};
+  votes.forEach(v => {
+    userVotes[v.user_id]  = (userVotes[v.user_id] || 0) + 1;
+    if (!userFirst[v.user_id] || v.created_at < userFirst[v.user_id])
+      userFirst[v.user_id] = v.created_at;
+  });
+  markers.forEach(m => {
+    if (m.created_by)
+      userMarkers[m.created_by] = (userMarkers[m.created_by] || 0) + 1;
+  });
+
+  const sorted = Object.entries(userVotes).sort((a, b) => b[1] - a[1]);
+  const tbody = document.getElementById('usersBody');
+  if (tbody) {
+    tbody.innerHTML = sorted.map(([uid, vcount], i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td class="muted" style="font-size:11px;font-family:monospace">${uid.substring(0,8)}…</td>
+        <td><strong>${vcount}</strong></td>
+        <td>${userMarkers[uid] || 0}</td>
+        <td class="muted">${userFirst[uid] ? new Date(userFirst[uid]).toLocaleDateString('es-ES') : '—'}</td>
+      </tr>`).join('');
+  }
 }
