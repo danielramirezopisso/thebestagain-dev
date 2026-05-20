@@ -70,7 +70,7 @@ function makeMarkerIcon(iconUrl, avg, count, greyed, isSparkle) {
   const zoom = getZoomLevel();
   const extraCls = isSparkle ? " tba-marker-sparkle" : "";
 
-  if (zoom <= 12) {
+  if (zoom <= 13) {
     // Tiny colored dot — no icon, no wrapper class confusion
     // Get color directly from rating
     const dotColor = greyed ? "#ccc" : ratingToColor(avg, count);
@@ -79,7 +79,7 @@ function makeMarkerIcon(iconUrl, avg, count, greyed, isSparkle) {
       html: `<div style="width:10px;height:10px;border-radius:50%;background:${dotColor};border:2px solid rgba(255,255,255,0.85);box-shadow:0 1px 4px rgba(0,0,0,0.3);"></div>`,
       iconSize: [10, 10], iconAnchor: [5, 5], popupAnchor: [0, -8],
     });
-  } else if (zoom <= 14) {
+  } else if (zoom === 14) {
     // Medium circle + icon
     const bgColor = greyed ? "#ccc" : ratingToColor(avg, count);
     return L.divIcon({
@@ -119,9 +119,17 @@ function ratingToColor(avg, count) {
 
 // Refresh all marker icons when zoom changes
 function refreshAllMarkerIcons() {
-  if (!window._allLeafletMarkers) return;
-  window._allLeafletMarkers.forEach(({ leafletMarker, iconUrl, avg, count, greyed, isSparkle }) => {
-    leafletMarker.setIcon(makeMarkerIcon(iconUrl, avg, count, greyed, isSparkle));
+  if (!LEAFLET_MARKERS_BY_ID || !MARKER_DATA_BY_ID) return;
+  Object.entries(LEAFLET_MARKERS_BY_ID).forEach(([id, mk]) => {
+    const m = MARKER_DATA_BY_ID[id];
+    if (!m) return;
+    const avg = Number(m.rating_avg ?? 0);
+    const cnt = Number(m.rating_count ?? 0);
+    const iconUrl = getIconUrlForCategory(m.category_id);
+    const greyed = JOURNEY_MODE && !MY_VOTED_IDS.has(id);
+    const displayAvg = (JOURNEY_MODE && window.MY_VOTE_SCORES_MAP?.[id])
+      ? Number(window.MY_VOTE_SCORES_MAP[id]) : avg;
+    mk.setIcon(makeMarkerIcon(iconUrl, displayAvg, cnt, greyed, false));
   });
 }
 
