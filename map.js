@@ -70,18 +70,25 @@ function makeMarkerIcon(iconUrl, avg, count, greyed, isSparkle) {
   const zoom = getZoomLevel();
   const extraCls = isSparkle ? " tba-marker-sparkle" : "";
 
-  if (zoom <= 12) {
-    // Tiny colored dot — no icon, no wrapper class confusion
-    // Get color directly from rating
-    const dotColor = greyed ? "#ccc" : ratingToColor(avg, count);
+  // When unfiltered (many markers), shift thresholds up by 1 zoom level
+  // to reduce clutter — dots appear sooner, icons appear later
+  const filtered = !!FILTER_CATEGORY;
+  const dotThreshold  = filtered ? 12 : 13;
+  const midThreshold  = filtered ? 14 : 15;
+  // ≥16 always full when filtered, ≥16 full when unfiltered too
+
+  const dotColor = greyed ? "#ccc" : ratingToColor(avg, count);
+  const bgColor  = dotColor;
+
+  if (zoom <= dotThreshold) {
+    // Tiny colored dot — no icon
     return L.divIcon({
       className: "",
       html: `<div style="width:10px;height:10px;border-radius:50%;background:${dotColor};border:2px solid rgba(255,255,255,0.85);box-shadow:0 1px 4px rgba(0,0,0,0.3);"></div>`,
       iconSize: [10, 10], iconAnchor: [5, 5], popupAnchor: [0, -8],
     });
-  } else if (zoom <= 14) {
+  } else if (zoom <= midThreshold) {
     // Medium circle + icon
-    const bgColor = greyed ? "#ccc" : ratingToColor(avg, count);
     return L.divIcon({
       className: "",
       html: `<div style="width:22px;height:22px;border-radius:50%;background:${bgColor};border:2px solid rgba(255,255,255,0.8);box-shadow:0 2px 6px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;overflow:hidden;"><img src="${escapeHtml(url)}" style="width:13px;height:13px;object-fit:contain;filter:brightness(0) invert(1);" alt=""/></div>`,
@@ -89,7 +96,6 @@ function makeMarkerIcon(iconUrl, avg, count, greyed, isSparkle) {
     });
   } else {
     // Full circle + icon
-    const bgColor = greyed ? "#ccc" : ratingToColor(avg, count);
     return L.divIcon({
       className: `tba-marker ${extraCls}`,
       html: `<div style="width:34px;height:34px;border-radius:50%;background:${bgColor};border:2.5px solid rgba(255,255,255,0.85);box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;"><img src="${escapeHtml(url)}" style="width:20px;height:20px;object-fit:contain;filter:brightness(0) invert(1);" alt=""/></div>`,
@@ -176,6 +182,7 @@ function showClearIfNeeded() {
 
 function clearFilters() {
   FILTER_CATEGORY = ""; FILTER_RATING_BUCKET = ""; FILTER_CHAINS = true;
+  refreshAllMarkerIcons();
   qs("catMore").value = "";
   const chainToggle = qs("chainToggle");
   if (chainToggle) chainToggle.checked = true;
@@ -192,6 +199,7 @@ function onCategoryMoreChanged() {
   const v = qs("catMore").value;
   if (!v) return;
   FILTER_CATEGORY = v;
+  refreshAllMarkerIcons();
   renderCategoryQuickChips(); showClearIfNeeded(); reloadMarkers();
 }
 
