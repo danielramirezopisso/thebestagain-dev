@@ -104,7 +104,7 @@ body.map-page{
 /* FAB button */
 .map-add-fab {
   position: absolute;
-  bottom: 88px; right: 12px;
+  bottom: 28px; right: 12px;
   width: 44px; height: 44px;
   border-radius: 999px;
   background: var(--accent);
