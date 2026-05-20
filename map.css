@@ -1035,3 +1035,24 @@ body.map-page{
   font-size: 11px; color: var(--accent); cursor: pointer;
   padding: 0; font-weight: 600; text-decoration: underline;
 }
+
+/* Leaflet attribution — behind all panels */
+.leaflet-control-attribution {
+  z-index: 100 !important;
+  font-size: 9px !important;
+  opacity: 0.6;
+}
+
+/* Add panel on mobile — scroll when keyboard appears */
+@media (max-width: 768px) {
+  .map-panel {
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+  }
+  /* When keyboard is open, panel shrinks to fit */
+  @supports (height: 100dvh) {
+    .map-panel {
+      max-height: 50dvh !important;
+    }
+  }
+}
