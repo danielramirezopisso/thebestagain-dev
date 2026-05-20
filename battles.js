@@ -30,7 +30,7 @@ const DEBATE_DESCRIPTIONS = {
   "babosa": "Hay dos tipos de personas: las que buscan el centro jugoso y cremoso, y las que prefieren una textura más firme y consistente. ¿En qué bando estás?",
   "piña": "El debate más polarizante de la pizza. La piña en la pizza: ¿atrevida combinación agridulce o sacrilegio culinario imperdonable?",
   "bordes": "El crust de la pizza tiene sus fans incondicionales y sus detractores acérrimos. ¿Te comes los bordes hasta el final o los dejas en el plato?",
-  "McDonald": "Dos imperios, dos filosofías, una sola hambre. La cheeseburger definitiva: ¿la clásica de McDonald's o la del Burger King?",
+  "Cheeseburger": "Dos imperios, dos filosofías, una sola hambre. La cheeseburger definitiva: ¿la clásica de McDonald's o la del Burger King?",
   "pepinillo": "Pequeño, verde y muy controversial. El pepinillo en la hamburguesa: ¿le da ese toque ácido perfecto o arruina todo lo que toca?",
   "Patatas fritas": "La guarnición más icónica del fast food. ¿Las finas, ligeras y crujientes del arco dorado, o las gordas, sabrosas y con más mordida del rey?",
   "croqueta": "La croqueta es sagrada en España. Pero ¿cuál es la reina? ¿La suave y contundente de jamón ibérico o la delicada y cremosa de pollo?",
@@ -44,7 +44,10 @@ const DEBATE_DESCRIPTIONS = {
 };
 
 function getDescription(question) {
-  for (const [key, desc] of Object.entries(DEBATE_DESCRIPTIONS)) {
+  // Sort by key length desc — longer/more specific keys match first
+  const sorted = Object.entries(DEBATE_DESCRIPTIONS)
+    .sort((a, b) => b[0].length - a[0].length);
+  for (const [key, desc] of sorted) {
     if (question.includes(key)) return desc;
   }
   return '';
