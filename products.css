@@ -521,11 +521,11 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
   transition: opacity 0.15s;
 }
 /* Score box color */
-.prod-score[style*="#1e5c3a"],
-.prod-score[style*="#4a7c59"],
-.prod-score[style*="#c8972a"],
-.prod-score[style*="#e76f51"],
-.prod-score[style*="#c1440e"],
+.prod-score[style*="#2d8653"],
+.prod-score[style*="#6aab7e"],
+.prod-score[style*="#e8b84b"],
+.prod-score[style*="#f0906e"],
+.prod-score[style*="#e05c3a"],
 .prod-score[style*="#1a3f8f"],
 .prod-score[style*="#2d6be4"],
 .prod-score[style*="#e87722"],

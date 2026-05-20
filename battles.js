@@ -272,8 +272,8 @@ function buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted, winLabelA, winLab
     <div class="debate-pie-winner" style="visibility:hidden">—</div>`;
   }
 
-  const colorA = '#c8972a';  // amber — option A
-  const colorB = '#4a7c59';  // olive — option B
+  const colorA = '#e8b84b';  // amber — option A
+  const colorB = '#6aab7e';  // olive — option B
 
   const fillA = circ * Math.max(pctA, 0) / 100;
   const fillB = circ - fillA;

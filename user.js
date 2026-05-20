@@ -122,7 +122,7 @@ async function loadStats() {
 function getBadge(score) {
   if (score >= 200) return { label:"🏆 Legend",      bg:"#1a1714", color:"#f5d97a", next:"You're at the top!" };
   if (score >= 100) return { label:"⭐ Expert",       bg:"#2d5a3d", color:"#fff",    next:`${200-score} pts to Legend` };
-  if (score >= 50)  return { label:"🍴 Connoisseur", bg:"#4a7c59", color:"#fff",    next:`${100-score} pts to Expert` };
+  if (score >= 50)  return { label:"🍴 Connoisseur", bg:"#6aab7e", color:"#fff",    next:`${100-score} pts to Expert` };
   if (score >= 20)  return { label:"🌱 Explorer",    bg:"#7a9e7e", color:"#fff",    next:`${50-score} pts to Connoisseur` };
   return               { label:"👋 Newcomer",    bg:"var(--faint)", color:"var(--muted)", next:`${20-score} pts to Explorer` };
 }
@@ -197,7 +197,7 @@ async function loadWishlist() {
     const isPlace = m.group_type === "place";
     const sub = cat?.name || "";
     const scoreColor = cnt
-      ? (avg >= 9 ? "#1e5c3a" : avg >= 7 ? "#4a7c59" : avg >= 5 ? "#c8972a" : avg >= 3 ? "#e76f51" : "#c1440e")
+      ? (avg >= 9 ? "#2d8653" : avg >= 7 ? "#6aab7e" : avg >= 5 ? "#e8b84b" : avg >= 3 ? "#f0906e" : "#e05c3a")
       : null;
     const sizeClass = i === 0 ? "vote-row-1" : i === 1 ? "vote-row-2" : i < 4 ? "vote-row-3" : "";
 
@@ -291,7 +291,7 @@ async function loadPlaces() {
     const score    = voteMap[m.id];
     const inactive = !m.is_active;
     const scoreColor = score != null
-      ? (score >= 9 ? "#1e5c3a" : score >= 7 ? "#4a7c59" : score >= 5 ? "#c8972a" : score >= 3 ? "#e76f51" : "#c1440e")
+      ? (score >= 9 ? "#2d8653" : score >= 7 ? "#6aab7e" : score >= 5 ? "#e8b84b" : score >= 3 ? "#f0906e" : "#e05c3a")
       : null;
     const scoreBadge = scoreColor
       ? `<div class="vote-score-badge" style="background:${scoreColor}">${Number(score).toFixed(0)}</div>`
@@ -567,7 +567,7 @@ async function loadComments() {
     const m = markerMap[d.marker_id] || {};
     const avg = Number(m.rating_avg ?? 0);
     const cnt = Number(m.rating_count ?? 0);
-    const scoreColor = cnt ? (avg >= 9 ? "#1e5c3a" : avg >= 7 ? "#4a7c59" : avg >= 5 ? "#c8972a" : avg >= 3 ? "#e76f51" : "#c1440e") : null;
+    const scoreColor = cnt ? (avg >= 9 ? "#2d8653" : avg >= 7 ? "#6aab7e" : avg >= 5 ? "#e8b84b" : avg >= 3 ? "#f0906e" : "#e05c3a") : null;
     const scoreBadge = scoreColor
       ? `<div class="vote-score-badge" style="background:${scoreColor};font-size:13px;">${avg.toFixed(1)}</div>`
       : "";

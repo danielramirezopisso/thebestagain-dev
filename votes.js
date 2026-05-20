@@ -300,11 +300,11 @@ function renderVoteRow(v, globalIdx, posInCat) {
 }
 
 function getScoreColor(s) {
-  if (s >= 9) return '#1e5c3a';
-  if (s >= 7) return '#4a7c59';
-  if (s >= 5) return '#c8972a';
-  if (s >= 3) return '#e76f51';
-  return '#c1440e';
+  if (s >= 9) return '#2d8653';
+  if (s >= 7) return '#6aab7e';
+  if (s >= 5) return '#e8b84b';
+  if (s >= 3) return '#f0906e';
+  return '#e05c3a';
 }
 
 function toggleVoteScores(id) {
