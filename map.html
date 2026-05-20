@@ -306,14 +306,16 @@
 
   <script>
   function toggleAddPanel() {
-    const panel = document.getElementById('addPanel');
-    if (!panel) return;
-    const isOpen = panel.classList.contains('map-panel-open');
-    panel.classList.toggle('map-panel-collapsed', isOpen);
-    panel.classList.toggle('map-panel-open', !isOpen);
-    if (!isOpen) {
-      if (typeof resetAddForm === 'function') resetAddForm();
-    }
+    try {
+      const panel = document.getElementById('addPanel');
+      if (!panel) return;
+      const isOpen = panel.classList.contains('map-panel-open');
+      panel.classList.toggle('map-panel-collapsed', isOpen);
+      panel.classList.toggle('map-panel-open', !isOpen);
+      if (!isOpen && typeof resetAddForm === 'function') {
+        try { resetAddForm(); } catch(e) { console.warn('resetAddForm error:', e); }
+      }
+    } catch(e) { console.error('toggleAddPanel error:', e); }
   }
 
   function openFilterDrawer(e) {
