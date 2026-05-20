@@ -1236,3 +1236,57 @@ function escH(s) {
 
 // Init: add one empty brand row on load
 document.addEventListener('DOMContentLoaded', () => { addBrandRow(); });
+
+/* ══════════════════════════════════════════════════════
+   ICON PICKER
+══════════════════════════════════════════════════════ */
+const LUCIDE_BASE = 'https://unpkg.com/lucide-static@latest/icons/';
+const FOOD_ICONS = [
+  'pizza','beef','egg','fish','salad','sandwich','cookie','cake','ice-cream-cone',
+  'coffee','cup-soda','beer','wine','milk','soup','apple','carrot','cherry',
+  'croissant','utensils','chef-hat','flame','store','map-pin','star',
+  'leaf','banana','citrus','ham','drumstick','popcorn','candy',
+  'donut','bread-slice','bottle-wine','glass-water','flask-conical','lemon',
+  'mushroom','pepper','strawberry','grape','nut','shrimp','clover',
+  'bowl-cereal','egg-fried','coffee-cup','beer-off','archive'
+];
+
+let iconTargetField = null;
+
+function openIconPicker(fieldId) {
+  iconTargetField = fieldId;
+  filterIcons('');
+  document.getElementById('iconSearch').value = '';
+  document.getElementById('iconCustomUrl').value = '';
+  document.getElementById('iconPickerModal').style.display = 'flex';
+}
+
+function filterIcons(q) {
+  const grid = document.getElementById('iconGrid');
+  const filtered = q ? FOOD_ICONS.filter(i => i.includes(q.toLowerCase())) : FOOD_ICONS;
+  grid.innerHTML = filtered.map(name => `
+    <div class="icon-thumb" onclick="selectIcon('${name}')" title="${name}">
+      <img src="${LUCIDE_BASE}${name}.svg" alt="${name}"
+        onerror="this.closest('.icon-thumb').style.display='none'" />
+      <div class="icon-label">${name}</div>
+    </div>`).join('');
+}
+
+function selectIcon(name) {
+  const url = LUCIDE_BASE + name + '.svg';
+  if (iconTargetField) {
+    const el = document.getElementById(iconTargetField);
+    if (el) el.value = url;
+  }
+  closeModal('iconPickerModal');
+}
+
+function useCustomIconUrl() {
+  const url = document.getElementById('iconCustomUrl').value.trim();
+  if (!url) return;
+  if (iconTargetField) {
+    const el = document.getElementById(iconTargetField);
+    if (el) el.value = url;
+  }
+  closeModal('iconPickerModal');
+}
