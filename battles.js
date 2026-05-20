@@ -32,7 +32,7 @@ const DEBATE_DESCRIPTIONS = {
   "bordes": "El crust de la pizza tiene sus fans incondicionales y sus detractores acérrimos. ¿Te comes los bordes hasta el final o los dejas en el plato?",
   "McDonald": "Dos imperios, dos filosofías, una sola hambre. La cheeseburger definitiva: ¿la clásica de McDonald's o la del Burger King?",
   "pepinillo": "Pequeño, verde y muy controversial. El pepinillo en la hamburguesa: ¿le da ese toque ácido perfecto o arruina todo lo que toca?",
-  "Patatas fritas": "Las patatas fritas del fast food: ¿las finas y crujientes del arco dorado o las más gordas y sabrosas del rey?",
+  "Patatas fritas": "La guarnición más icónica del fast food. ¿Las finas, ligeras y crujientes del arco dorado, o las gordas, sabrosas y con más mordida del rey?",
   "croqueta": "La croqueta es sagrada en España. Pero ¿cuál es la reina? ¿La suave y contundente de jamón ibérico o la delicada y cremosa de pollo?",
   "Desayuno": "Un debate de toda la vida. ¿Empiezas el día con una tostada con tomate y aceite, o te vas a los bollos, croissants y chocolate?",
   "ColaCao": "El clásico del desayuno infantil español. ¿ColaCao con su textura característica o el suave Nesquick que se disuelve perfectamente?",
@@ -270,8 +270,8 @@ function buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted, winLabelA, winLab
   }
 
   // Blue family: dark blue for A, muted blue-grey for B
-  const colorA = '#2d4a8a';
-  const colorB = '#b0bcce';
+  const colorA = '#1e5c3a';
+  const colorB = '#e76f51';
 
   const fillA = circ * Math.max(pctA, 0) / 100;
   const fillB = circ - fillA;
