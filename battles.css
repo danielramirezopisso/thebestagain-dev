@@ -130,8 +130,8 @@
   position: relative; cursor: pointer;
 }
 .debate-radio.is-filled {
-  border-color: var(--accent);
-  background: var(--accent);
+  border-color: var(--debate-color, var(--accent));
+  background: var(--debate-color, var(--accent));
   transform: scale(1.1);
 }
 .debate-radio.is-filled::after {
@@ -142,7 +142,7 @@
   background: #fff; border-radius: 50%;
 }
 .debate-result-row:hover .debate-radio:not(.is-filled) {
-  border-color: var(--accent);
+  border-color: var(--debate-color, var(--accent));
   background: rgba(45,74,138,0.08);
 }
 
@@ -162,7 +162,7 @@
   border-radius: 999px; overflow: hidden;
 }
 .debate-result-bar {
-  height: 100%; background: var(--accent);
+  height: 100%; background: var(--debate-color, var(--accent));
   opacity: 0.25; border-radius: 999px;
   width: 0%;
   transition: width 0.8s cubic-bezier(0.16,1,0.3,1), opacity 0.3s;
@@ -198,14 +198,14 @@
 
 .debate-result-row.is-chosen .debate-result-label { color: var(--text); font-weight: 700; }
 .debate-result-row.is-chosen .debate-result-bar   { opacity: 0.65; }
-.debate-result-row.is-chosen .debate-result-pct   { color: var(--accent); }
+.debate-result-row.is-chosen .debate-result-pct   { color: var(--debate-color, var(--accent)); }
 
 .debate-result-row.is-leader .debate-result-label { color: var(--text); }
 .debate-result-row.is-leader .debate-result-bar   { opacity: 0.45; }
 .debate-result-row.is-leader .debate-result-pct   { color: var(--text); }
 
-.debate-result-row.is-chosen.is-leader .debate-result-pct   { color: var(--accent); }
-.debate-result-row.is-chosen.is-leader .debate-result-label { color: var(--accent); }
+.debate-result-row.is-chosen.is-leader .debate-result-pct   { color: var(--debate-color, var(--accent)); }
+.debate-result-row.is-chosen.is-leader .debate-result-label { color: var(--debate-color, var(--accent)); }
 
 /* No opinion — tiny ghost link */
 .debate-footer-inner {
@@ -453,3 +453,23 @@
 }
 
 /* pie-wrap defined above */
+
+/* ── Per-option debate colors ── */
+.debate-result-row[data-choice="a"] { --debate-color: #c8972a; }
+.debate-result-row[data-choice="b"] { --debate-color: #4a7c59; }
+
+/* Pie chart colors now in JS but dot colors here */
+.debate-option-dot-a { background: #c8972a !important; }
+.debate-option-dot-b { background: #4a7c59 !important; }
+
+/* Option chosen border/shadow */
+.debate-option.is-chosen {
+  border-color: var(--debate-opt-color, var(--accent)) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--debate-opt-color, var(--accent)) 20%, transparent) !important;
+}
+.debate-option[data-choice="a"] { --debate-opt-color: #c8972a; }
+.debate-option[data-choice="b"] { --debate-opt-color: #4a7c59; }
+.debate-option[data-choice="a"].is-chosen .debate-option-label { color: #c8972a; }
+.debate-option[data-choice="b"].is-chosen .debate-option-label { color: #4a7c59; }
+.debate-option[data-choice="a"].is-chosen .debate-option-pct { color: #c8972a; }
+.debate-option[data-choice="b"].is-chosen .debate-option-pct { color: #4a7c59; }
