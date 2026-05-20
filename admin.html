@@ -58,6 +58,79 @@
            SECTION: CATEGORIES
       ══════════════════════════════ -->
 
+
+      <!-- ══ QUICK ADD ══ -->
+      <section class="admin-section" id="sec-quickadd">
+        <div class="section-head" onclick="toggleSection('sec-quickadd')">
+          <div>
+            <div class="section-title">⚡ Quick Add</div>
+            <div class="section-sub">Bulk add brands or products fast</div>
+          </div>
+          <span class="section-chevron">▾</span>
+        </div>
+        <div class="section-body">
+
+          <!-- Tab switcher -->
+          <div class="qa-tabs">
+            <button class="qa-tab active" onclick="setQATab('brands')">🏷 Add Brands</button>
+            <button class="qa-tab" onclick="setQATab('products')">📦 Add Products</button>
+          </div>
+
+          <!-- BRANDS TAB -->
+          <div class="qa-panel" id="qa-brands">
+            <p class="admin-note">Type a brand name and its website domain — the logo is fetched automatically via Clearbit.</p>
+            <table class="qa-table" id="qaBrandTable">
+              <thead>
+                <tr>
+                  <th>Brand name</th>
+                  <th>Website domain</th>
+                  <th>Logo preview</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="qaBrandRows">
+                <!-- rows added by JS -->
+              </tbody>
+            </table>
+            <button class="qa-add-row-btn" onclick="addBrandRow()">+ Add row</button>
+            <div class="qa-foot">
+              <button class="tba-btn tba-btn-primary" onclick="saveAllBrands()">Save all brands</button>
+              <span id="qaBrandStatus" class="muted qa-status"></span>
+            </div>
+          </div>
+
+          <!-- PRODUCTS TAB -->
+          <div class="qa-panel" id="qa-products" style="display:none;">
+            <div class="qa-cat-pick">
+              <label class="edit-label">Category</label>
+              <select id="qaCatSelect" onchange="onQACatChange()">
+                <option value="">— pick a category —</option>
+              </select>
+            </div>
+            <div id="qaProductTableWrap" style="display:none;">
+              <p class="admin-note">One row per product. Brand can be existing or type a new name.</p>
+              <table class="qa-table" id="qaProductTable">
+                <thead>
+                  <tr>
+                    <th>Brand</th>
+                    <th>Product name <span class="muted">(optional)</span></th>
+                    <th>Logo preview</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="qaProductRows"></tbody>
+              </table>
+              <button class="qa-add-row-btn" onclick="addProductRow()">+ Add row</button>
+              <div class="qa-foot">
+                <button class="tba-btn tba-btn-primary" onclick="saveAllProducts()">Save all products</button>
+                <span id="qaProductStatus" class="muted qa-status"></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
       <!-- ══ ANALYTICS ══ -->
       <section class="admin-section" id="sec-analytics">
         <div class="section-head" onclick="toggleSection('sec-analytics')">

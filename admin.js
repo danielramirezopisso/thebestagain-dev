@@ -987,3 +987,201 @@ async function loadAnalytics() {
       </tr>`).join('');
   }
 }
+
+/* ══════════════════════════════════════════════════════
+   QUICK ADD — Brands & Products
+══════════════════════════════════════════════════════ */
+
+function setQATab(tab) {
+  document.querySelectorAll('.qa-tab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && tab === 'brands') || (i === 1 && tab === 'products'));
+  });
+  document.getElementById('qa-brands').style.display   = tab === 'brands'   ? 'block' : 'none';
+  document.getElementById('qa-products').style.display = tab === 'products' ? 'block' : 'none';
+  if (tab === 'products') populateQACatSelect();
+}
+
+/* ── Brand rows ── */
+let brandRowCount = 0;
+function addBrandRow(name = '', domain = '') {
+  const id = ++brandRowCount;
+  const tbody = document.getElementById('qaBrandRows');
+  const tr = document.createElement('tr');
+  tr.id = `brow-${id}`;
+  tr.innerHTML = `
+    <td><input class="qa-input" placeholder="e.g. Damm" value="${escH(name)}"
+      oninput="updateBrandPreview(${id})" id="bname-${id}" /></td>
+    <td><input class="qa-input" placeholder="e.g. damm.com" value="${escH(domain)}"
+      oninput="updateBrandPreview(${id})" id="bdomain-${id}" /></td>
+    <td id="bpreview-${id}" class="qa-preview">—</td>
+    <td><button class="qa-del-btn" onclick="document.getElementById('brow-${id}').remove()">✕</button></td>`;
+  tbody.appendChild(tr);
+  if (domain) updateBrandPreview(id);
+}
+
+function updateBrandPreview(id) {
+  const domain = document.getElementById(`bdomain-${id}`)?.value.trim();
+  const cell   = document.getElementById(`bpreview-${id}`);
+  if (!cell) return;
+  if (!domain) { cell.innerHTML = '—'; return; }
+  const url = `https://logo.clearbit.com/${domain}`;
+  cell.innerHTML = `<img src="${url}" class="qa-logo-preview" onerror="this.src='';this.alt='No logo'" alt="logo" />`;
+}
+
+async function saveAllBrands() {
+  const rows = document.querySelectorAll('#qaBrandRows tr');
+  const status = document.getElementById('qaBrandStatus');
+  if (!rows.length) { status.textContent = 'No rows to save.'; return; }
+
+  status.textContent = 'Saving…';
+  let saved = 0, skipped = 0;
+
+  for (const row of rows) {
+    const id = row.id.replace('brow-', '');
+    const name   = document.getElementById(`bname-${id}`)?.value.trim();
+    const domain = document.getElementById(`bdomain-${id}`)?.value.trim();
+    if (!name) { skipped++; continue; }
+
+    const icon_url = domain ? `https://logo.clearbit.com/${domain}` : null;
+    const { error } = await sb.from('brands').insert([{ name, icon_url, is_active: true }]);
+    if (error && error.code !== '23505') { status.textContent = `Error: ${error.message}`; return; }
+    saved++;
+  }
+
+  await loadBrands(); // refresh brand list
+  status.textContent = `✅ Saved ${saved} brand(s)${skipped ? `, ${skipped} skipped` : ''}.`;
+  document.getElementById('qaBrandRows').innerHTML = '';
+  brandRowCount = 0;
+}
+
+/* ── Product rows ── */
+let productRowCount = 0;
+
+function populateQACatSelect() {
+  const sel = document.getElementById('qaCatSelect');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— pick a category —</option>' +
+    ALL_CATEGORIES.filter(c => c.for_products && c.is_active)
+      .map(c => `<option value="${c.id}" ${c.id == current ? 'selected' : ''}>${escH(c.name)}</option>`)
+      .join('');
+}
+
+function onQACatChange() {
+  const val = document.getElementById('qaCatSelect').value;
+  document.getElementById('qaProductTableWrap').style.display = val ? 'block' : 'none';
+  if (val && !document.querySelectorAll('#qaProductRows tr').length) addProductRow();
+}
+
+function addProductRow(brandName = '', productName = '') {
+  const id = ++productRowCount;
+  const tbody = document.getElementById('qaProductRows');
+  const tr = document.createElement('tr');
+  tr.id = `prow-${id}`;
+
+  // Brand options — existing brands + "New: type name"
+  const brandOpts = ALL_BRANDS
+    .filter(b => b.is_active)
+    .map(b => `<option value="${b.id}" ${b.name === brandName ? 'selected' : ''}>${escH(b.name)}</option>`)
+    .join('');
+
+  tr.innerHTML = `
+    <td>
+      <select class="qa-input" id="pbrand-${id}" onchange="onProductBrandChange(${id})">
+        <option value="">— existing brand —</option>
+        ${brandOpts}
+        <option value="__new__">＋ New brand…</option>
+      </select>
+      <input class="qa-input qa-new-brand" id="pnewbrand-${id}" placeholder="New brand name"
+        style="display:none;margin-top:4px;" oninput="updateProductLogo(${id})" />
+      <input class="qa-input qa-new-brand" id="pnewdomain-${id}" placeholder="Domain (for logo)"
+        style="display:none;margin-top:4px;" oninput="updateProductLogo(${id})" />
+    </td>
+    <td><input class="qa-input" id="pname-${id}" placeholder="Product name (optional)"
+      value="${escH(productName)}" /></td>
+    <td id="ppreview-${id}" class="qa-preview">—</td>
+    <td><button class="qa-del-btn" onclick="document.getElementById('prow-${id}').remove()">✕</button></td>`;
+  tbody.appendChild(tr);
+}
+
+function onProductBrandChange(id) {
+  const val = document.getElementById(`pbrand-${id}`)?.value;
+  const isNew = val === '__new__';
+  document.getElementById(`pnewbrand-${id}`).style.display = isNew ? 'block' : 'none';
+  document.getElementById(`pnewdomain-${id}`).style.display = isNew ? 'block' : 'none';
+  updateProductLogo(id);
+}
+
+function updateProductLogo(id) {
+  const sel    = document.getElementById(`pbrand-${id}`)?.value;
+  const cell   = document.getElementById(`ppreview-${id}`);
+  if (!cell) return;
+  let logoUrl = null;
+  if (sel && sel !== '__new__') {
+    const brand = ALL_BRANDS.find(b => b.id == sel);
+    logoUrl = brand?.icon_url;
+  } else {
+    const domain = document.getElementById(`pnewdomain-${id}`)?.value.trim();
+    if (domain) logoUrl = `https://logo.clearbit.com/${domain}`;
+  }
+  cell.innerHTML = logoUrl
+    ? `<img src="${logoUrl}" class="qa-logo-preview" onerror="this.alt='No logo'" alt="logo" />`
+    : '—';
+}
+
+async function saveAllProducts() {
+  const catId = document.getElementById('qaCatSelect').value;
+  if (!catId) { document.getElementById('qaProductStatus').textContent = 'Pick a category first.'; return; }
+
+  const rows  = document.querySelectorAll('#qaProductRows tr');
+  const status = document.getElementById('qaProductStatus');
+  if (!rows.length) { status.textContent = 'No rows to save.'; return; }
+
+  status.textContent = 'Saving…';
+  let saved = 0, skipped = 0;
+
+  for (const row of rows) {
+    const id        = row.id.replace('prow-', '');
+    const brandSel  = document.getElementById(`pbrand-${id}`)?.value;
+    const pname     = document.getElementById(`pname-${id}`)?.value.trim() || null;
+    if (!brandSel) { skipped++; continue; }
+
+    let brandId = null;
+    if (brandSel === '__new__') {
+      const newName   = document.getElementById(`pnewbrand-${id}`)?.value.trim();
+      const newDomain = document.getElementById(`pnewdomain-${id}`)?.value.trim();
+      if (!newName) { skipped++; continue; }
+      const icon_url = newDomain ? `https://logo.clearbit.com/${newDomain}` : null;
+      const { data: nb, error: ne } = await sb.from('brands')
+        .insert([{ name: newName, icon_url, is_active: true }])
+        .select('id').single();
+      if (ne) { status.textContent = `Brand error: ${ne.message}`; return; }
+      brandId = nb.id;
+      await loadBrands();
+    } else {
+      brandId = parseInt(brandSel);
+    }
+
+    const { error } = await sb.from('markers').insert([{
+      title: pname || ALL_BRANDS.find(b => b.id == brandId)?.name || 'Product',
+      group_type: 'product',
+      category_id: parseInt(catId),
+      brand_id: brandId,
+      product_name: pname,
+      is_active: true,
+      rating_count: 0,
+    }]);
+    if (error && error.code !== '23505') { status.textContent = `Error: ${error.message}`; return; }
+    saved++;
+  }
+
+  status.textContent = `✅ Saved ${saved} product(s)${skipped ? `, ${skipped} skipped` : ''}.`;
+  document.getElementById('qaProductRows').innerHTML = '';
+  productRowCount = 0;
+}
+
+function escH(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Init: add one empty brand row on load
+document.addEventListener('DOMContentLoaded', () => { addBrandRow(); });
