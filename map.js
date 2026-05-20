@@ -573,6 +573,7 @@ async function initMap() {
     const user = await maybeUser();
     const panelOpen = document.getElementById("addPanel")?.classList.contains("map-panel-open");
     const inManualMode = ADD_MODE || panelOpen;
+    console.log("MAP CLICK", {user: !!user, panelOpen, ADD_MODE, inManualMode});
     if (!user || !inManualMode) return;
 
     // If came from search result already, don't override
