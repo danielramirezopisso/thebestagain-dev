@@ -124,6 +124,9 @@ function ratingToColor(avg, count) {
 }
 
 // Refresh all marker icons when zoom changes
+// Alias for accessibility.js colorblind toggle
+function refreshMapMarkers() { refreshAllMarkerIcons(); }
+
 function refreshAllMarkerIcons() {
   if (!LEAFLET_MARKERS_BY_ID || !MARKER_DATA_BY_ID) return;
   Object.entries(LEAFLET_MARKERS_BY_ID).forEach(([id, mk]) => {
