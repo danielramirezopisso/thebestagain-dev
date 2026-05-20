@@ -345,8 +345,8 @@
   width: 9px; height: 9px;
   border-radius: 50%; flex-shrink: 0;
 }
-.debate-option-dot-a { background: #2d4a8a; }
-.debate-option-dot-b { background: #b0bcce; }
+.debate-option-dot-a { background: #c8972a; }
+.debate-option-dot-b { background: #4a7c59; }
 
 /* Label + bar */
 .debate-option-info { flex: 1; min-width: 0; }
@@ -374,8 +374,8 @@
   height: 100%; border-radius: 999px;
   transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
 }
-.debate-option-bar-a { background: #2d4a8a; opacity: 0.6; }
-.debate-option-bar-b { background: #b0bcce; opacity: 0.8; }
+.debate-option-bar-a { background: #c8972a; opacity: 0.7; }
+.debate-option-bar-b { background: #4a7c59; opacity: 0.7; }
 .debate-option.is-chosen .debate-option-bar-a { opacity: 1; }
 .debate-option.is-chosen .debate-option-bar-b { opacity: 1; }
 
@@ -388,7 +388,7 @@
   color: var(--muted); min-width: 32px; text-align: right;
   transition: color 0.2s;
 }
-.debate-option.is-chosen .debate-option-pct { color: var(--accent); }
+.debate-option.is-chosen .debate-option-pct { color: #c8972a; }
 /* chosen dot: keeps its own colour, accent ring around it */
 .debate-option.is-chosen .debate-option-dot {
   box-shadow: 0 0 0 2px var(--accent);
@@ -459,17 +459,16 @@
 .debate-result-row[data-choice="b"] { --debate-color: #4a7c59; }
 
 /* Pie chart colors now in JS but dot colors here */
-.debate-option-dot-a { background: #c8972a !important; }
-.debate-option-dot-b { background: #4a7c59 !important; }
+
+
 
 /* Option chosen border/shadow */
 .debate-option.is-chosen {
-  border-color: var(--debate-opt-color, var(--accent)) !important;
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--debate-opt-color, var(--accent)) 20%, transparent) !important;
+  border-color: #c8972a !important;
+  box-shadow: 0 0 0 2px rgba(200,151,42,0.2) !important;
 }
-.debate-option[data-choice="a"] { --debate-opt-color: #c8972a; }
-.debate-option[data-choice="b"] { --debate-opt-color: #4a7c59; }
-.debate-option[data-choice="a"].is-chosen .debate-option-label { color: #c8972a; }
-.debate-option[data-choice="b"].is-chosen .debate-option-label { color: #4a7c59; }
-.debate-option[data-choice="a"].is-chosen .debate-option-pct { color: #c8972a; }
-.debate-option[data-choice="b"].is-chosen .debate-option-pct { color: #4a7c59; }
+.debate-option.is-chosen .debate-option-label { color: #c8972a; font-weight: 700; }
+.debate-option.is-chosen .debate-option-pct   { color: #c8972a; }
+.debate-option.is-chosen .debate-option-radio.is-filled {
+  border-color: #c8972a; background: #c8972a;
+}
