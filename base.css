@@ -312,6 +312,18 @@ input:focus, select:focus, textarea:focus {
   display: grid !important;
   place-items: center !important;
 }
+/* Rating classes on marker WRAPPER should be transparent — inner elements carry the colour */
+.tba-marker.rating-9-10,
+.tba-marker.rating-7-8,
+.tba-marker.rating-5-6,
+.tba-marker.rating-3-4,
+.tba-marker.rating-1-2,
+.tba-marker.rating-none {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 /* ── Dot (zoom ≤12) ── */
 .tba-dot {
   width: 10px; height: 10px;
