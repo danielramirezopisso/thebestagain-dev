@@ -13,6 +13,7 @@ const ROTATING_FALLBACK = [
   "Vermut",
   "Bravas",
   "Bikini",
+  "Paella",
   "Cheesecake",
   "Tiramisú",
   "Ensaladilla",
