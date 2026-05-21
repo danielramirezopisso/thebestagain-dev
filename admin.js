@@ -1076,7 +1076,7 @@ function updateBrandPreview(id) {
   if (!cell) return;
   if (!domain) { cell.innerHTML = '—'; return; }
   const url = `https://logo.clearbit.com/${domain}`;
-  cell.innerHTML = `<img src="${url}" class="qa-logo-preview" onerror="this.src='';this.alt='No logo'" alt="logo" />`;
+  cell.innerHTML = `<img src="${url}" class="qa-logo-preview" onerror="this.closest('.qa-preview').innerHTML='<span style="font-size:10px;color:var(--muted)">no logo</span>'" alt="" />`;
 }
 
 async function saveAllBrands() {
@@ -1235,7 +1235,9 @@ function escH(s) {
 }
 
 // Init: add one empty brand row on load
-document.addEventListener('DOMContentLoaded', () => { addBrandRow(); });
+window.addEventListener('load', () => { 
+  if (document.getElementById('qaBrandRows')) addBrandRow(); 
+});
 
 /* ══════════════════════════════════════════════════════
    ICON PICKER

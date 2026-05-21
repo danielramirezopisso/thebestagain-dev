@@ -423,18 +423,20 @@
       </div>
       <input type="hidden" id="battle_id" />
 
-      <label>Category / Section</label>
-      <select id="battle_category_order" style="width:100%;margin-bottom:12px;">
-        <option value="1">1 — Tortilla</option>
-        <option value="2">2 — Croqueta</option>
-        <option value="3">3 — Vermut</option>
-        <option value="4">4 — Bravas</option>
-        <option value="5">5 — Cheesecake</option>
-        <option value="6">6 — General</option>
-        <option value="7">7 — Bebidas</option>
-        <option value="8">8 — Postres</option>
-        <option value="99">99 — Other</option>
-      </select>
+      <label>Group / Section <span class="muted" style="font-weight:400;">(debates in same group appear together)</span></label>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+        <input id="battle_category_order" type="number" min="1" placeholder="e.g. 1" style="width:80px;" />
+        <select onchange="document.getElementById('battle_category_order').value=this.value;this.value='';" style="flex:1;">
+          <option value="">— common groups —</option>
+          <option value="1">1 — Tortilla debates</option>
+          <option value="2">2 — Burger / fast food</option>
+          <option value="3">3 — Bebidas</option>
+          <option value="4">4 — Postres</option>
+          <option value="5">5 — Ingredientes</option>
+          <option value="6">6 — General food</option>
+          <option value="99">99 — Other</option>
+        </select>
+      </div>
 
       <label>Question</label>
       <input id="battle_question" placeholder="e.g. ¿Tortilla con o sin cebolla?" />
@@ -523,6 +525,11 @@
   <script>
   function toggleSection(id) {
     document.getElementById(id).classList.toggle('collapsed');
+    // Lazy load analytics when opened
+    if (id === 'sec-analytics' && !document.getElementById(id).classList.contains('collapsed') && !window._analyticsLoaded) {
+      window._analyticsLoaded = true;
+      if (typeof loadAnalytics === 'function') loadAnalytics();
+    }
   }
   </script>
 </body>
