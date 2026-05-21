@@ -424,6 +424,14 @@ const CITY_CENTERS = {
   BIL: [43.2627, -2.9253]
 };
 
+function rutaRatingColor(avg) {
+  if (avg >= 9) return '#2d8653';
+  if (avg >= 7) return '#6aab7e';
+  if (avg >= 5) return '#e8b84b';
+  if (avg >= 3) return '#f0906e';
+  return '#e05c3a';
+}
+
 function initRutaMap(ruta) {
   if (!ruta) return;
   const isMobile = window.innerWidth <= 768;
@@ -456,11 +464,14 @@ function initRutaMap(ruta) {
     markers.forEach(ri => {
       const m = ri.markers;
       const myVote = MY_VOTES[`${m.id}__${catId}`];
-      const cls = myVote ? colorClassForScore(myVote.vote) : 'ruta-score-none';
+      // Use same inline style approach as main map
+      const avg = myVote ? Number(myVote.vote) : (m.rating_avg || 0);
+      const cnt = myVote ? 1 : (m.rating_count || 0);
+      const bgColor = cnt ? rutaRatingColor(avg) : '#aaa';
       const icon = L.divIcon({
-        className: `tba-marker ${cls}`,
-        html: `<div class="tba-marker-inner">${iconUrl ? `<img src="${escapeHtml(iconUrl)}" alt="" />` : ''}</div>`,
-        iconSize: [30, 30], iconAnchor: [15, 15]
+        className: '',
+        html: `<div style="width:34px;height:34px;border-radius:50%;background:${bgColor};border:2.5px solid rgba(255,255,255,0.85);box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;">${iconUrl ? `<img src="${escapeHtml(iconUrl)}" style="width:20px;height:20px;object-fit:contain;filter:brightness(0) invert(1);" alt="" />` : ''}</div>`,
+        iconSize: [34, 34], iconAnchor: [17, 17]
       });
       const mk = L.marker([m.lat, m.lon], { icon }).addTo(RUTA_MAP_INSTANCE);
       mk.bindPopup(`<b>${escapeHtml(m.title)}</b>${myVote ? `<br>Your vote: ${myVote.vote}` : ''}`);
