@@ -5,7 +5,7 @@ let CAT = {};
 let BRAND = {};
 let rotatingIdx = 0;
 
-const DEFAULT_ICON_URL = "https://danielramirezopisso.github.io/thebestagain/icons/default.svg";
+const DEFAULT_ICON_URL = "https://thebestagain.com/icons/default.svg";
 
 const ROTATING_FALLBACK = [
   "Tortilla",

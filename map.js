@@ -6,8 +6,8 @@ let LAST_CLICK = null;
 let LAYER_GROUP;
 let PREVIEW_MARKER = null;
 
-const DEFAULT_ICON_URL = "https://danielramirezopisso.github.io/thebestagain/icons/default.svg";
-const SPARKLE_ICON_URL = "https://danielramirezopisso.github.io/thebestagain/icons/sparkle.svg";
+const DEFAULT_ICON_URL = "https://thebestagain.com/icons/default.svg";
+const SPARKLE_ICON_URL = "https://thebestagain.com/icons/sparkle.svg";
 const NOMINATIM_BASE = "https://nominatim.openstreetmap.org/reverse";
 
 const FOCUS_ID = new URLSearchParams(window.location.search).get("focus");

@@ -37,7 +37,7 @@ let JOURNEY_MODE_PROD = false;
 let MY_VOTED_IDS_PROD = new Set();
 let MY_VOTE_SCORES_PROD = {}; // marker_id -> personal vote score
 
-const DEFAULT_ICON_URL = "https://danielramirezopisso.github.io/thebestagain/icons/default.svg";
+const DEFAULT_ICON_URL = "https://thebestagain.com/icons/default.svg";
 
 function qs(id){ return document.getElementById(id); }
 

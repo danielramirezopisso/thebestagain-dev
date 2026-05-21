@@ -151,7 +151,7 @@ async function saveCategory() {
   const name = document.getElementById("cat_name").value.trim();
   const iconRaw = document.getElementById("cat_icon_url").value.trim();
   const icon_url = iconRaw
-    ? (iconRaw.startsWith("http") ? iconRaw : `https://danielramirezopisso.github.io/thebestagain/icons/${iconRaw.replace(/\.svg$/,"")}.svg`)
+    ? (iconRaw.startsWith("http") ? iconRaw : `https://thebestagain.com/icons/${iconRaw.replace(/\.svg$/,"")}.svg`)
     : null;
   const for_places = document.getElementById("cat_for_places").checked;
   const for_products = document.getElementById("cat_for_products").checked;
@@ -296,7 +296,7 @@ async function saveBrand() {
   const name = document.getElementById("brand_name").value.trim();
   const iconRaw2 = document.getElementById("brand_icon_url").value.trim();
   const icon_url = iconRaw2
-    ? (iconRaw2.startsWith("http") ? iconRaw2 : `https://danielramirezopisso.github.io/thebestagain/icons/brands/${iconRaw2.replace(/\.(svg|jpg|jpeg|png)$/,"")}.${iconRaw2.match(/\.(jpg|jpeg|png)$/) ? iconRaw2.split(".").pop() : "svg"}`)
+    ? (iconRaw2.startsWith("http") ? iconRaw2 : `https://thebestagain.com/icons/brands/${iconRaw2.replace(/\.(svg|jpg|jpeg|png)$/,"")}.${iconRaw2.match(/\.(jpg|jpeg|png)$/) ? iconRaw2.split(".").pop() : "svg"}`)
     : null;
   const statusEl = document.getElementById("brandModalStatus");
 
@@ -1242,7 +1242,7 @@ window.addEventListener('load', () => {
 /* ══════════════════════════════════════════════════════
    ICON PICKER
 ══════════════════════════════════════════════════════ */
-const LUCIDE_BASE = 'https://unpkg.com/lucide-static@latest/icons/';
+const LUCIDE_BASE = 'https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/';
 const FOOD_ICONS = [
   'pizza','beef','egg','fish','salad','sandwich','cookie','cake','ice-cream-cone',
   'coffee','cup-soda','beer','wine','milk','soup','apple','carrot','cherry',
