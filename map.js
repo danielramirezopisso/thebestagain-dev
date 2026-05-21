@@ -656,10 +656,15 @@ async function reloadMarkers() {
 
   let markerIds = null;
   if (FILTER_CATEGORY) {
-    const { data: mcData, error: mcErr } = await sb.from("marker_categories")
-      .select("marker_id").eq("category_id", parseInt(FILTER_CATEGORY)).eq("is_active", true);
-    if (mcErr) { setMapStatus("Error: " + mcErr.message); return; }
-    markerIds = (mcData || []).map(r => r.marker_id);
+    // Check both marker_categories table AND markers.category_id directly
+    const catId = parseInt(FILTER_CATEGORY);
+    const { data: mcData } = await sb.from("marker_categories")
+      .select("marker_id").eq("category_id", catId).eq("is_active", true);
+    const { data: directData } = await sb.from("markers")
+      .select("id").eq("category_id", catId).eq("is_active", true).eq("group_type", "place");
+    const fromMC = (mcData || []).map(r => r.marker_id);
+    const fromDirect = (directData || []).map(r => r.id);
+    markerIds = [...new Set([...fromMC, ...fromDirect])];
     if (!markerIds.length) {
       LAYER_GROUP.clearLayers(); LEAFLET_MARKERS_BY_ID = {}; MARKER_DATA_BY_ID = {};
       setMapStatus("No places found."); return;
