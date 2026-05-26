@@ -660,10 +660,7 @@ async function renderRankingWidget(m) {
 
     // Title
     const titleEl = document.getElementById("mkRankingTitle");
-    const cityLabel = m.group_type === "place" && m.city
-      ? ` · ${m.city === "BCN" ? "Barcelona" : m.city === "MAD" ? "Madrid" : m.city}`
-      : "";
-    if (titleEl) titleEl.textContent = `${escapeHtml(cat.name)}${cityLabel}`;
+    if (titleEl) titleEl.textContent = "How it ranks";
 
     // Edit link
     const editLink = document.getElementById("editVotesCatLink");
