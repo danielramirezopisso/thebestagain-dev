@@ -1067,3 +1067,20 @@
   margin-bottom: 8px;
 }
 .mk-revenue-cta-btn:hover { opacity: 0.88; transform: none; box-shadow: 0 2px 8px rgba(45,74,138,0.25); }
+
+/* ── Comment score pill ── */
+.comment-score-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 3px 7px;
+  border-radius: 20px;
+  color: #fff !important;
+  border: none !important;
+  vertical-align: middle;
+  margin-left: 6px;
+  font-variant-numeric: tabular-nums;
+}
