@@ -1,3 +1,6 @@
+/* Prevent horizontal scroll */
+body { overflow-x: hidden; }
+
 /* ══════════════════════════════════════
    CLAIM PAGE
 ══════════════════════════════════════ */
@@ -6,6 +9,7 @@
   max-width: 720px;
   margin: 0 auto;
   padding: 0 24px 100px;
+  overflow-x: hidden;
 }
 
 /* ── Contextual marker banner ── */
