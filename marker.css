@@ -1116,3 +1116,41 @@
 .share-btn:hover { background: var(--rule); }
 .share-whatsapp { background: #25d366; color: #fff; border-color: #25d366; }
 .share-whatsapp:hover { background: #1db954; }
+
+/* ── Action row (below score) ── */
+.mk-action-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0 4px;
+  flex-wrap: wrap;
+}
+.mk-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--faint);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  box-shadow: none;
+  line-height: 1;
+}
+.mk-action-btn:hover {
+  color: var(--text);
+  border-color: var(--text);
+  background: var(--rule);
+  transform: none;
+  box-shadow: none;
+}
+/* Wishlist btn sits inline with action buttons */
+.mk-action-row .mk-wl-wrap .wl-btn {
+  width: 32px;
+  height: 32px;
+}
