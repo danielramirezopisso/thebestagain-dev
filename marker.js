@@ -166,7 +166,7 @@ function renderHero(m, user) {
   const cat = getCategoryById(activeCatId) || getCategoryById(m.category_id);
   const isPlace = m.group_type === "place";
   const isAdmin = user?.email?.includes("dropisso");
-  const isCreator = user && (m.created_by === user.id || m.created_by === null || isAdmin);
+  const isCreator = user && (m.created_by === user.id || isAdmin);
 
   // Breadcrumb: Category > Place/Product
   const breadcrumbEl = document.getElementById("mkBreadcrumb");
@@ -235,7 +235,7 @@ function renderHero(m, user) {
     }
     btns += `<button class="mk-side-action-btn mk-side-action-ghost" onclick="shareMarker()">↗ Share</button>`;
     btns += `<span class="mk-wl-wrap">${wlBtnHtml(m.id)}</span>`;
-    if (isCreator) {
+    if (isCreator && isPlace) {
       btns += `<button class="mk-side-action-btn mk-side-action-subtle" onclick="enterEditMode()">✏️ Edit</button>`;
     }
     sideActions.innerHTML = btns;
