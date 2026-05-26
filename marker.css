@@ -578,7 +578,7 @@
 .mk-comment-input {
   width: 100%; resize: vertical;
   border: 1.5px solid var(--border); border-radius: 8px;
-  padding: 10px 12px; font-size: 13px;
+  padding: 10px 12px; font-size: 16px; /* 16px prevents iOS zoom */
   font-family: inherit; color: var(--text);
   background: var(--card);
   transition: border-color 0.15s;
