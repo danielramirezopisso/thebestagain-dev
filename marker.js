@@ -1885,7 +1885,8 @@ async function renderRutaBadge(m) {
       .eq("ruta_id", rutaId)
       .eq("is_active", true);
 
-    const rutaUrl = `rutas.html?ruta=${encodeURIComponent(ruta.id)}`;
+    const rutaCity = ruta.city || (window.CURRENT_MARKER?.city) || "BCN";
+    const rutaUrl = `rutas.html?city=${encodeURIComponent(rutaCity)}&ruta=${encodeURIComponent(ruta.id)}`;
     badge.innerHTML = `
       <a class="mk-ruta-badge" href="${rutaUrl}">
         <span class="mk-ruta-badge-icon">🗺</span>
