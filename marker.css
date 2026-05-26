@@ -949,8 +949,8 @@
   transition: all 0.12s !important;
 }
 .mk-side-actions .wl-btn:hover {
-  border-color: #e05252 !important;
-  color: #e05252 !important;
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
   transform: none !important;
   box-shadow: none !important;
 }

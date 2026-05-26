@@ -239,7 +239,7 @@ body.products-page { background: var(--page-bg); min-height: 100dvh; }
   flex-shrink: 0;
 }
 .item-row:hover .wl-btn-sm { opacity: 1; }
-.wl-btn-sm.wl-active { opacity: 1; color: #e05252; }
+.wl-btn-sm.wl-active { opacity: 1; color: var(--accent); }
 
 /* See more */
 .see-more {
