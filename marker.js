@@ -396,7 +396,7 @@ function renderRating(m, rankPos, rankTotal) {
     // Sub-line: votes count + your vote on same line if voted, or login prompt if not
     let subLine = "";
     if (CURRENT_VOTE !== null) {
-      subLine = `<div class="mk-score-sub">${cnt} vote${cnt !== 1 ? "s" : ""} · Your vote: <strong>${Number(CURRENT_VOTE).toFixed(1)}</strong></div>`;
+      subLine = `<div class="mk-score-sub">${cnt} vote${cnt !== 1 ? "s" : ""}</div>`;
     } else if (!window._mkUser) {
       subLine = `<div class="mk-score-sub">${cnt} vote${cnt !== 1 ? "s" : ""} · <a class="mk-score-vote-prompt" href="login.html?redirect=${encodeURIComponent(location.href)}">Vote →</a></div>`;
     } else {
