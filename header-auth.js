@@ -28,7 +28,6 @@ async function renderAuthHeader() {
         </div>
       </div>
       <a href="user.html" class="header-username" title="My Profile">👤 ${escapeHtmlHeader(displayName)}</a>
-      <a href="#" onclick="logout(); return false;">Logout</a>
     </div>
   `;
 
