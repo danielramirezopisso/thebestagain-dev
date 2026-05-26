@@ -1084,3 +1084,35 @@
   margin-left: 6px;
   font-variant-numeric: tabular-nums;
 }
+
+/* ── Share panel ── */
+.share-panel {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  border-radius: 16px 16px 0 0;
+  padding: 20px 24px calc(24px + env(safe-area-inset-bottom));
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
+  animation: slideUpPanel 0.2s ease;
+}
+@keyframes slideUpPanel {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.share-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 8px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  border: 1.5px solid var(--border); background: var(--faint);
+  color: var(--text); text-decoration: none;
+  transition: background 0.15s;
+}
+.share-btn:hover { background: var(--rule); }
+.share-whatsapp { background: #25d366; color: #fff; border-color: #25d366; }
+.share-whatsapp:hover { background: #1db954; }
