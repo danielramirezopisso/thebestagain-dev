@@ -333,7 +333,16 @@
 }
 @media (max-width: 600px) {
   .home-main { padding: 0 20px 60px; }
-  .home-hero { min-height: auto; padding: 40px 0 32px; }
+  .home-hero {
+    /* Fill viewport minus TBA nav (56px) and Safari bottom bar
+       Use 100svh (small viewport height) which accounts for Safari chrome */
+    min-height: calc(100svh - 56px);
+    padding: 40px 0 32px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
   .home-top-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .home-debates-grid { grid-template-columns: 1fr; }
   .home-rutas-grid { grid-template-columns: 1fr; }
