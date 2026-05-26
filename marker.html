@@ -197,7 +197,7 @@
       <div class="mk-section-head"><span class="mk-section-title">Edit marker</span></div>
       <div class="edit-grid">
         <div class="edit-field"><label>Title</label><input id="e_title" /></div>
-        <div class="edit-field"><label>Type</label>
+        <div class="edit-field" style="display:none;"><label>Type</label>
           <select id="e_group_type" onchange="onEditGroupChanged()">
             <option value="place">Place</option>
             <option value="product">Product</option>
@@ -208,8 +208,8 @@
         <div class="edit-field" id="productNameRow" style="display:none;"><label>Product name</label><input id="e_product_name" /></div>
         <div class="edit-field" id="chainRow" style="display:none;"><label>Chain</label><select id="e_chain_id"></select></div>
         <div class="edit-field"><label>Address</label><input id="e_address" /></div>
-        <div class="edit-field"><label>Lat</label><input id="e_lat" /></div>
-        <div class="edit-field"><label>Lon</label><input id="e_lon" /></div>
+        <div class="edit-field" style="display:none;"><label>Lat</label><input id="e_lat" /></div>
+        <div class="edit-field" style="display:none;"><label>Lon</label><input id="e_lon" /></div>
       </div>
       <div class="edit-foot">
         <span id="editStatus" class="muted"></span>
