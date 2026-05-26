@@ -1530,16 +1530,7 @@ function renderCommentRow(c, user, nameById, reactionsByComment, repliesByParent
     </button>`;
   }).join("");
 
-  const addReactionBtn = user ? `
-    <div class="reaction-add-wrap">
-      <button class="reaction-add-btn" onclick="toggleEmojiPicker('${c.id}')">＋</button>
-      <div class="emoji-picker" id="picker-${c.id}" style="display:none;">
-        ${EMOJI_OPTIONS.map(e => {
-          const b64 = btoa(unescape(encodeURIComponent(e)));
-          return `<button onclick="toggleReactionB64('${c.id}','${b64}');toggleEmojiPicker('${c.id}')">${e}</button>`;
-        }).join("")}
-      </div>
-    </div>` : "";
+  const addReactionBtn = ""; // removed — using addReactionBtnSmall only
 
   // Replies
   const commentReplies = repliesByParent[c.id] || [];
