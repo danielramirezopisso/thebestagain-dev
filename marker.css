@@ -1149,8 +1149,13 @@
   transform: none;
   box-shadow: none;
 }
-/* Wishlist btn sits inline with action buttons */
+/* Wishlist btn matches pill height of action buttons */
+.mk-action-row .mk-wl-wrap {
+  display: inline-flex;
+  align-items: center;
+}
 .mk-action-row .mk-wl-wrap .wl-btn {
   width: 32px;
   height: 32px;
+  border-radius: 20px;
 }
