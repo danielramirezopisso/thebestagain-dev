@@ -1754,8 +1754,6 @@ async function initMarkerPage() {
 
   setStatus("Loading…");
 
-  wlInit();
-
   const user = await maybeUser();
 
   // Load reference data + marker + marker_categories + chains in parallel
