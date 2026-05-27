@@ -133,9 +133,9 @@
 .mk-ruta-badge {
   display: flex; align-items: center; gap: 10px;
   padding: 10px 14px;
-  background: rgba(184, 134, 11, 0.06);
-  border: 1px solid rgba(184, 134, 11, 0.25);
-  border-left: 3px solid #b8860b;
+  background: rgba(45, 134, 83, 0.06);
+  border: 1px solid rgba(45, 134, 83, 0.25);
+  border-left: 3px solid #2d8653;
   border-radius: 8px;
   font-size: 12px; font-weight: 600;
   color: var(--text);
@@ -143,17 +143,17 @@
   transition: background 0.15s;
 }
 .mk-ruta-badge:hover {
-  background: rgba(184, 134, 11, 0.1);
+  background: rgba(45, 134, 83, 0.1);
 }
 .mk-ruta-badge-icon { font-size: 15px; flex-shrink: 0; }
 .mk-ruta-badge-name { flex: 1; }
 .mk-ruta-badge-stops {
   font-size: 11px;
-  color: #b8860b;
+  color: #2d8653;
   font-weight: 600;
   white-space: nowrap;
   padding-left: 8px;
-  border-left: 1px solid rgba(184, 134, 11, 0.2);
+  border-left: 1px solid rgba(45, 134, 83, 0.2);
   margin-left: 2px;
 }
 
@@ -797,12 +797,12 @@
 
 /* ── #1 Gold context line for #1 ranking ── */
 .mk-context-rank-gold {
-  color: #b8860b;
+  color: #2d8653;
   font-weight: 900;
   font-size: 16px;
 }
 .mk-context-verdict-gold {
-  color: #b8860b;
+  color: #2d8653;
   font-weight: 700;
   font-style: italic;
 }
