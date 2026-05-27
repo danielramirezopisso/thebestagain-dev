@@ -255,8 +255,10 @@ function renderHero(m, user) {
       </button>`;
     }
     sideActions.innerHTML = btns;
-    // Re-init wishlist so buttons reflect current state
-    if (typeof wlInit === "function") wlInit();
+    // Load wishlist state async then refresh buttons
+    if (typeof wlInit === "function") {
+      wlInit().then(() => { if (typeof _wlRefreshAll === "function") _wlRefreshAll(); });
+    }
   }
 
   // Admin/creator edit button goes in side actions (#18 - single edit button)

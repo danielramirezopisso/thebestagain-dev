@@ -1125,37 +1125,58 @@
   padding: 10px 20px 4px;
   flex-wrap: wrap;
 }
+/* All 4 action buttons same height and pill shape */
 .mk-action-btn {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 6px 12px;
+  padding: 0 14px;
+  height: 32px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
   color: var(--muted);
   background: var(--faint);
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   cursor: pointer;
   text-decoration: none;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
   box-shadow: none;
   line-height: 1;
+  white-space: nowrap;
 }
 .mk-action-btn:hover {
   color: var(--text);
-  border-color: var(--text);
-  background: var(--rule);
+  border-color: var(--accent);
   transform: none;
   box-shadow: none;
 }
-/* Wishlist btn matches pill height of action buttons */
+/* Claim — blue */
+a.mk-action-btn[href*="claim"] {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+a.mk-action-btn[href*="claim"]:hover {
+  background: #1e3a7a;
+  border-color: #1e3a7a;
+  color: #fff;
+}
+/* Share — white/outlined */
+button.mk-action-btn[onclick*="share"] {
+  background: var(--card);
+  color: var(--text);
+  border-color: var(--border);
+}
+/* Wishlist — same pill shape as other buttons */
 .mk-action-row .mk-wl-wrap {
   display: inline-flex;
   align-items: center;
 }
 .mk-action-row .mk-wl-wrap .wl-btn {
-  width: 32px;
+  width: auto;
   height: 32px;
+  padding: 0 14px;
   border-radius: 20px;
+  border: 1.5px solid var(--border);
 }
