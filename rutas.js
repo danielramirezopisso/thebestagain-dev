@@ -510,11 +510,13 @@ function initRutaMap(ruta) {
         markers.forEach(ri => {
           const m = ri.markers;
           const myVote = MY_VOTES[`${m.id}__${ruta.category_id}`];
-          const cls = myVote ? colorClassForScore(myVote.vote) : 'ruta-score-none';
+          const avg = myVote ? Number(myVote.vote) : (m.rating_avg || 0);
+          const cnt = myVote ? 1 : (m.rating_count || 0);
+          const bgColor = cnt ? rutaRatingColor(avg) : '#aaa';
           const icon = L.divIcon({
-            className: `tba-marker ${cls}`,
-            html: `<div class="tba-marker-inner">${iconUrl ? `<img src="${escapeHtml(iconUrl)}" alt="" />` : ''}</div>`,
-            iconSize: [30, 30], iconAnchor: [15, 15]
+            className: '',
+            html: `<div style="width:34px;height:34px;border-radius:50%;background:${bgColor};border:2.5px solid rgba(255,255,255,0.85);box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;">${iconUrl ? `<img src="${escapeHtml(iconUrl)}" style="width:20px;height:20px;object-fit:contain;filter:brightness(0) invert(1);" alt="" />` : ''}</div>`,
+            iconSize: [34, 34], iconAnchor: [17, 17]
           });
           L.marker([m.lat, m.lon], { icon }).addTo(RUTA_MAP_MOBILE)
             .bindPopup(`<b>${escapeHtml(m.title)}</b>${myVote ? `<br>Your vote: ${myVote.vote}` : ''}`);
