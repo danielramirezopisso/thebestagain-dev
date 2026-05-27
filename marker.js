@@ -1569,8 +1569,9 @@ function renderCommentRow(c, user, nameById, reactionsByComment, repliesByParent
 
   // Smaller reaction add button
   const addReactionBtnSmall = user ? `
+    <span style="position:relative;display:inline-block;">
     <button class="comment-action-btn" onclick="toggleEmojiPicker('${c.id}')" title="Add reaction">＋</button>
-    <div class="emoji-picker" id="picker-${c.id}" style="display:none;position:absolute;z-index:100;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    <div class="emoji-picker" id="picker-${c.id}" style="display:none;position:absolute;bottom:28px;left:0;z-index:200;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:160px;">
       ${EMOJI_OPTIONS.map(e => {
         const b64 = btoa(unescape(encodeURIComponent(e)));
         return `<button class="reaction-emoji-btn" onclick="toggleReactionB64('${c.id}','${b64}');toggleEmojiPicker('${c.id}')">${e}</button>`;
