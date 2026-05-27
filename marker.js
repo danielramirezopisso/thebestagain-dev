@@ -751,7 +751,7 @@ async function renderRankingWidget(m) {
       // Scroll current row into view after render
       setTimeout(() => {
         const row = document.getElementById("mkCurrentRankRow");
-        if (row) row.scrollIntoView({ block: "center", behavior: "smooth" });
+        // No auto-scroll — user should see photo and score first
       }, 150);
     }
   }

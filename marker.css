@@ -926,7 +926,6 @@
 
 /* ── Wishlist — icon-only pill ── */
 .mk-wl-wrap { display: block; }
-.mk-wl-wrap .wl-btn,
 .mk-side-actions .wl-btn {
   display: flex !important;
   width: 100% !important;
