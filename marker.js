@@ -255,9 +255,9 @@ function renderHero(m, user) {
       </button>`;
     }
     sideActions.innerHTML = btns;
-    // Load wishlist state async then refresh buttons
-    if (typeof wlInit === "function") {
-      wlInit().then(() => { if (typeof _wlRefreshAll === "function") _wlRefreshAll(); });
+    // Load wishlist state and refresh after
+    if (typeof wlLoad === "function" && typeof _wlRefreshAll === "function") {
+      wlLoad().then(() => _wlRefreshAll());
     }
   }
 
