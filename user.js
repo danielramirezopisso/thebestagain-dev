@@ -141,8 +141,14 @@ function switchTab(name) {
 
   if (name === "wishlist" && !window._wishlistLoaded) { loadWishlist(); window._wishlistLoaded = true; }
   if (name === "places"   && !window._placesLoaded)   { loadPlaces();   window._placesLoaded   = true; }
-  if (name === "comments" && !window._commentsLoaded) { loadComments(); window._commentsLoaded = true; }
-  if (name === "photos"   && !window._photosLoaded)   { loadPhotos();   window._photosLoaded   = true; }
+  if (name === "comments" && (!window._commentsLoaded || !USER_ID)) { 
+    window._commentsLoaded = !!USER_ID;
+    loadComments(); 
+  }
+  if (name === "photos" && (!window._photosLoaded || !USER_ID)) { 
+    window._photosLoaded = !!USER_ID;
+    loadPhotos(); 
+  }
 }
 
 /* ══════════════════════════════════════════
