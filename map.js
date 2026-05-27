@@ -748,8 +748,13 @@ async function saveMapMarker() {
   if (!LAST_CLICK) { setSaveStatus("Click the map first to pick a location."); return; }
   if (!title) { setSaveStatus("Title required."); return; }
 
+  // Infer city from coordinates
+  const _lat = LAST_CLICK.lat, _lon = LAST_CLICK.lon;
+  let city = "BCN"; // default
+  if (_lat >= 40.3 && _lat <= 40.6 && _lon >= -3.9 && _lon <= -3.5) city = "MAD";
+
   const { data: markerRow, error: mErr } = await sb.from("markers")
-    .insert([{ title, category_id, rating_manual, group_type: "place", is_active: true, lat: LAST_CLICK.lat, lon: LAST_CLICK.lon, address }])
+    .insert([{ title, category_id, rating_manual, group_type: "place", is_active: true, lat: _lat, lon: _lon, address, city }])
     .select("id").single();
   if (mErr) { setSaveStatus("Error creating place: " + mErr.message); return; }
 
