@@ -39,7 +39,8 @@
   <main class="user-main">
 
     <!-- ── HERO ── -->
-    <section class="user-hero">
+    <section class="user-hero" style="position:relative;">
+      <button class="user-logout-x" onclick="logout()" title="Log out">✕</button>
       <div class="user-hero-inner">
         <div class="user-avatar" id="userAvatar">?</div>
         <div class="user-hero-body">
@@ -65,11 +66,6 @@
           <span class="user-stat-label">places added</span>
         </div>
       </div>
-    <!-- Logout -->
-    <div class="user-logout-wrap">
-      <button class="user-logout-btn" onclick="logout()">Log out</button>
-    </div>
-
     </section>
 
     <!-- ── TABS — desktop pills, mobile dropdown ── -->

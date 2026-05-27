@@ -71,7 +71,7 @@ async function initUserPage() {
   renderNormalView();
 
   // Hide tabs with no content
-  hideEmptyTabs();
+  
 
   // Check URL tab param
   const tab = new URLSearchParams(location.search).get("tab");
@@ -745,17 +745,4 @@ async function deletePhoto(photoId, storagePath, btn) {
   }
 }
 
-function hideEmptyTabs() {
-  // Hide comments tab if no comments
-  const comments = document.getElementById("commentsList");
-  const commentsTab = document.querySelector('[data-tab="comments"]');
-  if (commentsTab && comments && !comments.children.length) {
-    commentsTab.style.display = "none";
-  }
-  // Hide photos tab if no photos
-  const photos = document.getElementById("photosList");
-  const photosTab = document.querySelector('[data-tab="photos"]');
-  if (photosTab && photos && !photos.children.length) {
-    photosTab.style.display = "none";
-  }
-}
+
