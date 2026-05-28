@@ -463,11 +463,12 @@ function initRutaMap(ruta) {
     const lMarkers = [];
     markers.forEach(ri => {
       const m = ri.markers;
-      const myVote = MY_VOTES[`${m.id}__${catId}`];
-      // Use same inline style approach as main map
+      // Try ruta catId first, then any vote for this marker
+      const myVote = MY_VOTES[`${m.id}__${catId}`]
+        || Object.entries(MY_VOTES).find(([k]) => k.startsWith(m.id + '__'))?.[1];
       const avg = myVote ? Number(myVote.vote) : (m.rating_avg || 0);
       const cnt = myVote ? 1 : (m.rating_count || 0);
-      const bgColor = cnt ? rutaRatingColor(avg) : '#aaa';
+      const bgColor = myVote ? rutaRatingColor(Number(myVote.vote)) : '#bbb';
       const icon = L.divIcon({
         className: '',
         html: `<div style="width:34px;height:34px;border-radius:50%;background:${bgColor};border:2.5px solid rgba(255,255,255,0.85);box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;">${iconUrl ? `<img src="${escapeHtml(iconUrl)}" style="width:20px;height:20px;object-fit:contain;filter:brightness(0) invert(1);" alt="" />` : ''}</div>`,
@@ -509,10 +510,10 @@ function initRutaMap(ruta) {
         const mMarkers = [];
         markers.forEach(ri => {
           const m = ri.markers;
-          const myVote = MY_VOTES[`${m.id}__${ruta.category_id}`];
+          const myVote = MY_VOTES[`${m.id}__${ruta.category_id}`]
+            || Object.entries(MY_VOTES).find(([k]) => k.startsWith(m.id + '__'))?.[1];
           const avg = myVote ? Number(myVote.vote) : (m.rating_avg || 0);
-          const cnt = myVote ? 1 : (m.rating_count || 0);
-          const bgColor = cnt ? rutaRatingColor(avg) : '#aaa';
+          const bgColor = myVote ? rutaRatingColor(Number(myVote.vote)) : '#bbb';
           const icon = L.divIcon({
             className: '',
             html: `<div style="width:34px;height:34px;border-radius:50%;background:${bgColor};border:2.5px solid rgba(255,255,255,0.85);box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;">${iconUrl ? `<img src="${escapeHtml(iconUrl)}" style="width:20px;height:20px;object-fit:contain;filter:brightness(0) invert(1);" alt="" />` : ''}</div>`,
