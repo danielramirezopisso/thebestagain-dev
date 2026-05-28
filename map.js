@@ -134,7 +134,10 @@ function refreshAllMarkerIcons() {
     if (!m) return;
     const avg = Number(m.rating_avg ?? 0);
     const cnt = Number(m.rating_count ?? 0);
-    const iconUrl = getIconUrlForCategory(m.category_id);
+    // Use filter category icon if filtering, otherwise primary category icon
+    const iconUrl = FILTER_CATEGORY
+      ? getIconUrlForCategory(parseInt(FILTER_CATEGORY))
+      : getIconUrlForCategory(m.primary_category_id || m.category_id);
     const greyed = JOURNEY_MODE && !MY_VOTED_IDS.has(id);
     const displayAvg = (JOURNEY_MODE && window.MY_VOTE_SCORES_MAP?.[id])
       ? Number(window.MY_VOTE_SCORES_MAP[id]) : avg;
