@@ -511,6 +511,7 @@ function showCard(idx) {
     document.getElementById('vcCard').style.display = 'none';
     document.getElementById('vcDone').style.display = 'flex';
     updateStats();
+    renderFeed(); // re-render so new votes appear immediately
     return;
   }
 
@@ -518,6 +519,26 @@ function showCard(idx) {
   document.getElementById('vcQuestion').textContent = battle.question;
   document.getElementById('vcLabelA').textContent   = battle.option_a;
   document.getElementById('vcLabelB').textContent   = battle.option_b;
+
+  // Images
+  const imgA = battle.image_a_url;
+  const imgB = battle.image_b_url;
+  const imgWrap = document.getElementById('vcImages');
+  if (imgWrap) {
+    if (imgA && imgB) {
+      // Two images — one above each option
+      imgWrap.innerHTML = `
+        <div class="vc-img-pair">
+          <img src="${imgA}" class="vc-img" onerror="this.style.display='none'" />
+          <img src="${imgB}" class="vc-img" onerror="this.style.display='none'" />
+        </div>`;
+    } else if (imgA || imgB) {
+      // One image — centered
+      imgWrap.innerHTML = `<img src="${imgA || imgB}" class="vc-img vc-img-single" onerror="this.style.display='none'" />`;
+    } else {
+      imgWrap.innerHTML = '';
+    }
+  }
 
   // Animate in
   const card = document.getElementById('vcCard');

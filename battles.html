@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Debates — The Best Again</title>
   <link rel="stylesheet" href="base.css?v=1779265061">
-  <link rel="stylesheet" href="battles.css?v=1780160059">
+  <link rel="stylesheet" href="battles.css?v=1780160548">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js"></script>
   <script src="accessibility.js"></script>
@@ -121,7 +121,7 @@
 
   </main>
 
-  <script src="battles.js?v=1780160059"></script>
+  <script src="battles.js?v=1780160548"></script>
   <script>
     document.addEventListener('DOMContentLoaded', initBattles);
   </script>
@@ -150,6 +150,7 @@
         <button class="vc-close" onclick="closeVoteCards()">✕</button>
       </div>
       <div class="vc-card" id="vcCard">
+        <div id="vcImages"></div>
         <div class="vc-question" id="vcQuestion"></div>
         <div class="vc-options">
           <button class="vc-option vc-option-a" id="vcOptA" onclick="castCardVote('a')">

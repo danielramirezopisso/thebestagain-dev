@@ -639,3 +639,18 @@
   font-size: 11px; color: var(--muted);
   margin-top: 14px; letter-spacing: 0.05em;
 }
+
+/* ── Card images ── */
+.vc-img-pair {
+  display: flex; gap: 8px; justify-content: center;
+  margin-bottom: 16px;
+}
+.vc-img {
+  width: 120px; height: 90px;
+  object-fit: cover; border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.vc-img-single {
+  width: 200px; height: 140px;
+  display: block; margin: 0 auto 16px;
+}
