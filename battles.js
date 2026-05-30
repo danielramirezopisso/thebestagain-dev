@@ -182,7 +182,6 @@ function buildDebateRow(battle) {
 
   row.innerHTML = `
     <div class="debate-question">${esc(battle.question)}</div>
-    ${desc ? `<div class="debate-description">${esc(desc)}</div>` : ''}
     <div class="debate-body" id="body-${battle.id}">
       ${buildDebateBodyHtml(battle)}
     </div>
