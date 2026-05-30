@@ -280,20 +280,34 @@ function buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted, winLabelA, winLab
   const offset = -(circ / 4);
   const winPct = pctA >= pctB ? pctA : pctB;
 
-  return `<svg viewBox="0 0 100 100" class="debate-pie">
-    <!-- Background ring -->
+  return `<svg viewBox="0 0 100 100" class="debate-pie" style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.15))">
+    <!-- White background circle -->
     <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
-      stroke="rgba(0,0,0,0.08)" stroke-width="11"/>
+      stroke="#fff" stroke-width="14"/>
+    <!-- Dark border ring (outer) -->
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
+      stroke="rgba(0,0,0,0.18)" stroke-width="13"/>
     <!-- Option B segment -->
     <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
-      stroke="${colorB}" stroke-width="10"
+      stroke="${colorB}" stroke-width="11"
       stroke-dasharray="${fillB.toFixed(2)} ${fillA.toFixed(2)}"
       stroke-dashoffset="${(offset - fillA).toFixed(2)}"/>
     <!-- Option A segment -->
     <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
-      stroke="${colorA}" stroke-width="10"
+      stroke="${colorA}" stroke-width="11"
       stroke-dasharray="${fillA.toFixed(2)} ${fillB.toFixed(2)}"
       stroke-dashoffset="${offset.toFixed(2)}"/>
+    <!-- Segment divider lines (thin white gaps) -->
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
+      stroke="#fff" stroke-width="1.5"
+      stroke-dasharray="0.5 ${circ - 0.5}"
+      stroke-dashoffset="${offset.toFixed(2)}"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
+      stroke="#fff" stroke-width="1.5"
+      stroke-dasharray="0.5 ${circ - 0.5}"
+      stroke-dashoffset="${(offset - fillA).toFixed(2)}"/>
+    <!-- Center white hole -->
+    <circle cx="${cx}" cy="${cy}" r="22" fill="white"/>
     <text x="50" y="55" text-anchor="middle" class="debate-pie-pct">${winPct}%</text>
   </svg>
   <div class="debate-pie-winner">${esc(pctA >= pctB ? winLabelA : winLabelB)}</div>`;
