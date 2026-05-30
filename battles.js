@@ -119,6 +119,13 @@ async function initBattles() {
   hide('debatesSkeleton');
   updateStats();
   renderFeed();
+  // Auto-open cards if unvoted debates exist
+  setTimeout(() => {
+    if (getUnvotedBattles().length > 0 && !window._vcAutoOpened) {
+      window._vcAutoOpened = true;
+      openVoteCards();
+    }
+  }, 900);
 }
 
 function updateStats() {
