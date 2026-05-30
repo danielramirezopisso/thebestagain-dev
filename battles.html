@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Debates — The Best Again</title>
   <link rel="stylesheet" href="base.css?v=1779265061">
-  <link rel="stylesheet" href="battles.css?v=1780159746">
+  <link rel="stylesheet" href="battles.css?v=1780159939">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js"></script>
   <script src="accessibility.js"></script>
@@ -100,6 +100,7 @@
       <h1 class="debates-hero-title">Debates</h1>
       <p class="debates-hero-sub">The debates that divide tables, families and friends.</p>
       <div class="debates-stats" id="debatesStats" style="display:none;"></div>
+      <button id="vcLaunchBtn" class="vc-launch-btn" onclick="openVoteCards()" style="display:none;"></button>
     </header>
 
     <!-- Feed -->
@@ -120,7 +121,7 @@
 
   </main>
 
-  <script src="battles.js?v=1780159746"></script>
+  <script src="battles.js?v=1780159939"></script>
   <script>
     document.addEventListener('DOMContentLoaded', initBattles);
   </script>

@@ -542,26 +542,23 @@ async function castCardVote(choice) {
   showCard(CARD_INDEX);
 }
 
-// Show launch button after battles load
+// Show/hide launch button and auto-open if unvoted debates exist
 function updateVoteCardBtn() {
   const unvoted = getUnvotedBattles().length;
-  let btn = document.getElementById('vcLaunchBtn');
+  const btn = document.getElementById('vcLaunchBtn');
+  if (!btn) return;
 
-  if (!btn && unvoted > 0) {
-    btn = document.createElement('button');
-    btn.id = 'vcLaunchBtn';
-    btn.className = 'vc-launch-btn';
-    btn.onclick = openVoteCards;
-    const statsEl = document.querySelector('.debates-stats');
-    if (statsEl) statsEl.after(btn);
-  }
-  if (btn) {
-    if (unvoted > 0) {
-      btn.innerHTML = `⚡ Vote on ${unvoted} debate${unvoted !== 1 ? 's' : ''}`;
-      btn.style.display = 'inline-flex';
-    } else {
-      btn.style.display = 'none';
+  if (unvoted > 0) {
+    btn.innerHTML = `⚡ Vote on ${unvoted} debate${unvoted !== 1 ? 's' : ''}`;
+    btn.style.display = 'inline-flex';
+
+    // Auto-open cards on first page load if unvoted debates exist
+    if (!window._vcAutoOpened) {
+      window._vcAutoOpened = true;
+      setTimeout(() => openVoteCards(), 800);
     }
+  } else {
+    btn.style.display = 'none';
   }
 }
 

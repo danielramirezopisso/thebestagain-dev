@@ -611,17 +611,27 @@
 
 /* Launch button */
 .vc-launch-btn {
-  display: inline-flex; align-items: center; gap: 6px;
+  display: none; /* shown by JS */
+  align-items: center; gap: 6px;
   background: var(--accent); color: #fff;
   border: none; border-radius: 20px;
   padding: 10px 20px; font-size: 13px; font-weight: 700;
   cursor: pointer; margin: 12px auto 0;
   box-shadow: 0 4px 14px rgba(45,74,138,0.3);
   transition: transform 0.15s, box-shadow 0.15s;
+  text-align: center;
+}
+/* When shown via JS (display:inline-flex) */
+#vcLaunchBtn[style*="inline-flex"] {
+  display: inline-flex !important;
 }
 .vc-launch-btn:hover {
-  transform: translateY(-1px);
+  transform: translateY(-1px) !important;
   box-shadow: 0 6px 20px rgba(45,74,138,0.4);
+}
+/* Center it in the hero */
+.debates-hero {
+  display: flex; flex-direction: column; align-items: center;
 }
 
 .vc-swipe-hint {
