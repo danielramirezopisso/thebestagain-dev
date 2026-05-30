@@ -297,11 +297,11 @@
 }
 .debate-img.is-winner {
   border-color: #e8b84b;
-  box-shadow: 0 0 0 2px rgba(200,151,42,0.25);
+  box-shadow: 0 0 0 2px rgba(45,74,138,0.25);
 }
 .debate-img.is-winner-b {
   border-color: #6aab7e;
-  box-shadow: 0 0 0 2px rgba(74,124,89,0.25);
+  box-shadow: 0 0 0 2px rgba(123,167,212,0.25);
 }
 /* loser: no fade — winner border is enough signal */
 
@@ -470,7 +470,7 @@
 /* Option A chosen — amber */
 .debate-option[data-choice="a"].is-chosen {
   border-color: #e8b84b !important;
-  box-shadow: 0 0 0 2px rgba(200,151,42,0.2) !important;
+  box-shadow: 0 0 0 2px rgba(45,74,138,0.2) !important;
 }
 .debate-option[data-choice="a"].is-chosen .debate-option-label { color: #e8b84b; font-weight: 700; }
 .debate-option[data-choice="a"].is-chosen .debate-option-pct   { color: #e8b84b; }
@@ -481,7 +481,7 @@
 /* Option B chosen — olive */
 .debate-option[data-choice="b"].is-chosen {
   border-color: #6aab7e !important;
-  box-shadow: 0 0 0 2px rgba(74,124,89,0.2) !important;
+  box-shadow: 0 0 0 2px rgba(123,167,212,0.2) !important;
 }
 .debate-option[data-choice="b"].is-chosen .debate-option-label { color: #6aab7e; font-weight: 700; }
 .debate-option[data-choice="b"].is-chosen .debate-option-pct   { color: #6aab7e; }
