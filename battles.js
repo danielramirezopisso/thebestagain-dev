@@ -306,8 +306,7 @@ function buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted, winLabelA, winLab
       stroke="#fff" stroke-width="1.5"
       stroke-dasharray="0.5 ${circ - 0.5}"
       stroke-dashoffset="${(offset - fillA).toFixed(2)}"/>
-    <!-- Center white hole -->
-    <circle cx="${cx}" cy="${cy}" r="22" fill="white"/>
+
     <text x="50" y="55" text-anchor="middle" class="debate-pie-pct">${winPct}%</text>
   </svg>
   <div class="debate-pie-winner">${esc(pctA >= pctB ? winLabelA : winLabelB)}</div>`;
