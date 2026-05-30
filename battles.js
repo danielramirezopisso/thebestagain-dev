@@ -552,7 +552,7 @@ function updateVoteCardBtn() {
     btn.id = 'vcLaunchBtn';
     btn.className = 'vc-launch-btn';
     btn.onclick = openVoteCards;
-    const statsEl = document.querySelector('.battles-stats');
+    const statsEl = document.querySelector('.debates-stats');
     if (statsEl) statsEl.after(btn);
   }
   if (btn) {
@@ -564,3 +564,36 @@ function updateVoteCardBtn() {
     }
   }
 }
+
+/* ── Swipe support for card voting ── */
+(function() {
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  document.addEventListener('touchstart', e => {
+    if (!document.getElementById('voteCardOverlay')?.style.display || 
+        document.getElementById('voteCardOverlay').style.display === 'none') return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    const overlay = document.getElementById('voteCardOverlay');
+    if (!overlay || overlay.style.display === 'none') return;
+    if (document.getElementById('vcDone')?.style.display !== 'none') return;
+
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+
+    // Only horizontal swipes (dx > dy)
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+
+    if (dx > 0) {
+      // Swipe right → Option B
+      castCardVote('b');
+    } else {
+      // Swipe left → Option A
+      castCardVote('a');
+    }
+  }, { passive: true });
+})();

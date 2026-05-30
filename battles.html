@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Debates — The Best Again</title>
   <link rel="stylesheet" href="base.css?v=1779265061">
-  <link rel="stylesheet" href="battles.css?v=1780159493">
+  <link rel="stylesheet" href="battles.css?v=1780159746">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js"></script>
   <script src="accessibility.js"></script>
@@ -120,7 +120,7 @@
 
   </main>
 
-  <script src="battles.js?v=1780159493"></script>
+  <script src="battles.js?v=1780159746"></script>
   <script>
     document.addEventListener('DOMContentLoaded', initBattles);
   </script>
@@ -159,7 +159,8 @@
             <span class="vc-option-label" id="vcLabelB"></span>
           </button>
         </div>
-        <button class="vc-skip" onclick="castCardVote('no_opinion')">Skip →</button>
+        <div class="vc-swipe-hint">← swipe for A &nbsp;·&nbsp; swipe for B →</div>
+        <button class="vc-skip" onclick="castCardVote('no_opinion')">No opinion</button>
       </div>
       <div class="vc-done" id="vcDone" style="display:none;">
         <div class="vc-done-icon">🎉</div>
