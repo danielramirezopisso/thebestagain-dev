@@ -296,11 +296,11 @@
   transition: border-color 0.3s, opacity 0.3s;
 }
 .debate-img.is-winner {
-  border-color: #e8b84b;
+  border-color: #2d4a8a;
   box-shadow: 0 0 0 2px rgba(45,74,138,0.25);
 }
 .debate-img.is-winner-b {
-  border-color: #6aab7e;
+  border-color: #7ba7d4;
   box-shadow: 0 0 0 2px rgba(123,167,212,0.25);
 }
 /* loser: no fade — winner border is enough signal */
@@ -349,8 +349,8 @@
   width: 9px; height: 9px;
   border-radius: 50%; flex-shrink: 0;
 }
-.debate-option-dot-a { background: #e8b84b; }
-.debate-option-dot-b { background: #6aab7e; }
+.debate-option-dot-a { background: #2d4a8a; }
+.debate-option-dot-b { background: #7ba7d4; }
 
 /* Label + bar */
 .debate-option-info { flex: 1; min-width: 0; }
@@ -378,8 +378,8 @@
   height: 100%; border-radius: 999px;
   transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
 }
-.debate-option-bar-a { background: #e8b84b; opacity: 0.7; }
-.debate-option-bar-b { background: #6aab7e; opacity: 0.7; }
+.debate-option-bar-a { background: #2d4a8a; opacity: 0.7; }
+.debate-option-bar-b { background: #7ba7d4; opacity: 0.7; }
 .debate-option.is-chosen .debate-option-bar-a { opacity: 1; }
 .debate-option.is-chosen .debate-option-bar-b { opacity: 1; }
 
@@ -392,7 +392,7 @@
   color: var(--muted); min-width: 32px; text-align: right;
   transition: color 0.2s;
 }
-.debate-option.is-chosen .debate-option-pct { color: #e8b84b; }
+.debate-option.is-chosen .debate-option-pct { color: #2d4a8a; }
 /* chosen dot: keeps its own colour, accent ring around it */
 .debate-option.is-chosen .debate-option-dot {
   box-shadow: 0 0 0 2px var(--accent);
@@ -459,8 +459,8 @@
 /* pie-wrap defined above */
 
 /* ── Per-option debate colors ── */
-.debate-result-row[data-choice="a"] { --debate-color: #e8b84b; }
-.debate-result-row[data-choice="b"] { --debate-color: #6aab7e; }
+.debate-result-row[data-choice="a"] { --debate-color: #2d4a8a; }
+.debate-result-row[data-choice="b"] { --debate-color: #7ba7d4; }
 
 /* Pie chart colors now in JS but dot colors here */
 
@@ -469,22 +469,22 @@
 /* Option chosen border/shadow */
 /* Option A chosen — amber */
 .debate-option[data-choice="a"].is-chosen {
-  border-color: #e8b84b !important;
+  border-color: #2d4a8a !important;
   box-shadow: 0 0 0 2px rgba(45,74,138,0.2) !important;
 }
-.debate-option[data-choice="a"].is-chosen .debate-option-label { color: #e8b84b; font-weight: 700; }
-.debate-option[data-choice="a"].is-chosen .debate-option-pct   { color: #e8b84b; }
+.debate-option[data-choice="a"].is-chosen .debate-option-label { color: #2d4a8a; font-weight: 700; }
+.debate-option[data-choice="a"].is-chosen .debate-option-pct   { color: #2d4a8a; }
 .debate-option[data-choice="a"].is-chosen .debate-option-radio.is-filled {
-  border-color: #e8b84b; background: #e8b84b;
+  border-color: #2d4a8a; background: #2d4a8a;
 }
 
 /* Option B chosen — olive */
 .debate-option[data-choice="b"].is-chosen {
-  border-color: #6aab7e !important;
+  border-color: #7ba7d4 !important;
   box-shadow: 0 0 0 2px rgba(123,167,212,0.2) !important;
 }
-.debate-option[data-choice="b"].is-chosen .debate-option-label { color: #6aab7e; font-weight: 700; }
-.debate-option[data-choice="b"].is-chosen .debate-option-pct   { color: #6aab7e; }
+.debate-option[data-choice="b"].is-chosen .debate-option-label { color: #7ba7d4; font-weight: 700; }
+.debate-option[data-choice="b"].is-chosen .debate-option-pct   { color: #7ba7d4; }
 .debate-option[data-choice="b"].is-chosen .debate-option-radio.is-filled {
-  border-color: #6aab7e; background: #6aab7e;
+  border-color: #7ba7d4; background: #7ba7d4;
 }
