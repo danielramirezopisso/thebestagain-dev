@@ -454,3 +454,113 @@ function esc(s) {
 }
 // Keep escapeHtml alias for any legacy calls
 const escapeHtml = esc;
+
+/* ══════════════════════════════════════════════════════
+   TINDER-STYLE CARD VOTING
+══════════════════════════════════════════════════════ */
+let CARD_QUEUE   = [];
+let CARD_INDEX   = 0;
+let CARD_TOTAL   = 0;
+
+function getUnvotedBattles() {
+  return ALL_BATTLES.filter(b => !MY_VOTES[b.id] || MY_VOTES[b.id] === 'no_opinion');
+}
+
+function openVoteCards() {
+  CARD_QUEUE = getUnvotedBattles();
+  CARD_TOTAL = CARD_QUEUE.length;
+  CARD_INDEX = 0;
+
+  if (!CARD_TOTAL) {
+    // All voted — show done state
+    document.getElementById('vcCard').style.display = 'none';
+    document.getElementById('vcDone').style.display = 'flex';
+    document.getElementById('voteCardOverlay').style.display = 'flex';
+    return;
+  }
+
+  document.getElementById('vcDone').style.display = 'none';
+  document.getElementById('vcCard').style.display = 'block';
+  document.getElementById('voteCardOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  showCard(0);
+}
+
+function closeVoteCards() {
+  document.getElementById('voteCardOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function showCard(idx) {
+  const remaining = CARD_QUEUE.length - idx;
+  const done      = CARD_TOTAL - remaining;
+  const pct       = CARD_TOTAL ? (done / CARD_TOTAL * 100) : 100;
+
+  document.getElementById('vcProgressBar').style.width = pct + '%';
+  document.getElementById('vcCounter').textContent = `${done} / ${CARD_TOTAL}`;
+
+  if (idx >= CARD_QUEUE.length) {
+    // All done
+    document.getElementById('vcCard').style.display = 'none';
+    document.getElementById('vcDone').style.display = 'flex';
+    updateStats();
+    return;
+  }
+
+  const battle = CARD_QUEUE[idx];
+  document.getElementById('vcQuestion').textContent = battle.question;
+  document.getElementById('vcLabelA').textContent   = battle.option_a;
+  document.getElementById('vcLabelB').textContent   = battle.option_b;
+
+  // Animate in
+  const card = document.getElementById('vcCard');
+  card.classList.remove('vc-slide-in');
+  void card.offsetWidth; // reflow
+  card.classList.add('vc-slide-in');
+}
+
+async function castCardVote(choice) {
+  const battle = CARD_QUEUE[CARD_INDEX];
+  if (!battle) return;
+
+  // Animate button
+  const btn = choice === 'a'
+    ? document.getElementById('vcOptA')
+    : choice === 'b'
+      ? document.getElementById('vcOptB')
+      : null;
+  if (btn) { btn.classList.add('vc-chosen'); await new Promise(r => setTimeout(r, 200)); }
+
+  // Save vote
+  MY_VOTES[battle.id] = choice;
+  saveLocalVote(battle.id, choice);
+  persistVote(battle.id, choice);
+
+  // Remove chosen class and advance
+  if (btn) btn.classList.remove('vc-chosen');
+  CARD_INDEX++;
+  showCard(CARD_INDEX);
+}
+
+// Show launch button after battles load
+function updateVoteCardBtn() {
+  const unvoted = getUnvotedBattles().length;
+  let btn = document.getElementById('vcLaunchBtn');
+
+  if (!btn && unvoted > 0) {
+    btn = document.createElement('button');
+    btn.id = 'vcLaunchBtn';
+    btn.className = 'vc-launch-btn';
+    btn.onclick = openVoteCards;
+    const statsEl = document.querySelector('.battles-stats');
+    if (statsEl) statsEl.after(btn);
+  }
+  if (btn) {
+    if (unvoted > 0) {
+      btn.innerHTML = `⚡ Vote on ${unvoted} debate${unvoted !== 1 ? 's' : ''}`;
+      btn.style.display = 'inline-flex';
+    } else {
+      btn.style.display = 'none';
+    }
+  }
+}

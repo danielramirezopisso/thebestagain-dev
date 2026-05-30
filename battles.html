@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Debates — The Best Again</title>
   <link rel="stylesheet" href="base.css?v=1779265061">
-  <link rel="stylesheet" href="battles.css?v=1780159311">
+  <link rel="stylesheet" href="battles.css?v=1780159493">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js"></script>
   <script src="accessibility.js"></script>
@@ -120,7 +120,7 @@
 
   </main>
 
-  <script src="battles.js?v=1780159311"></script>
+  <script src="battles.js?v=1780159493"></script>
   <script>
     document.addEventListener('DOMContentLoaded', initBattles);
   </script>
@@ -136,5 +136,39 @@
   }, {passive: true});
 })();
 </script>
+
+  <!-- ══ TINDER CARD OVERLAY ══ -->
+  <div id="voteCardOverlay" style="display:none;">
+    <div class="vc-backdrop" onclick="closeVoteCards()"></div>
+    <div class="vc-container">
+      <div class="vc-header">
+        <div class="vc-progress-wrap">
+          <div class="vc-progress-bar" id="vcProgressBar"></div>
+        </div>
+        <div class="vc-counter" id="vcCounter"></div>
+        <button class="vc-close" onclick="closeVoteCards()">✕</button>
+      </div>
+      <div class="vc-card" id="vcCard">
+        <div class="vc-question" id="vcQuestion"></div>
+        <div class="vc-options">
+          <button class="vc-option vc-option-a" id="vcOptA" onclick="castCardVote('a')">
+            <span class="vc-option-label" id="vcLabelA"></span>
+          </button>
+          <div class="vc-vs">vs</div>
+          <button class="vc-option vc-option-b" id="vcOptB" onclick="castCardVote('b')">
+            <span class="vc-option-label" id="vcLabelB"></span>
+          </button>
+        </div>
+        <button class="vc-skip" onclick="castCardVote('no_opinion')">Skip →</button>
+      </div>
+      <div class="vc-done" id="vcDone" style="display:none;">
+        <div class="vc-done-icon">🎉</div>
+        <div class="vc-done-title">All caught up!</div>
+        <div class="vc-done-sub">You've voted on all debates.</div>
+        <button class="tba-btn tba-btn-primary" onclick="closeVoteCards()">Done</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

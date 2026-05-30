@@ -488,3 +488,138 @@
 .debate-option[data-choice="b"].is-chosen .debate-option-radio.is-filled {
   border-color: #7ba7d4; background: #7ba7d4;
 }
+
+/* ══════════════════════════════════════════════════════
+   TINDER CARD OVERLAY
+══════════════════════════════════════════════════════ */
+#voteCardOverlay {
+  position: fixed; inset: 0;
+  z-index: 2000;
+  display: flex; align-items: center; justify-content: center;
+}
+.vc-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+}
+.vc-container {
+  position: relative;
+  background: var(--card);
+  border-radius: 20px;
+  width: min(480px, 92vw);
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+  animation: vcPop 0.25s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes vcPop {
+  from { transform: scale(0.9); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+/* Header */
+.vc-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--rule);
+}
+.vc-progress-wrap {
+  flex: 1; height: 6px;
+  background: var(--faint);
+  border-radius: 99px; overflow: hidden;
+}
+.vc-progress-bar {
+  height: 100%; background: var(--accent);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.vc-counter {
+  font-size: 12px; font-weight: 700;
+  color: var(--muted); white-space: nowrap;
+}
+.vc-close {
+  background: none; border: none; box-shadow: none;
+  font-size: 16px; color: var(--muted);
+  cursor: pointer; padding: 0 4px;
+  transition: color 0.15s;
+}
+.vc-close:hover { color: var(--text); transform: none; box-shadow: none; }
+
+/* Card */
+.vc-card { padding: 28px 24px 24px; }
+.vc-question {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 22px; font-weight: 700;
+  color: var(--text); line-height: 1.3;
+  text-align: center; margin-bottom: 28px;
+}
+.vc-options {
+  display: flex; align-items: center; gap: 12px;
+}
+.vc-option {
+  flex: 1; padding: 18px 12px;
+  border-radius: 14px; border: 2px solid var(--border);
+  background: var(--faint);
+  cursor: pointer; font-size: 15px; font-weight: 700;
+  color: var(--text); text-align: center;
+  transition: all 0.15s; box-shadow: none;
+  line-height: 1.3;
+}
+.vc-option:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+.vc-option-a:hover, .vc-option-a.vc-chosen {
+  background: var(--accent); color: #fff; border-color: var(--accent);
+}
+.vc-option-b:hover, .vc-option-b.vc-chosen {
+  background: #7ba7d4; color: #fff; border-color: #7ba7d4;
+}
+.vc-vs {
+  font-size: 11px; font-weight: 800;
+  color: var(--muted); letter-spacing: 0.1em;
+  text-transform: uppercase; flex-shrink: 0;
+}
+.vc-skip {
+  display: block; width: 100%; margin-top: 16px;
+  background: none; border: none; box-shadow: none;
+  font-size: 13px; color: var(--muted);
+  cursor: pointer; padding: 8px;
+  transition: color 0.15s; text-align: center;
+}
+.vc-skip:hover { color: var(--text); transform: none; box-shadow: none; }
+
+/* Slide animation */
+.vc-slide-in {
+  animation: vcSlide 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes vcSlide {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* Done state */
+.vc-done {
+  padding: 40px 24px;
+  flex-direction: column; align-items: center;
+  gap: 12px; text-align: center;
+}
+.vc-done-icon { font-size: 48px; }
+.vc-done-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 24px; font-weight: 700; color: var(--text);
+}
+.vc-done-sub { font-size: 14px; color: var(--muted); }
+
+/* Launch button */
+.vc-launch-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--accent); color: #fff;
+  border: none; border-radius: 20px;
+  padding: 10px 20px; font-size: 13px; font-weight: 700;
+  cursor: pointer; margin: 12px auto 0;
+  box-shadow: 0 4px 14px rgba(45,74,138,0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.vc-launch-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(45,74,138,0.4);
+}
