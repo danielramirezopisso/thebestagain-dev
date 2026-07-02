@@ -868,22 +868,51 @@ async function nominatimSearch(q) {
   res.style.display = 'block';
   res.innerHTML = '<div class="map-search-loading">Searching…</div>';
   try {
-    // 1. Search our DB first
+    // 1. Search our DB first (markers + categories)
     try {
-      const { data: markers, error: dbErr } = await sb.from('markers')
-        .select('id,title,group_type,rating_avg,rating_count,city,lat,lon')
-        .eq('is_active', true)
-        .ilike('title', '%' + q + '%')
-        .order('rating_count', { ascending: false })
-        .limit(6);
+      const [{ data: markers, error: mErr }, { data: cats, error: cErr }] = await Promise.all([
+        sb.from('markers')
+          .select('id,title,group_type,rating_avg,rating_count,city,lat,lon')
+          .eq('is_active', true)
+          .ilike('title', '%' + q + '%')
+          .order('rating_count', { ascending: false })
+          .limit(6),
+        sb.from('categories')
+          .select('id,name,icon_url,for_places')
+          .eq('is_active', true)
+          .ilike('name', '%' + q + '%')
+          .limit(3)
+      ]);
 
-      if (!dbErr && markers && markers.length) {
-        searchResults = markers.map(m => ({ _type: 'db', ...m }));
+      const items = [];
+
+      // Categories first
+      (cats || []).forEach(cat => {
+        items.push({ _type: 'category', id: cat.id, title: cat.name, icon: cat.icon_url });
+      });
+
+      // Then markers
+      (markers || []).forEach(m => {
+        items.push({ _type: 'db', ...m });
+      });
+
+      if (items.length) {
+        searchResults = items;
         searchActive = -1;
-        res.innerHTML = markers.map((m, i) => {
-          const city = m.city === 'BCN' ? 'Barcelona' : m.city === 'MAD' ? 'Madrid' : (m.city || '');
-          const score = m.rating_count > 0 ? ' · ' + Number(m.rating_avg).toFixed(1) + '★' : '';
-          return '<div class="map-search-result" data-idx="' + i + '" onmousedown="selectSearchResult(' + i + ')" onmouseover="highlightResult(' + i + ')"><span class="map-sr-main">' + escapeHtml(m.title) + '</span><span class="map-sr-sub">' + escapeHtml(city + score) + '</span></div>';
+        res.innerHTML = items.map((it, i) => {
+          let icon, main, sub;
+          if (it._type === 'category') {
+            const imgTag = it.icon ? ('<img src="' + escapeHtml(it.icon) + '" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;margin-right:4px;">') : '';
+            icon = imgTag || '🏷 ';
+            main = icon + escapeHtml(it.title);
+            sub = 'Filter map by category';
+          } else {
+            const city = it.city === 'BCN' ? 'Barcelona' : it.city === 'MAD' ? 'Madrid' : (it.city || '');
+            const score = it.rating_count > 0 ? ' · ' + Number(it.rating_avg).toFixed(1) + '★' : '';
+            main = '📍 ' + escapeHtml(it.title);
+            sub = city + score;
+          }
+          return '<div class="map-search-result" data-idx="' + i + '" onmousedown="selectSearchResult(' + i + ')" onmouseover="highlightResult(' + i + ')"><span class="map-sr-main">' + main + '</span>' + (sub ? '<span class="map-sr-sub">' + escapeHtml(sub) + '</span>' : '') + '</div>';
         }).join('');
         return;
       }
@@ -910,6 +939,12 @@ function highlightResult(idx) {
 
 function selectSearchResult(idx) {
   const d = searchResults[idx]; if (!d) return;
+
+  // Category result — filter map
+  if (d._type === 'category') {
+    window.location.href = 'map.html?category=' + d.id;
+    return;
+  }
 
   // DB result — fly to marker on map and open popup
   if (d._type === 'db') {
