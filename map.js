@@ -868,47 +868,15 @@ async function nominatimSearch(q) {
   res.style.display = 'block';
   res.innerHTML = '<div class="map-search-loading">Searching…</div>';
   try {
-    // Search our own DB — markers and categories
-    const [{ data: markers }, { data: cats }] = await Promise.all([
-      sb.from('markers')
-        .select('id,title,group_type,rating_avg,rating_count,city,lat,lon')
-        .eq('is_active', true)
-        .ilike('title', `%${q}%`)
-        .order('rating_count', { ascending: false })
-        .limit(6),
-      sb.from('categories')
-        .select('id,name,icon_url')
-        .eq('is_active', true)
-        .ilike('name', `%${q}%`)
-        .limit(3)
-    ]);
-
-    const items = [];
-
-    // Categories → filter map
-    (cats || []).forEach(c => items.push({ type: 'category', id: c.id, label: c.name, sub: 'See all places →', icon: c.icon_url }));
-
-    // Markers → go to marker page
-    (markers || []).forEach(m => {
-      const city = m.city === 'BCN' ? 'Barcelona' : m.city === 'MAD' ? 'Madrid' : (m.city || '');
-      const score = m.rating_count > 0 ? `${Number(m.rating_avg).toFixed(1)} ★` : '';
-      items.push({ type: m.group_type, id: m.id, label: m.title, sub: [city, score].filter(Boolean).join(' · '), lat: m.lat, lon: m.lon });
-    });
-
-    searchResults = items; searchActive = -1;
-
-    if (!items.length) { res.innerHTML = '<div class="map-search-empty">No results found.</div>'; return; }
-
-    res.innerHTML = items.map((it, i) => {
-      const icon = it.type === 'category'
-        ? (it.icon ? `<img src="${it.icon}" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">` : '🏷 ')
-        : it.type === 'product' ? '📦 ' : '📍 ';
-      return `<div class="map-search-result" data-idx="${i}" onmousedown="selectSearchResult(${i})" onmouseover="highlightResult(${i})">
-        <span class="map-sr-main">${icon}${escapeHtml(it.label)}</span>
-        ${it.sub ? `<span class="map-sr-sub">${escapeHtml(it.sub)}</span>` : ''}
-      </div>`;
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=6&addressdetails=1`;
+    const r = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+    const data = await r.json();
+    searchResults = data; searchActive = -1;
+    if (!data.length) { res.innerHTML = '<div class="map-search-empty">No results found.</div>'; return; }
+    res.innerHTML = data.map((d, i) => {
+      const parts = (d.display_name || '').split(', ');
+      return `<div class="map-search-result" data-idx="${i}" onmousedown="selectSearchResult(${i})" onmouseover="highlightResult(${i})"><span class="map-sr-main">${escapeHtml(parts[0])}</span>${parts.slice(1,3).join(', ') ? `<span class="map-sr-sub">${escapeHtml(parts.slice(1,3).join(', '))}</span>` : ''}</div>`;
     }).join('');
-
   } catch(e) { res.innerHTML = '<div class="map-search-empty">Search unavailable.</div>'; }
 }
 
@@ -919,28 +887,12 @@ function highlightResult(idx) {
 
 function selectSearchResult(idx) {
   const d = searchResults[idx]; if (!d) return;
-
-  if (d.type === 'category') {
-    // Filter map by category
-    window.location.href = `map.html?category=${d.id}`;
-    return;
-  }
-
-  if (d.type === 'place' || d.type === 'product') {
-    // Go to marker page
-    window.location.href = `marker.html?id=${d.id}`;
-    return;
-  }
-
-  // Fallback: fly to coordinates
-  if (d.lat && d.lon) {
-    MAP.setView([parseFloat(d.lat), parseFloat(d.lon)], 17);
-    if (window._searchPin) window._searchPin.remove();
-    window._searchPin = L.marker([parseFloat(d.lat), parseFloat(d.lon)], {
-      icon: L.divIcon({ className:'', html:`<div class="search-pin">📍</div>`, iconSize:[32,32], iconAnchor:[16,32] })
-    }).addTo(MAP);
-  }
-  document.getElementById('mapSearchInput').value = d.label || '';
+  window._lastSearchResult = d; // remember for add panel
+  if (d.boundingbox) { const [s,n,w,e] = d.boundingbox.map(Number); MAP.fitBounds([[s,w],[n,e]], { maxZoom:17, padding:[30,30] }); }
+  else MAP.setView([parseFloat(d.lat), parseFloat(d.lon)], 16);
+  if (window._searchPin) window._searchPin.remove();
+  window._searchPin = L.marker([parseFloat(d.lat), parseFloat(d.lon)], { icon: L.divIcon({ className:'', html:`<div class="search-pin">📍</div>`, iconSize:[32,32], iconAnchor:[16,32] }) }).addTo(MAP);
+  document.getElementById('mapSearchInput').value = d.display_name.split(', ').slice(0,2).join(', ');
   hideSearchResults();
 }
 
