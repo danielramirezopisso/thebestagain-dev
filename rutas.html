@@ -34,6 +34,64 @@
       <a href="battles.html">Debates</a>
     </nav>
     <div class="nav-right">
+      <span id="authStatus" class="auth-pill"></span>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    </div>
+  </header>
+
+  <!-- Sticky progress bar -->
+<!-- sticky bar removed -->
+
+  <main class="rutas-main">
+
+    <!-- HERO -->
+    <section class="rutas-hero">
+      <div class="rutas-hero-eyebrow">Curated food discovery</div>
+      <h1 class="rutas-hero-title">Rutas</h1>
+      <p class="rutas-hero-desc">12 hand-picked places per category. Try them all, rate each one, and build your personal ranking of the city — one dish at a time.</p>
+    </section>
+
+    <!-- CITY TABS -->
+    <section class="rutas-city-section">
+      <div class="rutas-city-tabs">
+        <button class="city-tab" id="cityBCN" onclick="selectCity('BCN')">Barcelona</button>
+        <button class="city-tab" id="cityMAD" onclick="selectCity('MAD')">Madrid</button>
+      </div>
+    </section>
+
+    <!-- CATEGORY CARDS -->
+    <section class="rutas-cat-section" id="catSection" style="display:none;">
+      <div class="rutas-section-label">Choose a category</div>
+      <div class="rutas-cat-grid" id="rutasCatGrid"></div>
+    </section>
+
+    <!-- RUTA VIEW -->
+    <section class="rutas-ruta-section" id="rutaSection" style="display:none;">
+      <button class="ruta-back-btn" onclick="closeRuta()">← Back to categories</button>
+      <div class="ruta-title-block">
+        <div class="ruta-title-label" id="rutaTitleLabel"></div>
+        <h2 class="ruta-title" id="rutaTitle"></h2>
+        <div class="ruta-progress-row">
+          <div class="ruta-progress-track"><div class="ruta-progress-fill" id="rutaProgressFill"></div></div>
+          <span class="ruta-progress-text" id="rutaProgressText"></span>
+        </div>
+      </div>
+
+      <div class="ruta-layout">
+        <button class="ruta-map-toggle" id="rutaMapToggle" onclick="toggleRutaMap()">🗺 Show on map</button>
+        <div class="ruta-map-wrap" id="rutaMapWrap" style="display:none;"><div id="rutaMap"></div></div>
+        <div class="ruta-grid-wrap">
+          <div class="ruta-grid" id="rutaGrid"></div>
+        </div>
+        <!-- Mobile map: always open, above coming soon -->
+        <div class="ruta-map-mobile" id="rutaMapMobile"><div id="rutaMapM"></div></div>
+          <div class="ruta-tier-teaser" id="rutaTierTeaser" style="display:none;">
+            <div class="ruta-tier-teaser-inner">
+              <div class="ruta-tier-teaser-icon">🔒</div>
+              <div class="ruta-tier-teaser-title">More coming</div>
+              <div class="ruta-tier-teaser-sub">A deeper selection of hidden gems and local favourites is on its way. Finish this ruta to be the first to know.</div>
+            </div>
+          </div>
       </div>
     </section>
 

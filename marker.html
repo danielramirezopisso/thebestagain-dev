@@ -39,6 +39,26 @@
       <a href="battles.html">Debates</a>
     </nav>
     <div class="nav-right">
+      <span id="authStatus" class="auth-pill"></span>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    </div>
+  </header>
+
+  <!-- Loading state -->
+  <div id="pageLoadingState" class="mk-loading">
+    <div class="mk-loading-bar"></div>
+  </div>
+
+  <main class="mk-main" id="mkMain" style="display:none;">
+
+    <!-- ── PHOTO HERO ── -->
+    <div class="mk-photo-hero" id="mkPhotoHero">
+      <div class="mk-photo-strip" id="mkPhotoStrip">
+        <!-- Photos injected by JS, or placeholder -->
+        <div class="mk-photo-placeholder" id="mkPhotoPlaceholder">
+          <div class="mk-photo-placeholder-icon" id="mkPhotoPlaceholderIcon">🍽</div>
+        </div>
+      </div>
       <!-- Overlay actions on photo -->
       <div class="mk-photo-actions">
         <label class="mk-photo-add-btn" id="mkPhotoAddBtn" style="display:none;" title="Add photo">

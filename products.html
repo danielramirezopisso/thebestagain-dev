@@ -41,6 +41,165 @@
       <a href="battles.html">Debates</a>
     </nav>
     <div class="nav-right">
+      <span id="authStatus" class="auth-pill"></span>
+      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu">&#9776;</button>
+    </div>
+  </header>
+
+  <main class="products-main">
+
+    <!-- Hero -->
+    <header class="products-hero">
+      <div class="products-hero-eyebrow">The Best Again</div>
+      <h1 class="products-hero-title">Products</h1>
+      <p class="products-hero-sub">The highest-rated products, ranked by the community.</p>
+
+      <!-- Controls row: Filters pill + Journey toggle -->
+      <div class="products-controls">
+        <button class="prod-filter-pill" id="prodFilterPill" onclick="toggleFilterDrawer()">
+          <span>≡ Filters</span>
+          <span class="prod-filter-count" id="prodFilterCount" style="display:none;"></span>
+        </button>
+
+        <div class="prod-journey-toggle" onclick="toggleJourneyModeProd()">
+          <span class="journey-opt journey-opt-active" id="prodJOptDiscover">🌍 Discover</span>
+          <span class="journey-divider">|</span>
+          <span class="journey-opt" id="prodJOptJourney">🧭 My Journey</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Status -->
+    <div class="prod-status" id="pageStatus"></div>
+
+    <!-- Lanes grid -->
+    <div class="lanes-grid" id="lanes"></div>
+
+  </main>
+
+  <!-- Filter drawer (like map) -->
+  <div class="prod-filter-overlay" id="prodFilterOverlay" onclick="closeFilterDrawer()" style="display:none;"></div>
+  <div class="prod-filter-drawer" id="prodFilterDrawer" style="display:none;">
+    <div class="prod-filter-drawer-head">
+      <span class="prod-filter-drawer-title">Filters</span>
+      <button class="prod-filter-drawer-close" onclick="closeFilterDrawer()">✕</button>
+    </div>
+
+    <div class="prod-filter-section">
+      <div class="prod-filter-label">Category</div>
+      <div id="catQuick" class="prod-filter-chips"></div>
+      <!-- Hidden select kept for compatibility -->
+      <select id="catMore" style="display:none;" onchange="onCategoryMoreChanged()">
+        <option value="">More…</option>
+      </select>
+    </div>
+
+    <div class="prod-filter-section">
+      <div class="prod-filter-label">Rating</div>
+      <div id="ratingSeg" class="prod-filter-chips"></div>
+    </div>
+
+    <div class="prod-filter-section prod-filter-suggest">
+      <span class="request-link" onclick="openTraction('requestCategory', null)">💡 Suggest category</span>
+      <span class="request-link" onclick="openTraction('requestBrand', null)">🏷️ Suggest brand</span>
+    </div>
+
+
+      <!-- Colorblind mode toggle -->
+      <div class="cb-toggle-row">
+        <label class="cb-toggle-label">
+          <span>👁</span>
+          <div>
+            Colorblind mode
+            <div class="cb-toggle-sub">Replaces red/green with blue/orange</div>
+          </div>
+        </label>
+        <label class="cb-toggle-switch">
+          <input type="checkbox" class="cb-toggle-input" id="cbToggleProd"
+            onchange="toggleColorblindMode()">
+          <span class="cb-toggle-track"></span>
+        </label>
+      </div>
+
+    <div class="prod-filter-actions">
+      <button class="prod-filter-clear" id="btnClearFilters" onclick="clearFilters()" style="display:none;">✕ Clear filters</button>
+    </div>
+  </div>
+
+  <!-- FAB: Add product -->
+  <button class="add-product-fab" id="addFab" onclick="toggleAddPanel()" title="Add new product">＋</button>
+
+  <!-- Add product panel -->
+  <div class="prod-add-overlay" id="prodAddOverlay" onclick="if(event.target===this)toggleAddPanel()" style="display:none;">
+    <aside class="prod-add-panel" id="addPanel">
+      <div class="prod-add-head">
+        <div class="prod-add-title">Add product</div>
+        <button class="prod-add-close" onclick="toggleAddPanel()">✕</button>
+      </div>
+      <p class="prod-add-sub">Category + Brand (unique). Creating also saves your vote.</p>
+
+      <div id="addPanelLoggedOut" style="display:none;">
+        Please <a href="login.html"><b>login</b></a> to add products.
+      </div>
+
+      <div id="addPanelForm">
+        <label>Category</label>
+        <select id="p_category"></select>
+        <label>Brand</label>
+        <select id="p_brand"></select>
+        <label>Product name <span class="prod-add-optional">(optional)</span></label>
+        <input id="p_product_name" placeholder="Leave blank if only one version" />
+        <label>My vote (1–10)</label>
+        <select id="p_vote"></select>
+        <div class="prod-add-footer">
+          <button class="tba-btn tba-btn-primary" onclick="saveProduct()">Save</button>
+          <span id="p_status" class="muted"></span>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- See all drawer -->
+  <div id="drawerOverlay" class="drawer-overlay" style="display:none;" onclick="closeDrawer()"></div>
+  <aside id="drawer" class="drawer drawer-slide" style="display:none;">
+    <div class="drawer-head">
+      <div class="drawer-title">
+        <span id="drawerCatName">—</span>
+      </div>
+      <div class="drawer-actions">
+        <button class="tba-btn" id="drawerSortBtn" onclick="toggleDrawerSort()">↓</button>
+        <button class="tba-btn" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+    <div class="drawer-body" id="drawerList"></div>
+  </aside>
+
+  <!-- Traction popup -->
+  <div class="traction-overlay" id="tractionOverlay" onclick="if(event.target===this)closeTraction()">
+    <div class="traction-popup">
+      <span class="traction-emoji" id="trEmoji">🚧</span>
+      <h2 id="trTitle"></h2>
+      <p id="trBody"></p>
+      <div class="traction-request-area" id="trRequestArea" style="display:none;">
+        <label class="tr-field-label" id="trRequestLabel">Your suggestion</label>
+        <textarea id="trRequestText" rows="2"></textarea>
+        <div id="trBrandExtras" style="display:none;">
+          <label class="tr-field-label" style="margin-top:10px;">Category</label>
+          <select id="trCategorySelect"><option value="">— Select existing category —</option></select>
+          <div class="tr-or-row"><span>or suggest a new one</span></div>
+          <input type="text" id="trNewCategory" placeholder="New category name (optional)" />
+        </div>
+      </div>
+      <div class="traction-email-area" id="trEmailArea">
+        <input type="email" id="trEmail" placeholder="Your email address" />
+      </div>
+      <div class="traction-actions">
+        <button class="tba-btn tba-btn-primary" id="trSubmitBtn" onclick="submitTraction()">Notify me</button>
+        <button class="tba-btn" id="trSkipBtn" onclick="closeTraction()">Maybe later</button>
+      </div>
+      <div class="traction-status" id="trStatus"></div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="accessibility.js"></script>
