@@ -868,6 +868,30 @@ async function nominatimSearch(q) {
   res.style.display = 'block';
   res.innerHTML = '<div class="map-search-loading">Searching…</div>';
   try {
+    // 1. Search our DB first
+    const { data: markers } = await sb.from('markers')
+      .select('id,title,group_type,rating_avg,rating_count,city,lat,lon')
+      .eq('is_active', true)
+      .ilike('title', `%${q}%`)
+      .order('rating_count', { ascending: false })
+      .limit(6);
+
+    if (markers && markers.length) {
+      // Show DB results
+      searchResults = markers.map(m => ({ _type: 'db', ...m }));
+      searchActive = -1;
+      res.innerHTML = markers.map((m, i) => {
+        const city = m.city === 'BCN' ? 'Barcelona' : m.city === 'MAD' ? 'Madrid' : (m.city || '');
+        const score = m.rating_count > 0 ? ` · ${Number(m.rating_avg).toFixed(1)}★` : '';
+        return `<div class="map-search-result" data-idx="${i}" onmousedown="selectSearchResult(${i})" onmouseover="highlightResult(${i})">
+          <span class="map-sr-main">${escapeHtml(m.title)}</span>
+          <span class="map-sr-sub">${escapeHtml(city + score)}</span>
+        </div>`;
+      }).join('');
+      return;
+    }
+
+    // 2. Fall back to Nominatim if no DB results
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=6&addressdetails=1`;
     const r = await fetch(url, { headers: { 'Accept-Language': 'en' } });
     const data = await r.json();
@@ -877,6 +901,7 @@ async function nominatimSearch(q) {
       const parts = (d.display_name || '').split(', ');
       return `<div class="map-search-result" data-idx="${i}" onmousedown="selectSearchResult(${i})" onmouseover="highlightResult(${i})"><span class="map-sr-main">${escapeHtml(parts[0])}</span>${parts.slice(1,3).join(', ') ? `<span class="map-sr-sub">${escapeHtml(parts.slice(1,3).join(', '))}</span>` : ''}</div>`;
     }).join('');
+
   } catch(e) { res.innerHTML = '<div class="map-search-empty">Search unavailable.</div>'; }
 }
 
@@ -887,7 +912,21 @@ function highlightResult(idx) {
 
 function selectSearchResult(idx) {
   const d = searchResults[idx]; if (!d) return;
-  window._lastSearchResult = d; // remember for add panel
+
+  // DB result — fly to marker on map and open popup
+  if (d._type === 'db') {
+    MAP.setView([parseFloat(d.lat), parseFloat(d.lon)], 17);
+    if (window._searchPin) window._searchPin.remove();
+    window._searchPin = L.marker([parseFloat(d.lat), parseFloat(d.lon)], {
+      icon: L.divIcon({ className:'', html:`<div class="search-pin">📍</div>`, iconSize:[32,32], iconAnchor:[16,32] })
+    }).addTo(MAP).bindPopup(`<b>${d.title}</b><br><a href="marker.html?id=${d.id}">View →</a>`).openPopup();
+    document.getElementById('mapSearchInput').value = d.title;
+    hideSearchResults();
+    return;
+  }
+
+  // Nominatim result
+  window._lastSearchResult = d;
   if (d.boundingbox) { const [s,n,w,e] = d.boundingbox.map(Number); MAP.fitBounds([[s,w],[n,e]], { maxZoom:17, padding:[30,30] }); }
   else MAP.setView([parseFloat(d.lat), parseFloat(d.lon)], 16);
   if (window._searchPin) window._searchPin.remove();
