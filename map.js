@@ -868,7 +868,8 @@ async function nominatimSearch(q) {
   res.style.display = 'block';
   res.innerHTML = '<div class="map-search-loading">Searching…</div>';
   try {
-    // 1. Search our DB first
+    // 1. Search our DB first (only if sb is ready)
+    if (typeof sb === 'undefined') throw new Error('sb not ready');
     const { data: markers } = await sb.from('markers')
       .select('id,title,group_type,rating_avg,rating_count,city,lat,lon')
       .eq('is_active', true)
