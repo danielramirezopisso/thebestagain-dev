@@ -39,35 +39,6 @@
       <a href="battles.html">Debates</a>
     </nav>
     <div class="nav-right">
-      <div class="gs-wrap" id="globalSearchWrap">
-        <div class="gs-input-wrap">
-          <input id="globalSearchInput" type="search" placeholder="Search…" autocomplete="off" />
-        </div>
-        <button class="gs-toggle-btn" onclick="toggleGlobalSearch()" title="Search">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        </button>
-        <div id="globalSearchResults"></div>
-      </div>
-      <span id="authStatus" class="auth-pill"></span>
-      <button class="burger" id="burgerBtn" onclick="toggleNav()" aria-label="Menu" aria-expanded="false">&#9776;</button>
-    </div>
-  </header>
-
-  <!-- Loading state -->
-  <div id="pageLoadingState" class="mk-loading">
-    <div class="mk-loading-bar"></div>
-  </div>
-
-  <main class="mk-main" id="mkMain" style="display:none;">
-
-    <!-- ── PHOTO HERO ── -->
-    <div class="mk-photo-hero" id="mkPhotoHero">
-      <div class="mk-photo-strip" id="mkPhotoStrip">
-        <!-- Photos injected by JS, or placeholder -->
-        <div class="mk-photo-placeholder" id="mkPhotoPlaceholder">
-          <div class="mk-photo-placeholder-icon" id="mkPhotoPlaceholderIcon">🍽</div>
-        </div>
-      </div>
       <!-- Overlay actions on photo -->
       <div class="mk-photo-actions">
         <label class="mk-photo-add-btn" id="mkPhotoAddBtn" style="display:none;" title="Add photo">
@@ -309,6 +280,14 @@
 
 <button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <script>(function(){var b=document.getElementById('scrollTopBtn');if(!b)return;window.addEventListener('scroll',function(){b.classList.toggle('visible',window.scrollY>300)},{passive:true});})();</script>
+
+  <!-- Global Search Overlay -->
+  <div class="gs-overlay" id="gsOverlay">
+    <input id="gsInput" type="search" placeholder="Search places, categories…" autocomplete="off" />
+    <button class="gs-close-btn" onclick="closeGlobalSearch()">Cancel</button>
+  </div>
+  <div id="gsResults"></div>
+
   <script src="search.js"></script>
   <script>initGlobalSearch();</script>
 </body>

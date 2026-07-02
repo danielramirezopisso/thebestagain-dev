@@ -1,125 +1,99 @@
-/* ══════════════════════════════════════════════════════
-   GLOBAL SEARCH — search.js
-   Searches markers + categories across all pages
-══════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   GLOBAL SEARCH
+══════════════════════════════════════════ */
+let _gsDebounce = null;
 
-let _searchDebounce = null;
-let _searchOpen = false;
+function openGlobalSearch() {
+  document.getElementById('gsOverlay').classList.add('gs-open');
+  setTimeout(() => document.getElementById('gsInput')?.focus(), 60);
+}
+
+function closeGlobalSearch() {
+  document.getElementById('gsOverlay').classList.remove('gs-open');
+  document.getElementById('gsInput').value = '';
+  document.getElementById('gsResults').style.display = 'none';
+}
 
 function initGlobalSearch() {
-  const input = document.getElementById('globalSearchInput');
-  const results = document.getElementById('globalSearchResults');
-  if (!input || !results) return;
+  const input = document.getElementById('gsInput');
+  if (!input) return;
 
   input.addEventListener('input', () => {
-    clearTimeout(_searchDebounce);
+    clearTimeout(_gsDebounce);
     const q = input.value.trim();
-    if (q.length < 2) { results.style.display = 'none'; return; }
-    _searchDebounce = setTimeout(() => runGlobalSearch(q), 280);
-  });
-
-  input.addEventListener('focus', () => {
-    if (input.value.trim().length >= 2) results.style.display = 'block';
-  });
-
-  // Close on outside click
-  document.addEventListener('click', e => {
-    if (!e.target.closest('.gs-wrap')) {
-      results.style.display = 'none';
+    if (q.length < 2) {
+      document.getElementById('gsResults').style.display = 'none';
+      return;
     }
+    _gsDebounce = setTimeout(() => runSearch(q), 280);
   });
 
-  // Escape to close
   input.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { results.style.display = 'none'; input.blur(); }
+    if (e.key === 'Escape') closeGlobalSearch();
   });
 }
 
-async function runGlobalSearch(q) {
-  const results = document.getElementById('globalSearchResults');
-  if (!results) return;
-  results.style.display = 'block';
-  results.innerHTML = '<div class="gs-loading">Searching…</div>';
+async function runSearch(q) {
+  const box = document.getElementById('gsResults');
+  box.style.display = 'block';
+  box.innerHTML = '<div class="gs-status">Searching…</div>';
 
   try {
-    // Search markers (places + products)
-    const { data: markers } = await sb.from('markers')
-      .select('id, title, group_type, category_id, rating_avg, rating_count, city')
-      .eq('is_active', true)
-      .ilike('title', `%${q}%`)
-      .order('rating_count', { ascending: false })
-      .limit(7);
-
-    // Search categories
-    const { data: cats } = await sb.from('categories')
-      .select('id, name, icon_url, for_places, for_products')
-      .eq('is_active', true)
-      .ilike('name', `%${q}%`)
-      .limit(3);
+    const [{ data: markers }, { data: cats }] = await Promise.all([
+      sb.from('markers')
+        .select('id,title,group_type,rating_avg,rating_count,city')
+        .eq('is_active', true)
+        .ilike('title', `%${q}%`)
+        .order('rating_count', { ascending: false })
+        .limit(7),
+      sb.from('categories')
+        .select('id,name,icon_url')
+        .eq('is_active', true)
+        .ilike('name', `%${q}%`)
+        .limit(3)
+    ]);
 
     const items = [];
 
-    // Categories first
-    (cats || []).forEach(c => {
-      items.push({
-        type: 'category',
-        id: c.id,
-        title: c.name,
-        sub: c.for_places ? 'Category · Places' : 'Category · Products',
-        icon: c.icon_url,
-        url: `map.html?category=${c.id}`
-      });
-    });
+    (cats || []).forEach(c => items.push({
+      icon: c.icon_url
+        ? `<img src="${c.icon_url}" class="gs-icon-img" onerror="this.style.display='none'">`
+        : '🏷',
+      title: c.name,
+      sub: 'Category',
+      url: `map.html?category=${c.id}`
+    }));
 
-    // Markers
     (markers || []).forEach(m => {
-      const cityLabel = m.city === 'BCN' ? 'Barcelona' : m.city === 'MAD' ? 'Madrid' : m.city || '';
-      const score = m.rating_count > 0 ? Number(m.rating_avg).toFixed(1) : null;
+      const city = m.city === 'BCN' ? 'Barcelona' : m.city === 'MAD' ? 'Madrid' : (m.city || '');
+      const score = m.rating_count > 0 ? `${Number(m.rating_avg).toFixed(1)} ★` : '';
       items.push({
-        type: m.group_type,
-        id: m.id,
+        icon: m.group_type === 'product' ? '📦' : '📍',
         title: m.title,
-        sub: [cityLabel, score ? `⭐ ${score}` : null].filter(Boolean).join(' · '),
+        sub: [city, score].filter(Boolean).join(' · '),
         url: `marker.html?id=${m.id}`
       });
     });
 
     if (!items.length) {
-      results.innerHTML = '<div class="gs-empty">No results found</div>';
+      box.innerHTML = '<div class="gs-status">No results found</div>';
       return;
     }
 
-    results.innerHTML = items.map(item => {
-      const icon = item.type === 'category'
-        ? (item.icon ? `<img src="${item.icon}" class="gs-icon-img" onerror="this.style.display='none'" />` : '🏷')
-        : item.type === 'product' ? '📦' : '📍';
-      return `<a class="gs-result" href="${item.url}">
-        <span class="gs-result-icon">${icon}</span>
+    box.innerHTML = items.map(it => `
+      <a class="gs-result" href="${it.url}" onclick="closeGlobalSearch()">
+        <span class="gs-result-icon">${it.icon}</span>
         <span class="gs-result-body">
-          <span class="gs-result-title">${escapeHtmlSearch(item.title)}</span>
-          ${item.sub ? `<span class="gs-result-sub">${item.sub}</span>` : ''}
+          <span class="gs-result-title">${esc(it.title)}</span>
+          ${it.sub ? `<span class="gs-result-sub">${it.sub}</span>` : ''}
         </span>
-      </a>`;
-    }).join('');
+      </a>`).join('');
 
   } catch(e) {
-    results.innerHTML = '<div class="gs-empty">Search unavailable</div>';
+    box.innerHTML = '<div class="gs-status">Search unavailable</div>';
   }
 }
 
-function escapeHtmlSearch(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function toggleGlobalSearch() {
-  const wrap = document.getElementById('globalSearchWrap');
-  const input = document.getElementById('globalSearchInput');
-  if (!wrap) return;
-  _searchOpen = !_searchOpen;
-  wrap.classList.toggle('gs-open', _searchOpen);
-  if (_searchOpen) setTimeout(() => input?.focus(), 50);
-  else {
-    document.getElementById('globalSearchResults').style.display = 'none';
-    if (input) input.value = '';
-  }
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
