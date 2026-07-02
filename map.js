@@ -948,7 +948,7 @@ function selectSearchResult(idx) {
 
   // DB result — fly to marker on map and open popup
   if (d._type === 'db') {
-    MAP.setView([parseFloat(d.lat), parseFloat(d.lon)], 17);
+    MAP.setView([parseFloat(d.lat), parseFloat(d.lon)], 15);
     if (window._searchPin) window._searchPin.remove();
     window._searchPin = L.marker([parseFloat(d.lat), parseFloat(d.lon)], {
       icon: L.divIcon({ className:'', html:`<div class="search-pin">📍</div>`, iconSize:[32,32], iconAnchor:[16,32] })
