@@ -868,29 +868,26 @@ async function nominatimSearch(q) {
   res.style.display = 'block';
   res.innerHTML = '<div class="map-search-loading">Searching…</div>';
   try {
-    // 1. Search our DB first (only if sb is ready)
-    if (typeof sb === 'undefined') throw new Error('sb not ready');
-    const { data: markers } = await sb.from('markers')
-      .select('id,title,group_type,rating_avg,rating_count,city,lat,lon')
-      .eq('is_active', true)
-      .ilike('title', `%${q}%`)
-      .order('rating_count', { ascending: false })
-      .limit(6);
+    // 1. Search our DB first
+    try {
+      const { data: markers, error: dbErr } = await sb.from('markers')
+        .select('id,title,group_type,rating_avg,rating_count,city,lat,lon')
+        .eq('is_active', true)
+        .ilike('title', '%' + q + '%')
+        .order('rating_count', { ascending: false })
+        .limit(6);
 
-    if (markers && markers.length) {
-      // Show DB results
-      searchResults = markers.map(m => ({ _type: 'db', ...m }));
-      searchActive = -1;
-      res.innerHTML = markers.map((m, i) => {
-        const city = m.city === 'BCN' ? 'Barcelona' : m.city === 'MAD' ? 'Madrid' : (m.city || '');
-        const score = m.rating_count > 0 ? ` · ${Number(m.rating_avg).toFixed(1)}★` : '';
-        return `<div class="map-search-result" data-idx="${i}" onmousedown="selectSearchResult(${i})" onmouseover="highlightResult(${i})">
-          <span class="map-sr-main">${escapeHtml(m.title)}</span>
-          <span class="map-sr-sub">${escapeHtml(city + score)}</span>
-        </div>`;
-      }).join('');
-      return;
-    }
+      if (!dbErr && markers && markers.length) {
+        searchResults = markers.map(m => ({ _type: 'db', ...m }));
+        searchActive = -1;
+        res.innerHTML = markers.map((m, i) => {
+          const city = m.city === 'BCN' ? 'Barcelona' : m.city === 'MAD' ? 'Madrid' : (m.city || '');
+          const score = m.rating_count > 0 ? ' · ' + Number(m.rating_avg).toFixed(1) + '★' : '';
+          return '<div class="map-search-result" data-idx="' + i + '" onmousedown="selectSearchResult(' + i + ')" onmouseover="highlightResult(' + i + ')"><span class="map-sr-main">' + escapeHtml(m.title) + '</span><span class="map-sr-sub">' + escapeHtml(city + score) + '</span></div>';
+        }).join('');
+        return;
+      }
+    } catch(dbEx) { /* fall through to Nominatim */ }
 
     // 2. Fall back to Nominatim if no DB results
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=6&addressdetails=1`;
