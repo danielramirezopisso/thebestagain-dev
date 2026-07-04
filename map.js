@@ -569,6 +569,13 @@ async function initMap() {
     if (typeof renderCategoryQuickChips === 'function') renderCategoryQuickChips();
     if (typeof showClearIfNeeded === 'function') showClearIfNeeded();
     await reloadMarkers();
+    // Fit view to filtered markers, never closer than standard zoom 15
+    try {
+      const pts = Object.values(MARKER_DATA_BY_ID)
+        .filter(m => m.lat && m.lon)
+        .map(m => [m.lat, m.lon]);
+      if (pts.length) MAP.fitBounds(pts, { maxZoom: 15, padding: [40, 40] });
+    } catch(e) { /* keep default view */ }
   }
 
   MAP.on("zoomend", refreshAllMarkerIcons);
