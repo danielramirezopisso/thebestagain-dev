@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Foodie Profile — The Best Again</title>
+  <meta name="description" content="Personal food rankings on The Best Again" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="base.css?v=1779265061" />
+  <link rel="stylesheet" href="searchbar.css">
+  <link rel="stylesheet" href="foodies.css">
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header class="topbar-sticky">
+    <a class="brand" href="index.html">TBA</a>
+    <nav class="nav" id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="map.html">Map</a>
+      <a href="products.html">Products</a>
+      <a href="rutas.html">Rutas</a>
+      <a href="battles.html">Debates</a>
+    </nav>
+    <div class="nav-right">
+      <span id="authStatus" class="auth-pill"></span>
+      <button class="burger" onclick="toggleNav()" aria-label="Menu">☰</button>
+    </div>
+  </header>
+
+  <main class="foodie-main">
+
+    <!-- ── HERO ── -->
+    <section class="foodie-hero">
+      <div class="foodie-avatar" id="fAvatar">?</div>
+      <div class="foodie-hero-body">
+        <h1 class="foodie-name" id="fName">…</h1>
+        <p class="foodie-sub" id="fSub"></p>
+      </div>
+      <div class="foodie-stats" id="fStats"></div>
+    </section>
+
+    <!-- ── CATEGORY CHIPS ── -->
+    <div class="foodie-chips" id="fChips"></div>
+
+    <!-- ── MAP + LIST ── -->
+    <div class="foodie-grid">
+      <div class="foodie-map-col">
+        <div id="foodieMap" class="foodie-map"></div>
+      </div>
+      <div class="foodie-list-col">
+        <h2 class="foodie-list-title" id="fListTitle"></h2>
+        <div class="foodie-list" id="fList"></div>
+      </div>
+    </div>
+
+    <!-- ── CTA ── -->
+    <div class="foodie-cta">
+      <p>Disagree with this ranking?</p>
+      <a class="tba-btn tba-btn-primary" href="map.html">Explore the map & vote →</a>
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="auth.js"></script>
+  <script src="header-auth.js"></script>
+  <script src="searchbar.js"></script>
+  <script src="foodies.js"></script>
+  <script>
+  function toggleNav() {
+    const nav = document.getElementById('mainNav');
+    nav.classList.toggle('nav-open');
+  }
+  </script>
+</body>
+</html>

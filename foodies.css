@@ -1,0 +1,156 @@
+/* ══════════════════════════════════════════════════════
+   FOODIES — public profile page
+══════════════════════════════════════════════════════ */
+
+.foodie-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+}
+
+/* ── Hero ── */
+.foodie-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0 20px;
+  flex-wrap: wrap;
+}
+.foodie-avatar {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 26px; font-weight: 700;
+  flex-shrink: 0;
+}
+.foodie-hero-body { flex: 1; min-width: 150px; }
+.foodie-name {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 32px; font-weight: 900;
+  margin: 0; color: var(--text); line-height: 1.1;
+}
+.foodie-sub {
+  margin: 4px 0 0; font-size: 13px; color: var(--muted);
+}
+.foodie-stats {
+  display: flex; gap: 20px; align-items: center;
+}
+.f-stat { display: flex; flex-direction: column; align-items: center; }
+.f-stat-val {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 22px; font-weight: 900; color: var(--text);
+}
+.f-stat-lbl {
+  font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--muted); font-weight: 600;
+}
+
+/* ── Chips ── */
+.foodie-chips {
+  display: flex; gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0 16px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.foodie-chips::-webkit-scrollbar { display: none; }
+.f-chip {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  font-size: 13px; font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  box-shadow: none;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.f-chip:hover { border-color: var(--accent); color: var(--text); transform: none; box-shadow: none; }
+.f-chip-on {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border-color: var(--accent) !important;
+}
+.f-chip-n { opacity: 0.65; font-size: 11px; margin-left: 2px; }
+
+/* ── Grid: map + list ── */
+.foodie-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+.foodie-map-col { position: sticky; top: 76px; }
+.foodie-map {
+  height: 480px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.foodie-list-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 22px; font-weight: 700;
+  margin: 0 0 12px; color: var(--text);
+}
+.foodie-list { display: flex; flex-direction: column; }
+
+.f-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 6px;
+  text-decoration: none;
+  color: var(--text);
+  border-bottom: 1px solid var(--rule);
+  transition: background 0.1s;
+  border-radius: 6px;
+}
+.f-row:hover { background: var(--faint); }
+.f-row-pos {
+  font-size: 13px; font-weight: 700; color: var(--muted);
+  width: 22px; text-align: right; flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.f-row-body {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 1px;
+}
+.f-row-title {
+  font-size: 14px; font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.f-row-cat { font-size: 11px; color: var(--muted); }
+.f-row-score {
+  flex-shrink: 0;
+  color: #fff;
+  font-size: 12px; font-weight: 800;
+  padding: 4px 9px;
+  border-radius: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── CTA ── */
+.foodie-cta {
+  text-align: center;
+  padding: 48px 0 0;
+}
+.foodie-cta p {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px; font-style: italic;
+  color: var(--text); margin: 0 0 14px;
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .foodie-main { padding: 16px 14px 60px; }
+  .foodie-name { font-size: 26px; }
+  .foodie-stats { gap: 14px; }
+  .foodie-grid { grid-template-columns: 1fr; gap: 16px; }
+  .foodie-map-col { position: static; }
+  .foodie-map { height: 260px; }
+}
