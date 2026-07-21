@@ -1,7 +1,5 @@
-// battles.js — Clean rewrite
-// Stack: Tinder swipe/tap to vote
-// Voted grid: editorial leaderboard rows (% bars, thumbnails)
-// Votes: only active (is_active = true) battle_votes count
+// battles.js — VS Poster redesign
+// Each battle = a split poster. Tap a side to vote. Animated reveal. Canvas share image.
 
 /* ── Visitor ID ── */
 function getVisitorId() {
@@ -23,66 +21,30 @@ function saveLocalVote(id, choice) {
   localStorage.setItem(VOTED_KEY, JSON.stringify(v));
 }
 
-
-// Editorial descriptions for each debate
-const DEBATE_DESCRIPTIONS = {
-  "cebolla": "La pregunta que divide familias en España desde generaciones. ¿Eres de los que no conciben una tortilla sin cebolla, o defiendes la pureza de la patata y el huevo?",
-  "babosa": "Hay dos tipos de personas: las que buscan el centro jugoso y cremoso, y las que prefieren una textura más firme y consistente. ¿En qué bando estás?",
-  "piña": "El debate más polarizante de la pizza. La piña en la pizza: ¿atrevida combinación agridulce o sacrilegio culinario imperdonable?",
-  "bordes": "El crust de la pizza tiene sus fans incondicionales y sus detractores acérrimos. ¿Te comes los bordes hasta el final o los dejas en el plato?",
-  "Cheeseburger": "Dos imperios, dos filosofías, una sola hambre. La cheeseburger definitiva: ¿la clásica de McDonald's o la del Burger King?",
-  "pepinillo": "Pequeño, verde y muy controversial. El pepinillo en la hamburguesa: ¿le da ese toque ácido perfecto o arruina todo lo que toca?",
-  "Patatas fritas": "La guarnición más icónica del fast food. ¿Las finas, ligeras y crujientes del arco dorado, o las gordas, sabrosas y con más mordida del rey?",
-  "croqueta": "La croqueta es sagrada en España. Pero ¿cuál es la reina? ¿La suave y contundente de jamón ibérico o la delicada y cremosa de pollo?",
-  "Desayuno": "Un debate de toda la vida. ¿Empiezas el día con una tostada con tomate y aceite, o te vas a los bollos, croissants y chocolate?",
-  "ColaCao": "El clásico del desayuno infantil español. ¿ColaCao con su textura característica o el suave Nesquick que se disuelve perfectamente?",
-  "Nutella": "Las dos grandes cremas de cacao. ¿La italiana Nutella con su sabor más intenso y famoso, o la española Nocilla que muchos llevamos en el alma?",
-  "Churros": "Crujientes, calientes y para mojar en chocolate. ¿Los churros finos y crujientes de toda la vida, o las porras más gordas y esponjosas?",
-  "Coca": "El debate de las colas. ¿La inconfundible Coca-Cola o la Pepsi con su sabor ligeramente más dulce? La pregunta de siempre.",
-  "Fanta": "La naranja en versión gaseosa. ¿La Fanta internacional con su sabor globalmente conocido, o el Kas naranja genuinamente español?",
-  "cerveza": "Para acompañar una buena comida, ¿qué eliges? ¿Una cerveza bien fría que refresca con cada bocado, o un buen vino que marida y eleva el sabor?"
-};
-
-function getDescription(question) {
-  // Sort by key length desc — longer/more specific keys match first
-  const sorted = Object.entries(DEBATE_DESCRIPTIONS)
-    .sort((a, b) => b[0].length - a[0].length);
-  for (const [key, desc] of sorted) {
-    if (question.includes(key)) return desc;
-  }
-  return '';
-}
-
-/* ── Global state ── */
-let ALL_BATTLES        = [];
-let TALLY              = {}; // battle_id → { a: N, b: N } — only active votes
-let MY_VOTES           = {}; // battle_id → 'a' | 'b' | 'no_opinion'
+/* ── State ── */
+let ALL_BATTLES = [];
+let TALLY       = {};
+let MY_VOTES    = {};
 
 /* ═══════════════════════════════════════
    INIT
 ═══════════════════════════════════════ */
 async function initBattles() {
   const [battlesRes, votesRes] = await Promise.all([
-    sb.from('battles')
-      .select('*')
-      .eq('is_active', true)
+    sb.from('battles').select('*').eq('is_active', true)
       .order('category_order', { ascending: true })
-      .order('position',       { ascending: true }),
-    // Only count active votes (soft-delete safe)
-    sb.from('battle_votes')
-      .select('battle_id, choice')
+      .order('position', { ascending: true }),
+    sb.from('battle_votes').select('battle_id, choice')
   ]);
 
   ALL_BATTLES = battlesRes.data || [];
   const allVotes = votesRes.data || [];
 
   if (!ALL_BATTLES.length) {
-    hide('debatesSkeleton');
-    show('debatesEmpty');
+    hideEl('bSkeleton'); showEl('bEmpty');
     return;
   }
 
-  // Build tally from active votes only
   TALLY = {};
   allVotes.forEach(v => {
     if (v.choice !== 'a' && v.choice !== 'b') return;
@@ -90,535 +52,325 @@ async function initBattles() {
     TALLY[v.battle_id][v.choice]++;
   });
 
-  // My personal votes — fetch by visitor_id AND user_id if logged in
   const visitorId = getVisitorId();
   const user = await maybeUser();
 
   if (user) {
-    // Logged in: prefer user votes, fall back to visitor
-    const { data: userVotes } = await sb.from('battle_votes')
-      .select('battle_id, choice')
-      .eq('user_id', user.id);
-    const { data: visitorVotes } = await sb.from('battle_votes')
-      .select('battle_id, choice')
-      .eq('visitor_id', visitorId);
+    const [{ data: userVotes }, { data: visitorVotes }] = await Promise.all([
+      sb.from('battle_votes').select('battle_id, choice').eq('user_id', user.id),
+      sb.from('battle_votes').select('battle_id, choice').eq('visitor_id', visitorId)
+    ]);
     const dbMap = {};
-    // Visitor votes first, user votes override
     (visitorVotes || []).forEach(v => { dbMap[v.battle_id] = v.choice; });
-    (userVotes   || []).forEach(v => { dbMap[v.battle_id] = v.choice; });
+    (userVotes || []).forEach(v => { dbMap[v.battle_id] = v.choice; });
     MY_VOTES = { ...getLocalVotes(), ...dbMap };
   } else {
     const { data: myVotes } = await sb.from('battle_votes')
-      .select('battle_id, choice')
-      .eq('visitor_id', visitorId);
+      .select('battle_id, choice').eq('visitor_id', visitorId);
     const dbMap = {};
     (myVotes || []).forEach(v => { dbMap[v.battle_id] = v.choice; });
     MY_VOTES = { ...getLocalVotes(), ...dbMap };
   }
 
-  hide('debatesSkeleton');
-  updateStats();
-  renderFeed();
-  // Auto-open cards if unvoted debates exist
-  setTimeout(() => {
-    if (getUnvotedBattles().length > 0 && !window._vcAutoOpened) {
-      window._vcAutoOpened = true;
-      openVoteCards();
-    }
-  }, 900);
+  hideEl('bSkeleton');
+  renderAll();
 }
 
-function updateStats() {
-  const total = ALL_BATTLES.length;
-  const done  = Object.keys(MY_VOTES).filter(id => MY_VOTES[id] && MY_VOTES[id] !== 'no_opinion').length;
-  const el    = qs('debatesStats');
-  if (!el) return;
-  if (done > 0) {
-    el.textContent = `${done} of ${total} debates voted`;
-    el.style.display = 'block';
-  } else {
-    el.style.display = 'none';
-  }
-}
+function hideEl(id) { const e = document.getElementById(id); if (e) e.style.display = 'none'; }
+function showEl(id) { const e = document.getElementById(id); if (e) e.style.display = 'block'; }
 
 /* ═══════════════════════════════════════
-   FEED — single scrollable column
+   RENDER
 ═══════════════════════════════════════ */
-function renderFeed() {
-  const feed = qs('debatesFeed');
-  if (!feed) return;
-  feed.innerHTML = '';
+function renderAll() {
+  const host = document.getElementById('bFeed');
+  if (!host) return;
 
-  if (!ALL_BATTLES.length) {
-    show('debatesEmpty');
-    return;
-  }
+  // Featured = first unvoted battle, or first battle
+  const unvoted = ALL_BATTLES.filter(b => !MY_VOTES[b.id] || MY_VOTES[b.id] === 'no_opinion');
+  const featured = unvoted[0] || ALL_BATTLES[0];
+  const rest = ALL_BATTLES.filter(b => b.id !== featured.id);
 
-  // Group by category
-  const groups = {};
-  const groupOrder = [];
-  ALL_BATTLES.forEach(b => {
-    const cat = b.category || 'Otros';
-    const ord = b.category_order || 99;
-    const key = `${String(ord).padStart(3,'0')}_${cat}`;
-    if (!groups[key]) { groups[key] = { label: cat, items: [] }; groupOrder.push(key); }
-    groups[key].items.push(b);
-  });
-  groupOrder.sort();
-
-  groupOrder.forEach(key => {
-    const { label, items } = groups[key];
-
-    // Chapter divider — bold newspaper section break
-    const chapter = document.createElement('div');
-    chapter.className = 'debates-chapter';
-    chapter.innerHTML = `<div class="debates-chapter-label">${esc(label)}</div>`;
-    feed.appendChild(chapter);
-
-    items.forEach(b => feed.appendChild(buildDebateRow(b)));
-  });
+  let html = renderPoster(featured, true);
+  html += '<div class="b-archive-label">Más batallas</div>';
+  html += '<div class="b-archive">' + rest.map(b => renderPoster(b, false)).join('') + '</div>';
+  host.innerHTML = html;
 }
 
-function buildDebateRow(battle) {
-  const row = document.createElement('div');
-  row.className = 'debate-row';
-  row.id = 'debate-' + battle.id;
+function renderPoster(b, isFeatured) {
+  const voted   = MY_VOTES[b.id] === 'a' || MY_VOTES[b.id] === 'b';
+  const t       = TALLY[b.id] || { a: 0, b: 0 };
+  const total   = t.a + t.b;
+  const pctA    = total ? Math.round(t.a / total * 100) : 50;
+  const pctB    = 100 - pctA;
+  const sizeCls = isFeatured ? 'b-poster-lg' : 'b-poster-sm';
 
-  const voted = MY_VOTES[battle.id];
-  const desc  = battle.description || getDescription(battle.question);
+  const imgA = b.image_a_url, imgB = b.image_b_url;
+  const bgA = imgA ? `background-image:url('${imgA}')` : '';
+  const bgB = imgB ? `background-image:url('${imgB}')` : '';
+  const emojiA = !imgA ? '<span class="b-side-emoji">🍽</span>' : '';
+  const emojiB = !imgB ? '<span class="b-side-emoji">🍽</span>' : '';
 
-  row.innerHTML = `
-    <div class="debate-question">${esc(battle.question)}</div>
-    <div class="debate-body" id="body-${battle.id}">
-      ${buildDebateBodyHtml(battle)}
-    </div>
-    <div class="debate-footer">
-      <span class="debate-vote-count" id="count-${battle.id}">${getVoteCountLabel(battle.id)}</span>
-      <button class="debate-share-btn" onclick="shareBattle(event,'${battle.id}')">Share ↗</button>
-    </div>`;
-
-  return row;
-}
-
-function buildDebateBodyHtml(battle) {
-  const myChoice   = MY_VOTES[battle.id];
-  const counts     = TALLY[battle.id] || { a: 0, b: 0 };
-  const totalVotes = (counts.a || 0) + (counts.b || 0);
-
-  let pctA = 0, pctB = 0;
-  if (totalVotes > 0) {
-    pctA = Math.round((counts.a / totalVotes) * 100);
-    pctB = 100 - pctA;
-  }
-
-  const chosenA  = myChoice === 'a';
-  const chosenB  = myChoice === 'b';
-  const hasVoted = !!myChoice; // no_opinion also shows results
-  const noOp     = myChoice === 'no_opinion';
-
-  const pieHtml = buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted, battle.option_a, battle.option_b);
-
-  // Small images — left of chart, stacked or single
-  const hasImgA = !!battle.image_a_url;
-  const hasImgB = !!battle.image_b_url;
-  const winnerA = hasVoted && pctA > pctB;
-  const winnerB = hasVoted && pctB > pctA;
-  const imgsHtml = (hasImgA || hasImgB) ? `
-    <div class="debate-imgs">
-      ${hasImgA ? `<div class="debate-img${winnerA ? ' is-winner' : (hasVoted && !winnerA ? ' is-loser' : '')}" style="background-image:url('${esc(battle.image_a_url)}')"></div>` : ''}
-      ${hasImgB ? `<div class="debate-img${winnerB ? ' is-winner is-winner-b' : (hasVoted && !winnerB ? ' is-loser' : '')}" style="background-image:url('${esc(battle.image_b_url)}')"></div>` : ''}
-    </div>` : '';
-
-  const noOpLink = noOp
-    ? `<span class="debate-no-opinion is-chosen">No opinion ✓</span>`
-    : `<button class="debate-no-opinion-btn" onclick="castFeedVote('${battle.id}','no_opinion')">No opinion</button>`;
+  // widths: before vote 50/50; after vote animate to result
+  const wA = voted ? pctA : 50;
+  const wB = voted ? pctB : 50;
 
   return `
-    <div class="debate-body-wrap${hasVoted ? ' has-voted' : ''}">
-      ${imgsHtml}
-      <div class="debate-options">
-        <div class="debate-option${chosenA ? ' is-chosen' : ''}" data-choice="a" onclick="toggleFeedVote('${battle.id}','a')">
-          <div class="debate-option-dot debate-option-dot-a"></div>
-          <div class="debate-option-info">
-            <div class="debate-option-label">${esc(battle.option_a)}</div>
-            ${hasVoted ? `<div class="debate-option-bar-wrap"><div class="debate-option-bar debate-option-bar-a" style="width:${pctA}%"></div></div>` : ''}
-          </div>
-          <div class="debate-option-right">
-            ${hasVoted ? `<div class="debate-option-pct">${pctA}%</div>` : ''}
-            <div class="debate-option-radio${chosenA ? ' is-filled' : ''}"></div>
-          </div>
+  <div class="b-poster ${sizeCls} ${voted ? 'b-voted' : ''}" id="poster-${b.id}">
+    <div class="b-question">${esc(b.question)}</div>
+    <div class="b-arena">
+      <div class="b-side b-side-a ${MY_VOTES[b.id]==='a'?'b-side-mine':''}" style="width:${wA}%;${bgA}"
+           onclick="voteSide('${b.id}','a')">
+        ${emojiA}
+        <div class="b-side-shade"></div>
+        <div class="b-side-label">
+          <span class="b-side-name">${esc(b.option_a)}</span>
+          <span class="b-side-pct" style="${voted?'':'display:none'}">${pctA}%</span>
         </div>
-        <div class="debate-option${chosenB ? ' is-chosen' : ''}" data-choice="b" onclick="toggleFeedVote('${battle.id}','b')">
-          <div class="debate-option-dot debate-option-dot-b"></div>
-          <div class="debate-option-info">
-            <div class="debate-option-label">${esc(battle.option_b)}</div>
-            ${hasVoted ? `<div class="debate-option-bar-wrap"><div class="debate-option-bar debate-option-bar-b" style="width:${pctB}%"></div></div>` : ''}
-          </div>
-          <div class="debate-option-right">
-            ${hasVoted ? `<div class="debate-option-pct">${pctB}%</div>` : ''}
-            <div class="debate-option-radio${chosenB ? ' is-filled' : ''}"></div>
-          </div>
-        </div>
+        ${MY_VOTES[b.id]==='a' ? '<span class="b-mine-badge">Tu voto</span>' : ''}
       </div>
-      <div class="debate-pie-wrap">${pieHtml}</div>
+      <div class="b-vs">VS</div>
+      <div class="b-side b-side-b ${MY_VOTES[b.id]==='b'?'b-side-mine':''}" style="width:${wB}%;${bgB}"
+           onclick="voteSide('${b.id}','b')">
+        ${emojiB}
+        <div class="b-side-shade"></div>
+        <div class="b-side-label">
+          <span class="b-side-name">${esc(b.option_b)}</span>
+          <span class="b-side-pct" style="${voted?'':'display:none'}">${pctB}%</span>
+        </div>
+        ${MY_VOTES[b.id]==='b' ? '<span class="b-mine-badge">Tu voto</span>' : ''}
+      </div>
     </div>
-    <div class="debate-footer-inner">${noOpLink}</div>`;
+    <div class="b-foot">
+      <span class="b-verdict" id="verdict-${b.id}">${voted ? verdictLine(b, MY_VOTES[b.id], pctA, pctB) : (total ? total + ' votos' : 'Sé el primero en votar')}</span>
+      <button class="b-share-btn" onclick="shareBattleImage('${b.id}')">Compartir ↗</button>
+    </div>
+  </div>`;
 }
 
-function buildPieChart(pctA, pctB, chosenA, chosenB, hasVoted, winLabelA, winLabelB) {
-  const r = 36; const cx = 50; const cy = 50;
-  const circ = 2 * Math.PI * r;
-
-  if (!hasVoted) {
-    return `<svg viewBox="0 0 100 100" class="debate-pie">
-      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
-        stroke="rgba(26,23,20,0.07)" stroke-width="10"/>
-      <text x="50" y="55" text-anchor="middle" class="debate-pie-label">Vote</text>
-    </svg>
-    <div class="debate-pie-winner" style="visibility:hidden">—</div>`;
-  }
-
-  const colorA = '#2d4a8a';  // editorial blue — option A
-  const colorB = '#7ba7d4';  // baby blue — option B
-
-  const fillA = circ * Math.max(pctA, 0) / 100;
-  const fillB = circ - fillA;
-  // Negative offset = start at 12 o'clock
-  const offset = -(circ / 4);
-  const winPct = pctA >= pctB ? pctA : pctB;
-
-  return `<svg viewBox="0 0 100 100" class="debate-pie" style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.15))">
-    <!-- White background circle -->
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
-      stroke="#fff" stroke-width="14"/>
-    <!-- Dark border ring (outer) -->
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
-      stroke="rgba(0,0,0,0.18)" stroke-width="13"/>
-    <!-- Option B segment -->
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
-      stroke="${colorB}" stroke-width="11"
-      stroke-dasharray="${fillB.toFixed(2)} ${fillA.toFixed(2)}"
-      stroke-dashoffset="${(offset - fillA).toFixed(2)}"/>
-    <!-- Option A segment -->
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
-      stroke="${colorA}" stroke-width="11"
-      stroke-dasharray="${fillA.toFixed(2)} ${fillB.toFixed(2)}"
-      stroke-dashoffset="${offset.toFixed(2)}"/>
-    <!-- Segment divider lines (thin white gaps) -->
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
-      stroke="#fff" stroke-width="1.5"
-      stroke-dasharray="0.5 ${circ - 0.5}"
-      stroke-dashoffset="${offset.toFixed(2)}"/>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
-      stroke="#fff" stroke-width="1.5"
-      stroke-dasharray="0.5 ${circ - 0.5}"
-      stroke-dashoffset="${(offset - fillA).toFixed(2)}"/>
-
-    <text x="50" y="55" text-anchor="middle" class="debate-pie-pct">${winPct}%</text>
-  </svg>
-  <div class="debate-pie-winner">${esc(pctA >= pctB ? winLabelA : winLabelB)}</div>`;
+function verdictLine(b, mine, pctA, pctB) {
+  const myPct  = mine === 'a' ? pctA : pctB;
+  const myName = mine === 'a' ? b.option_a : b.option_b;
+  if (myPct >= 50) return `Team ${esc(myName)} — el ${myPct}% está contigo 💪`;
+  return `Solo el ${myPct}% piensa como tú. Valiente. 😤`;
 }
-
-// Kept for compatibility — now unified
-function buildResultsHtml(battle) { return buildDebateBodyHtml(battle); }
-function buildVoteBtnsHtml(battle) { return buildDebateBodyHtml(battle); }
-
-function getVoteCountLabel(battleId) {
-  const counts = TALLY[battleId] || { a: 0, b: 0 };
-  const total  = (counts.a || 0) + (counts.b || 0);
-  if (total === 0) return 'No votes yet';
-  return `${total.toLocaleString()} vote${total !== 1 ? 's' : ''}`;
-}
-
-// Animate bars in after insert
-function animateBars(battleId) {
-  requestAnimationFrame(() => {
-    const body = document.getElementById('body-' + battleId);
-    if (!body) return;
-    body.querySelectorAll('.debate-result-bar').forEach(bar => {
-      const pct = bar.dataset.pct;
-      requestAnimationFrame(() => { bar.style.width = pct + '%'; });
-    });
-  });
-}
-
-// Vote from feed
-async function castFeedVote(battleId, choice) {
-  // If already voted, treat as change vote instead
-  if (MY_VOTES[battleId] && MY_VOTES[battleId] !== 'no_opinion') {
-    return changeFeedVote(battleId, choice);
-  }
-  if (!TALLY[battleId]) TALLY[battleId] = { a: 0, b: 0 };
-  TALLY[battleId][choice] = (TALLY[battleId][choice] || 0) + 1;
-  MY_VOTES[battleId] = choice;
-  saveLocalVote(battleId, choice);
-
-  refreshDebateBody(battleId);
-  updateStats();
-  persistVote(battleId, choice);
-  if (typeof gtag !== 'undefined') gtag('event', 'battle_voted', { battle_id: battleId, choice });
-}
-
-// Change vote (tap a result row)
-async function changeFeedVote(battleId, newChoice) {
-  const old = MY_VOTES[battleId];
-  if (old === newChoice) return;
-
-  if (old && old !== 'no_opinion' && TALLY[battleId]) {
-    TALLY[battleId][old] = Math.max(0, (TALLY[battleId][old] || 0) - 1);
-  }
-  if (!TALLY[battleId]) TALLY[battleId] = { a: 0, b: 0 };
-  TALLY[battleId][newChoice] = (TALLY[battleId][newChoice] || 0) + 1;
-
-  MY_VOTES[battleId] = newChoice;
-  saveLocalVote(battleId, newChoice);
-
-  refreshDebateBody(battleId);
-  updateStats();
-  persistVote(battleId, newChoice);
-}
-
-// Toggle: tap chosen radio = unvote; tap other = change vote
-async function toggleFeedVote(battleId, side) {
-  const current = MY_VOTES[battleId];
-  if (current === side) {
-    // Unvote
-    if (current !== 'no_opinion' && TALLY[battleId]) {
-      TALLY[battleId][current] = Math.max(0, (TALLY[battleId][current] || 0) - 1);
-    }
-    delete MY_VOTES[battleId];
-    saveLocalVote(battleId, null);
-    refreshDebateBody(battleId);
-    updateStats();
-    persistVote(battleId, 'no_opinion');
-  } else {
-    castFeedVote(battleId, side);
-  }
-}
-
-function refreshDebateBody(battleId) {
-  const body = document.getElementById('body-' + battleId);
-  const battle = ALL_BATTLES.find(b => b.id === battleId);
-  if (body && battle) {
-    body.innerHTML = buildDebateBodyHtml(battle);
-    animateBars(battleId);
-  }
-  const countEl = document.getElementById('count-' + battleId);
-  if (countEl) countEl.textContent = getVoteCountLabel(battleId);
-}
-
-// Stack/swipe removed — replaced by inline feed voting
-
 
 /* ═══════════════════════════════════════
-   PERSIST VOTE TO DB
+   VOTE
 ═══════════════════════════════════════ */
+async function voteSide(battleId, choice) {
+  const prev = MY_VOTES[battleId];
+  if (prev === choice) return; // already this side
+
+  // Update tally
+  if (!TALLY[battleId]) TALLY[battleId] = { a: 0, b: 0 };
+  if (prev === 'a' || prev === 'b') TALLY[battleId][prev] = Math.max(0, TALLY[battleId][prev] - 1);
+  TALLY[battleId][choice]++;
+
+  MY_VOTES[battleId] = choice;
+  saveLocalVote(battleId, choice);
+  persistVote(battleId, choice);
+  if (typeof gtag !== 'undefined') gtag('event', 'battle_voted', { battle_id: battleId, choice });
+
+  animateReveal(battleId, choice);
+}
+
+function animateReveal(battleId, choice) {
+  const poster = document.getElementById('poster-' + battleId);
+  if (!poster) { renderAll(); return; }
+
+  const b = ALL_BATTLES.find(x => x.id === battleId);
+  const t = TALLY[battleId];
+  const total = t.a + t.b;
+  const pctA = total ? Math.round(t.a / total * 100) : 50;
+  const pctB = 100 - pctA;
+
+  const sideA = poster.querySelector('.b-side-a');
+  const sideB = poster.querySelector('.b-side-b');
+  poster.classList.add('b-voted');
+
+  // Flash chosen side
+  const chosen = choice === 'a' ? sideA : sideB;
+  chosen.classList.add('b-flash');
+  setTimeout(() => chosen.classList.remove('b-flash'), 450);
+
+  // Animate widths
+  requestAnimationFrame(() => {
+    sideA.style.width = pctA + '%';
+    sideB.style.width = pctB + '%';
+  });
+
+  // Show percentages + badges
+  setTimeout(() => {
+    sideA.querySelector('.b-side-pct').style.display = '';
+    sideB.querySelector('.b-side-pct').style.display = '';
+    sideA.querySelector('.b-side-pct').textContent = pctA + '%';
+    sideB.querySelector('.b-side-pct').textContent = pctB + '%';
+    sideA.classList.toggle('b-side-mine', choice === 'a');
+    sideB.classList.toggle('b-side-mine', choice === 'b');
+    // Remove old badges, add new
+    poster.querySelectorAll('.b-mine-badge').forEach(el => el.remove());
+    const badge = document.createElement('span');
+    badge.className = 'b-mine-badge';
+    badge.textContent = 'Tu voto';
+    chosen.appendChild(badge);
+    // Verdict
+    const v = document.getElementById('verdict-' + battleId);
+    if (v) v.innerHTML = verdictLine(b, choice, pctA, pctB);
+  }, 550);
+}
+
 async function persistVote(battleId, choice) {
   const visitorId = getVisitorId();
-  const user      = await maybeUser();
-  const payload   = { battle_id: battleId, visitor_id: visitorId, choice };
+  const user = await maybeUser();
+  const payload = { battle_id: battleId, visitor_id: visitorId, choice };
   if (user) payload.user_id = user.id;
-
   const { error } = await sb.from('battle_votes')
-    .upsert(payload, {
-      onConflict: user ? 'battle_id,user_id' : 'battle_id,visitor_id'
-    });
+    .upsert(payload, { onConflict: user ? 'battle_id,user_id' : 'battle_id,visitor_id' });
   if (error) console.warn('Vote save error:', error.message);
 }
 
 /* ═══════════════════════════════════════
-   SHARE
+   SHARE — canvas poster image
 ═══════════════════════════════════════ */
-async function shareBattle(e, battleId) {
-  e.stopPropagation();
-  const battle = ALL_BATTLES.find(b => b.id === battleId);
-  if (!battle) return;
-  if (typeof gtag !== 'undefined')
-    gtag('event', 'share_clicked', { content_type: 'battle', battle_id: battleId });
-  const myChoice = MY_VOTES[battleId];
-  const voted = myChoice === 'a' ? battle.option_a : myChoice === 'b' ? battle.option_b : null;
-  const text  = voted
-    ? `${battle.question} I voted: ${voted}. What about you? thebestagain.com/battles.html`
-    : `${battle.question} thebestagain.com/battles.html`;
-  if (navigator.share) {
-    navigator.share({ text }).catch(() => {});
-  } else {
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = e.target;
-      if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = 'Share ↗'; }, 2000); }
-    }).catch(() => {});
+async function shareBattleImage(battleId) {
+  const b = ALL_BATTLES.find(x => x.id === battleId);
+  if (!b) return;
+  if (typeof gtag !== 'undefined') gtag('event', 'share_clicked', { content_type: 'battle', battle_id: battleId });
+
+  const t = TALLY[battleId] || { a: 0, b: 0 };
+  const total = t.a + t.b;
+  const pctA = total ? Math.round(t.a / total * 100) : 50;
+  const pctB = 100 - pctA;
+  const mine = MY_VOTES[battleId];
+
+  const W = 1080, H = 1080;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+
+  // Background
+  ctx.fillStyle = '#f4f1ec';
+  ctx.fillRect(0, 0, W, H);
+
+  // Load images
+  const loadImg = url => new Promise(resolve => {
+    if (!url) return resolve(null);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+  const [imgA, imgB] = await Promise.all([loadImg(b.image_a_url), loadImg(b.image_b_url)]);
+
+  // Split arena — proportional to result
+  const arenaY = 260, arenaH = 560;
+  const splitX = W * (pctA / 100);
+
+  // Draw side A
+  ctx.save();
+  ctx.beginPath(); ctx.rect(0, arenaY, splitX, arenaH); ctx.clip();
+  if (imgA) drawCover(ctx, imgA, 0, arenaY, splitX, arenaH);
+  else { ctx.fillStyle = '#2d4a8a'; ctx.fillRect(0, arenaY, splitX, arenaH); }
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.fillRect(0, arenaY, splitX, arenaH);
+  ctx.restore();
+
+  // Draw side B
+  ctx.save();
+  ctx.beginPath(); ctx.rect(splitX, arenaY, W - splitX, arenaH); ctx.clip();
+  if (imgB) drawCover(ctx, imgB, splitX, arenaY, W - splitX, arenaH);
+  else { ctx.fillStyle = '#7ba7d4'; ctx.fillRect(splitX, arenaY, W - splitX, arenaH); }
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.fillRect(splitX, arenaY, W - splitX, arenaH);
+  ctx.restore();
+
+  // Divider
+  ctx.fillStyle = '#f4f1ec';
+  ctx.fillRect(splitX - 4, arenaY, 8, arenaH);
+
+  // VS badge
+  ctx.beginPath();
+  ctx.arc(splitX, arenaY + arenaH / 2, 54, 0, Math.PI * 2);
+  ctx.fillStyle = '#1a1714'; ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'italic 900 44px Georgia';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('VS', splitX, arenaY + arenaH / 2 + 2);
+
+  // Percentages on each side
+  ctx.font = '900 96px Georgia';
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.fillText(pctA + '%', splitX / 2, arenaY + arenaH / 2);
+  ctx.fillText(pctB + '%', splitX + (W - splitX) / 2, arenaY + arenaH / 2);
+
+  // Option names below percentages
+  ctx.font = '700 40px Georgia';
+  wrapText(ctx, b.option_a, splitX / 2, arenaY + arenaH / 2 + 80, splitX - 60, 46);
+  wrapText(ctx, b.option_b, splitX + (W - splitX) / 2, arenaY + arenaH / 2 + 80, (W - splitX) - 60, 46);
+
+  // Question at top
+  ctx.fillStyle = '#1a1714';
+  ctx.font = 'italic 900 64px Georgia';
+  wrapText(ctx, b.question, W / 2, 130, W - 120, 74);
+
+  // My vote line
+  if (mine === 'a' || mine === 'b') {
+    const myName = mine === 'a' ? b.option_a : b.option_b;
+    ctx.font = '700 42px Georgia';
+    ctx.fillStyle = '#2d4a8a';
+    ctx.fillText('Yo voté: ' + myName, W / 2, arenaY + arenaH + 90);
   }
+
+  // Footer
+  ctx.font = '600 34px Georgia';
+  ctx.fillStyle = '#7a7672';
+  ctx.fillText('¿Y tú? — thebestagain.com', W / 2, H - 70);
+
+  // Export + share
+  cv.toBlob(async blob => {
+    if (!blob) return;
+    const file = new File([blob], 'tba-battle.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], text: b.question + ' — vota en thebestagain.com/battles.html' }).catch(() => {});
+    } else {
+      // Fallback: download
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'tba-battle.png';
+      a.click();
+    }
+  }, 'image/png');
 }
 
-/* ═══════════════════════════════════════
-   HELPERS
-═══════════════════════════════════════ */
-function qs(id)  { return document.getElementById(id); }
-function show(id) { const el = qs(id); if (el) el.style.display = ''; }
-function hide(id) { const el = qs(id); if (el) el.style.display = 'none'; }
+function drawCover(ctx, img, x, y, w, h) {
+  const ir = img.width / img.height, r = w / h;
+  let sw, sh, sx, sy;
+  if (ir > r) { sh = img.height; sw = sh * r; sx = (img.width - sw) / 2; sy = 0; }
+  else { sw = img.width; sh = sw / r; sx = 0; sy = (img.height - sh) / 2; }
+  ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+}
+
+function wrapText(ctx, text, cx, y, maxW, lineH) {
+  const words = String(text || '').split(' ');
+  let line = '', lines = [];
+  words.forEach(w => {
+    const test = line ? line + ' ' + w : w;
+    if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = w; }
+    else line = test;
+  });
+  if (line) lines.push(line);
+  lines.forEach((l, i) => ctx.fillText(l, cx, y + i * lineH));
+}
+
 function esc(s) {
-  return String(s ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
-}
-// Keep escapeHtml alias for any legacy calls
-const escapeHtml = esc;
-
-/* ══════════════════════════════════════════════════════
-   TINDER-STYLE CARD VOTING
-══════════════════════════════════════════════════════ */
-let CARD_QUEUE   = [];
-let CARD_INDEX   = 0;
-let CARD_TOTAL   = 0;
-
-function getUnvotedBattles() {
-  return ALL_BATTLES.filter(b => !MY_VOTES[b.id] || MY_VOTES[b.id] === 'no_opinion');
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function openVoteCards() {
-  CARD_QUEUE = getUnvotedBattles();
-  CARD_TOTAL = CARD_QUEUE.length;
-  CARD_INDEX = 0;
-
-  if (!CARD_TOTAL) {
-    // All voted — show done state
-    document.getElementById('vcCard').style.display = 'none';
-    document.getElementById('vcDone').style.display = 'flex';
-    document.getElementById('voteCardOverlay').style.display = 'flex';
-    return;
-  }
-
-  document.getElementById('vcDone').style.display = 'none';
-  document.getElementById('vcCard').style.display = 'block';
-  document.getElementById('voteCardOverlay').style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-  showCard(0);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initBattles);
+} else {
+  initBattles();
 }
-
-function closeVoteCards() {
-  document.getElementById('voteCardOverlay').style.display = 'none';
-  document.body.style.overflow = '';
-}
-
-function showCard(idx) {
-  const remaining = CARD_QUEUE.length - idx;
-  const done      = CARD_TOTAL - remaining;
-  const pct       = CARD_TOTAL ? (done / CARD_TOTAL * 100) : 100;
-
-  document.getElementById('vcProgressBar').style.width = pct + '%';
-  document.getElementById('vcCounter').textContent = `${done} / ${CARD_TOTAL}`;
-
-  if (idx >= CARD_QUEUE.length) {
-    // All done
-    document.getElementById('vcCard').style.display = 'none';
-    document.getElementById('vcDone').style.display = 'flex';
-    updateStats();
-    renderFeed(); // re-render so new votes appear immediately
-    return;
-  }
-
-  const battle = CARD_QUEUE[idx];
-  document.getElementById('vcQuestion').textContent = battle.question;
-  document.getElementById('vcLabelA').textContent   = battle.option_a;
-  document.getElementById('vcLabelB').textContent   = battle.option_b;
-
-  // Images
-  const imgA = battle.image_a_url;
-  const imgB = battle.image_b_url;
-  const imgWrap = document.getElementById('vcImages');
-  if (imgWrap) {
-    if (imgA && imgB) {
-      // Two images — one above each option
-      imgWrap.innerHTML = `
-        <div class="vc-img-pair">
-          <img src="${imgA}" class="vc-img" onerror="this.style.display='none'" />
-          <img src="${imgB}" class="vc-img" onerror="this.style.display='none'" />
-        </div>`;
-    } else if (imgA || imgB) {
-      // One image — centered
-      imgWrap.innerHTML = `<img src="${imgA || imgB}" class="vc-img vc-img-single" onerror="this.style.display='none'" />`;
-    } else {
-      imgWrap.innerHTML = '';
-    }
-  }
-
-  // Animate in
-  const card = document.getElementById('vcCard');
-  card.classList.remove('vc-slide-in');
-  void card.offsetWidth; // reflow
-  card.classList.add('vc-slide-in');
-}
-
-async function castCardVote(choice) {
-  const battle = CARD_QUEUE[CARD_INDEX];
-  if (!battle) return;
-
-  // Animate button
-  const btn = choice === 'a'
-    ? document.getElementById('vcOptA')
-    : choice === 'b'
-      ? document.getElementById('vcOptB')
-      : null;
-  if (btn) { btn.classList.add('vc-chosen'); await new Promise(r => setTimeout(r, 200)); }
-
-  // Save vote
-  MY_VOTES[battle.id] = choice;
-  saveLocalVote(battle.id, choice);
-  persistVote(battle.id, choice);
-
-  // Remove chosen class and advance
-  if (btn) btn.classList.remove('vc-chosen');
-  CARD_INDEX++;
-  showCard(CARD_INDEX);
-}
-
-// Show/hide launch button and auto-open if unvoted debates exist
-function updateVoteCardBtn() {
-  const unvoted = getUnvotedBattles().length;
-  const btn = document.getElementById('vcLaunchBtn');
-  if (!btn) return;
-
-  if (unvoted > 0) {
-    btn.innerHTML = `⚡ Vote on ${unvoted} debate${unvoted !== 1 ? 's' : ''}`;
-    btn.style.display = 'inline-flex';
-
-    // Auto-open cards on first page load if unvoted debates exist
-    if (!window._vcAutoOpened) {
-      window._vcAutoOpened = true;
-      setTimeout(() => openVoteCards(), 800);
-    }
-  } else {
-    btn.style.display = 'none';
-  }
-}
-
-/* ── Swipe support for card voting ── */
-(function() {
-  let touchStartX = 0;
-  let touchStartY = 0;
-
-  document.addEventListener('touchstart', e => {
-    if (!document.getElementById('voteCardOverlay')?.style.display || 
-        document.getElementById('voteCardOverlay').style.display === 'none') return;
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-  }, { passive: true });
-
-  document.addEventListener('touchend', e => {
-    const overlay = document.getElementById('voteCardOverlay');
-    if (!overlay || overlay.style.display === 'none') return;
-    if (document.getElementById('vcDone')?.style.display !== 'none') return;
-
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    const dy = e.changedTouches[0].clientY - touchStartY;
-
-    // Only horizontal swipes (dx > dy)
-    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-
-    if (dx > 0) {
-      // Swipe right → Option B
-      castCardVote('b');
-    } else {
-      // Swipe left → Option A
-      castCardVote('a');
-    }
-  }, { passive: true });
-})();

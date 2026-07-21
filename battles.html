@@ -11,7 +11,7 @@
   <title>Debates — The Best Again</title>
   <link rel="stylesheet" href="base.css?v=1779265061">
   <link rel="stylesheet" href="searchbar.css">
-  <link rel="stylesheet" href="battles.css?v=1780160548">
+  <link rel="stylesheet" href="battles.css?v=1784622299">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js"></script>
   <script src="accessibility.js"></script>
@@ -94,36 +94,22 @@
   <script src="searchbar.js"></script>
   <script>renderAuthHeader();</script>
 
-  <main class="debates-main">
+  <main class="b-main">
 
     <!-- Hero -->
-    <header class="debates-hero">
-      <div class="debates-hero-eyebrow">The Best Again</div>
-      <h1 class="debates-hero-title">Debates</h1>
-      <p class="debates-hero-sub">The debates that divide tables, families and friends.</p>
-      <div class="debates-stats" id="debatesStats" style="display:none;"></div>
-      <button id="vcLaunchBtn" class="vc-launch-btn" onclick="openVoteCards()" style="display:none;"></button>
+    <header class="b-hero">
+      <div class="b-hero-eyebrow">The Best Again</div>
+      <h1 class="b-hero-title">Debates</h1>
+      <p class="b-hero-sub">Elige tu bando. Comparte tu verdad.</p>
     </header>
 
-    <!-- Feed -->
-    <div class="debates-feed" id="debatesFeed">
-      <!-- Skeleton -->
-      <div class="debates-skeleton" id="debatesSkeleton">
-        <div class="debates-skeleton-item"></div>
-        <div class="debates-skeleton-item"></div>
-        <div class="debates-skeleton-item"></div>
-      </div>
-    </div>
-
-    <!-- Empty state -->
-    <div class="debates-empty" id="debatesEmpty" style="display:none;">
-      <div class="debates-empty-icon">🗳</div>
-      <div>No debates available yet.</div>
-    </div>
+    <div class="b-skeleton" id="bSkeleton"></div>
+    <div class="b-empty" id="bEmpty" style="display:none;">No hay debates todavía.</div>
+    <div id="bFeed"></div>
 
   </main>
 
-  <script src="battles.js?v=1780160548"></script>
+  <script src="battles.js?v=1784622299"></script>
   <script>
     document.addEventListener('DOMContentLoaded', initBattles);
   </script>
@@ -139,41 +125,6 @@
   }, {passive: true});
 })();
 </script>
-
-  <!-- cache:1780160059 ══ TINDER CARD OVERLAY ══ -->
-  <div id="voteCardOverlay" style="display:none;">
-    <div class="vc-backdrop" onclick="closeVoteCards()"></div>
-    <div class="vc-container">
-      <div class="vc-header">
-        <div class="vc-progress-wrap">
-          <div class="vc-progress-bar" id="vcProgressBar"></div>
-        </div>
-        <div class="vc-counter" id="vcCounter"></div>
-        <button class="vc-close" onclick="closeVoteCards()">✕</button>
-      </div>
-      <div class="vc-card" id="vcCard">
-        <div id="vcImages"></div>
-        <div class="vc-question" id="vcQuestion"></div>
-        <div class="vc-options">
-          <button class="vc-option vc-option-a" id="vcOptA" onclick="castCardVote('a')">
-            <span class="vc-option-label" id="vcLabelA"></span>
-          </button>
-          <div class="vc-vs">vs</div>
-          <button class="vc-option vc-option-b" id="vcOptB" onclick="castCardVote('b')">
-            <span class="vc-option-label" id="vcLabelB"></span>
-          </button>
-        </div>
-        <div class="vc-swipe-hint">← swipe for A &nbsp;·&nbsp; swipe for B →</div>
-        <button class="vc-skip" onclick="castCardVote('no_opinion')">No opinion</button>
-      </div>
-      <div class="vc-done" id="vcDone" style="display:none;">
-        <div class="vc-done-icon">🎉</div>
-        <div class="vc-done-title">All caught up!</div>
-        <div class="vc-done-sub">You've voted on all debates.</div>
-        <button class="tba-btn tba-btn-primary" onclick="closeVoteCards()">Done</button>
-      </div>
-    </div>
-  </div>
 
 </body>
 </html>
