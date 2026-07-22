@@ -21,6 +21,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <link rel="stylesheet" href="base.css?v=1779265061" />
   <link rel="stylesheet" href="list.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="TBA">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#f4f1ec">
 </head>
 
 <body onload="initListPage()">
@@ -148,6 +154,11 @@
     }
   });
   window.addEventListener('resize', initFilterToggle);
+  </script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  }
   </script>
 </body>
 </html>

@@ -18,6 +18,12 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <meta property="og:image" content="https://thebestagain.com/og-image.png">
   <meta property="og:site_name" content="The Best Again">
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="TBA">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#f4f1ec">
 </head>
 
 <body onload="initUserPage()">
@@ -262,6 +268,11 @@
       btn.classList.toggle('visible', window.scrollY > 300);
     }, {passive: true});
   })();
+  </script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  }
   </script>
 </body>
 </html>

@@ -33,6 +33,12 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Organization","name":"The Best Again","url":"https://thebestagain.com","logo":"https://thebestagain.com/logo.png"}
   </script>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="TBA">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#f4f1ec">
 </head>
 <body onload="initHomePage()">
 
@@ -154,6 +160,11 @@
       document.getElementById('burgerBtn').innerHTML = '&#9776;';
     }));
   });
+  </script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  }
   </script>
 </body>
 </html>
