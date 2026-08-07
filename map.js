@@ -287,20 +287,42 @@ async function searchPlaceToAdd(q) {
   res.style.display = 'block';
   res.innerHTML = '<div class="add-place-loading">Searching…</div>';
   try {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=6&addressdetails=1&countrycodes=es`;
-    const r = await fetch(url, { headers: { 'Accept-Language': 'es,en' } });
-    const data = await r.json();
+    // Photon (komoot) — much better at business names; biased to map center
+    const center = (typeof MAP !== 'undefined' && MAP) ? MAP.getCenter() : { lat: 41.3889, lng: 2.1618 };
+    let data = [];
+    try {
+      const purl = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=6&lang=es&lat=${center.lat}&lon=${center.lng}`;
+      const pj = await (await fetch(purl)).json();
+      data = (pj.features || []).map(f => {
+        const p = f.properties || {};
+        const addr = [p.street && (p.street + (p.housenumber ? ' ' + p.housenumber : '')), p.postcode, p.city].filter(Boolean).join(', ');
+        return {
+          _name: p.name || '',
+          _addr: addr,
+          display_name: [p.name, addr].filter(Boolean).join(', '),
+          lat: f.geometry.coordinates[1],
+          lon: f.geometry.coordinates[0]
+        };
+      }).filter(d => d._name);
+    } catch(pe) { data = []; }
+
+    // Fallback: Nominatim
+    if (!data.length) {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=6&addressdetails=1&countrycodes=es`;
+      const r = await fetch(url, { headers: { 'Accept-Language': 'es,en' } });
+      const nd = await r.json();
+      data = (nd || []).map(d => {
+        const parts = (d.display_name || '').split(', ');
+        return { ...d, _name: parts[0], _addr: parts.slice(1, 4).join(', ') };
+      });
+    }
+
     addSearchResults = data;
     if (!data.length) { res.innerHTML = '<div class="add-place-empty">No results. Try a different name.</div>'; return; }
-    res.innerHTML = data.map((d, i) => {
-      const parts = (d.display_name || '').split(', ');
-      const name = parts[0];
-      const addr = parts.slice(1, 3).join(', ');
-      return `<div class="add-place-result" onmousedown="selectPlaceToAdd(${i})">
-        <div class="add-pr-name">${escapeHtml(name)}</div>
-        ${addr ? `<div class="add-pr-addr">${escapeHtml(addr)}</div>` : ''}
-      </div>`;
-    }).join('');
+    res.innerHTML = data.map((d, i) => `<div class="add-place-result" onmousedown="selectPlaceToAdd(${i})">
+        <div class="add-pr-name">${escapeHtml(d._name)}</div>
+        ${d._addr ? `<div class="add-pr-addr">${escapeHtml(d._addr)}</div>` : ''}
+      </div>`).join('');
   } catch(e) { res.innerHTML = '<div class="add-place-empty">Search unavailable.</div>'; }
 }
 
@@ -337,9 +359,9 @@ function showAddForm(nominatimResult) {
   if (aw) aw.style.display = 'none';
 
   if (nominatimResult) {
-    const parts = (nominatimResult.display_name || '').split(', ');
-    const name  = parts[0];
-    const addr  = parts.slice(0, 4).join(', ');
+    ADD_MODE = true; // saving is allowed — place picked from search
+    const name  = nominatimResult._name || (nominatimResult.display_name || '').split(', ')[0];
+    const addr  = nominatimResult._addr || (nominatimResult.display_name || '').split(', ').slice(1, 4).join(', ');
     const lat   = parseFloat(nominatimResult.lat).toFixed(6);
     const lon   = parseFloat(nominatimResult.lon).toFixed(6);
 
@@ -538,7 +560,11 @@ async function initMap() {
   renderRatingButtons();
   MAP = L.map("map", { zoomControl: false, doubleClickZoom: true }).setView([41.3889, 2.1618], 15);
   L.control.zoom({ position: "topright" }).addTo(MAP);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { maxZoom: 19, attribution: "&copy; OpenStreetMap &copy; CARTO" }).addTo(MAP);
+  // Standard OSM tiles (show business POIs) with muted filter — HurryUp style
+  const _tl = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "&copy; OpenStreetMap" }).addTo(MAP);
+  _tl.on('load', () => {});
+  const _tp = document.querySelector('#map .leaflet-tile-pane');
+  if (_tp) _tp.style.filter = 'grayscale(0.85) sepia(0.15) brightness(1.04) contrast(0.92)';
   LAYER_GROUP = L.layerGroup().addTo(MAP);
   setMapStatus("Loading categories…");
 
