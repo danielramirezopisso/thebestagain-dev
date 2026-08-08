@@ -1,5 +1,5 @@
 // TBA service worker — network-first, cache fallback
-const CACHE = 'tba-v1';
+const CACHE = 'tba-v2';
 
 self.addEventListener('install', e => {
   self.skipWaiting();

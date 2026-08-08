@@ -609,8 +609,6 @@ async function initMap() {
     const panelOpen = document.getElementById("addPanel")?.classList.contains("map-panel-open");
     if (!panelOpen && !ADD_MODE) return;
 
-    // If came from search result already, don't override
-    if (LAST_CLICK && !ADD_MODE) return;
 
     LAST_CLICK = { lat: e.latlng.lat, lon: e.latlng.lng };
     qs("m_lat").value = LAST_CLICK.lat.toFixed(6);
@@ -780,7 +778,6 @@ async function saveMapMarker() {
   const category_id = parseInt(qs("m_category").value);
   const rating_manual = Number(qs("m_rating").value);
   const address = (qs("m_address")?.value || "").trim();
-  if (!ADD_MODE) { setSaveStatus("Turn Add ON first."); return; }
   if (!LAST_CLICK) { setSaveStatus("Click the map first to pick a location."); return; }
   if (!title) { setSaveStatus("Title required."); return; }
 
