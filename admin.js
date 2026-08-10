@@ -555,10 +555,11 @@ function renderMCPanel() {
     return `
       <label class="brand-check-card ${isLinked ? "linked" : ""}">
         <input type="checkbox" ${isLinked ? "checked" : ""} onchange="toggleMarkerCategory(${c.id}, this.checked)" />
-        <div>
+        <div style="flex:1;">
           <div class="brand-check-name">${escapeHtml(c.name)} ${isPrimary ? "⭐ primary" : ""}</div>
           <div class="brand-check-status">${isLinked ? "✓ Linked" : "Not linked"}</div>
         </div>
+        ${isLinked && !isPrimary ? `<button class="tba-btn" style="font-size:11px;padding:4px 10px;" onclick="event.preventDefault();setPrimaryCategory(${c.id})">Make primary</button>` : ""}
       </label>
     `;
   }).join("");
@@ -588,6 +589,24 @@ async function toggleMarkerCategory(category_id, shouldLink) {
   MC_CURRENT = data || [];
   renderMCPanel();
   setMcStatus("Saved ✅ — " + (shouldLink ? "category linked" : "category unlinked"));
+}
+
+async function setPrimaryCategory(category_id) {
+  if (!MC_MARKER_ID) return;
+  setMcStatus("Setting primary…");
+  // Clear current primary, set the new one, sync markers.category_id
+  await sb.from("marker_categories").update({ is_primary: false }).eq("marker_id", MC_MARKER_ID);
+  const row = MC_CURRENT.find(r => r.category_id === category_id);
+  if (row) {
+    await sb.from("marker_categories").update({ is_primary: true, is_active: true }).eq("id", row.id);
+  } else {
+    await sb.from("marker_categories").insert([{ marker_id: MC_MARKER_ID, category_id, is_primary: true, is_active: true }]);
+  }
+  await sb.from("markers").update({ category_id }).eq("id", MC_MARKER_ID);
+  const { data } = await sb.from("marker_categories").select("id,category_id,is_primary,is_active").eq("marker_id", MC_MARKER_ID);
+  MC_CURRENT = data || [];
+  renderMCPanel();
+  setMcStatus("Primary changed ✅");
 }
 
 /* ══════════════════════════════

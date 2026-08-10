@@ -96,9 +96,15 @@ function brandsForCategory(category_id) {
 function fillAddBrandDropdown() {
   const category_id = parseInt(qs("p_category").value) || null;
   const filtered = brandsForCategory(category_id);
-  qs("p_brand").innerHTML = filtered.length
-    ? filtered.map(b => `<option value="${b.id}">${escapeHtml(b.name)}</option>`).join("")
-    : `<option value="">No brands linked to this category</option>`;
+  const opts = filtered.map(b => `<option value="${b.id}">${escapeHtml(b.name)}</option>`).join("");
+  qs("p_brand").innerHTML = opts + `<option value="__new">＋ Create new brand…</option>`;
+  onBrandSelectChange();
+}
+
+function onBrandSelectChange() {
+  const isNew = qs("p_brand").value === "__new";
+  const wrap = document.getElementById("p_new_brand_wrap");
+  if (wrap) wrap.style.display = isNew ? "block" : "none";
 }
 
 function fillVoteSelect(){
@@ -600,11 +606,37 @@ async function saveProduct(){
   setPStatus("Saving…");
 
   const category_id = parseInt(qs("p_category").value) || null;
-  const brand_id = parseInt(qs("p_brand").value) || null;
   const product_name = (qs("p_product_name")?.value || "").trim() || null;
   const v = Number(qs("p_vote").value);
 
   if (!category_id) { setPStatus("Category required."); return; }
+
+  // Resolve brand — create inline if "__new"
+  let brand_id = null;
+  if (qs("p_brand").value === "__new") {
+    const nbName = (qs("p_new_brand_name")?.value || "").trim();
+    const nbLogo = (qs("p_new_brand_logo")?.value || "").trim() || null;
+    if (!nbName) { setPStatus("New brand name required."); return; }
+    // Reuse if a brand with this name already exists
+    const existingBrand = BRANDS.find(b => b.name.toLowerCase() === nbName.toLowerCase());
+    if (existingBrand) {
+      brand_id = existingBrand.id;
+    } else {
+      const { data: nb, error: nbErr } = await sb.from("brands")
+        .insert([{ name: nbName, icon_url: nbLogo, is_active: true }])
+        .select("id,name,icon_url,is_active").single();
+      if (nbErr) { setPStatus("Brand error: " + nbErr.message); return; }
+      brand_id = nb.id;
+      BRANDS.push(nb);
+      BRAND_BY_ID[nb.id] = nb;
+    }
+    // Link brand to the selected category
+    await sb.from("category_brands")
+      .upsert({ category_id, brand_id, is_active: true }, { onConflict: "category_id,brand_id" });
+    CATEGORY_BRANDS.push({ category_id, brand_id, is_active: true });
+  } else {
+    brand_id = parseInt(qs("p_brand").value) || null;
+  }
   if (!brand_id) { setPStatus("Brand required."); return; }
   if (!(v >= 1 && v <= 10)) { setPStatus("Vote must be 1–10."); return; }
 

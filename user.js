@@ -52,6 +52,17 @@ async function initUserPage() {
 
   USER_ID  = me.id;
   IS_ADMIN = me.email?.toLowerCase().includes("dropisso");
+  if (IS_ADMIN) {
+    const hero = document.querySelector(".user-hero");
+    if (hero && !document.getElementById("adminLinkBtn")) {
+      const a = document.createElement("a");
+      a.id = "adminLinkBtn";
+      a.href = "admin.html";
+      a.textContent = "⚙️ Admin";
+      a.style.cssText = "position:absolute;top:12px;left:16px;font-size:11px;font-weight:700;color:var(--muted);text-decoration:none;border:1.5px solid var(--border);border-radius:20px;padding:5px 10px;";
+      hero.appendChild(a);
+    }
+  }
 
   const name = me.user_metadata?.display_name || me.email || "You";
   document.getElementById("userName").textContent   = name;

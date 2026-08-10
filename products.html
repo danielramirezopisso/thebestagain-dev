@@ -153,7 +153,13 @@
         <label>Category</label>
         <select id="p_category"></select>
         <label>Brand</label>
-        <select id="p_brand"></select>
+        <select id="p_brand" onchange="onBrandSelectChange()"></select>
+        <div id="p_new_brand_wrap" style="display:none;">
+          <label>New brand name</label>
+          <input id="p_new_brand_name" placeholder="e.g. Moritz" />
+          <label>Logo URL <span class="prod-add-optional">(optional)</span></label>
+          <input id="p_new_brand_logo" placeholder="https://…" />
+        </div>
         <label>Product name <span class="prod-add-optional">(optional)</span></label>
         <input id="p_product_name" placeholder="Leave blank if only one version" />
         <label>My vote (1–10)</label>
