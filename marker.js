@@ -2057,35 +2057,74 @@ async function uploadPhoto(input) {
   const user = await maybeUser();
   if (!user) { window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href); return; }
   if (PHOTOS.length >= MAX_PHOTOS) { setPhotoStatus(`Max ${MAX_PHOTOS} photos reached.`); return; }
-
-  // Validate type + size (5MB max)
   if (!file.type.startsWith('image/')) { setPhotoStatus('Please select an image file.'); return; }
-  if (file.size > 5 * 1024 * 1024) { setPhotoStatus('Image must be under 5MB.'); return; }
 
-  setPhotoStatus('Uploading…');
+  showPhotoUploading(true);
+  setPhotoStatus('Subiendo foto…');
 
-  const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
-  const path = `${MARKER_ID}/${user.id}_${Date.now()}.${ext}`;
+  try {
+    // Compress big files (iPhone photos are often 5-10MB)
+    let blob = file, contentType = file.type, ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    if (file.size > 1.5 * 1024 * 1024) {
+      setPhotoStatus('Optimizando imagen…');
+      blob = await compressImage(file, 1600, 0.82);
+      contentType = 'image/jpeg'; ext = 'jpg';
+      setPhotoStatus('Subiendo foto…');
+    }
 
-  const { error: upErr } = await sb.storage
-    .from('marker-photos')
-    .upload(path, file, { upsert: false, contentType: file.type });
+    const path = `${MARKER_ID}/${user.id}_${Date.now()}.${ext}`;
 
-  if (upErr) { setPhotoStatus('Upload failed: ' + upErr.message); return; }
+    const { error: upErr } = await sb.storage
+      .from('marker-photos')
+      .upload(path, blob, { upsert: false, contentType });
 
-  // Insert db row (soft-delete ready)
-  const { error: dbErr } = await sb
-    .from('marker_photos')
-    .insert([{ marker_id: MARKER_ID, user_id: user.id, storage_path: path, is_active: true }]);
+    if (upErr) { setPhotoStatus('Upload failed: ' + upErr.message); showPhotoUploading(false); return; }
 
-  if (dbErr) {
-    setPhotoStatus('Saved to storage but DB failed: ' + dbErr.message);
-    return;
+    const { error: dbErr } = await sb
+      .from('marker_photos')
+      .insert([{ marker_id: MARKER_ID, user_id: user.id, storage_path: path, is_active: true }]);
+
+    if (dbErr) { setPhotoStatus('Saved to storage but DB failed: ' + dbErr.message); showPhotoUploading(false); return; }
+
+    input.value = '';
+    await loadPhotos(MARKER_ID);
+    // Refresh hero image too so the new photo appears without reloading
+    try { await loadPhotosHero(MARKER_ID, user); } catch(e) {}
+    setPhotoStatus('✓ Foto subida');
+    setTimeout(() => setPhotoStatus(''), 2500);
+  } catch(e) {
+    setPhotoStatus('Error: ' + (e.message || 'upload failed'));
+  } finally {
+    showPhotoUploading(false);
   }
+}
 
-  setPhotoStatus('');
-  input.value = ''; // reset input
-  await loadPhotos(MARKER_ID);
+// Visual uploading state: spinner on the card + disabled upload button
+function showPhotoUploading(on) {
+  const label = document.getElementById('photoUploadLabel');
+  if (label) {
+    label.style.opacity = on ? '0.4' : '';
+    label.style.pointerEvents = on ? 'none' : '';
+  }
+  let sp = document.getElementById('photoSpinner');
+  if (on) {
+    if (!sp) {
+      sp = document.createElement('span');
+      sp.id = 'photoSpinner';
+      sp.style.cssText = 'display:inline-block;width:16px;height:16px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:photoSpin 0.7s linear infinite;vertical-align:middle;margin-left:8px;';
+      const st = document.getElementById('photoStatus');
+      if (st && st.parentNode) st.parentNode.insertBefore(sp, st.nextSibling);
+      if (!document.getElementById('photoSpinKf')) {
+        const s = document.createElement('style');
+        s.id = 'photoSpinKf';
+        s.textContent = '@keyframes photoSpin{to{transform:rotate(360deg)}}';
+        document.head.appendChild(s);
+      }
+    }
+    sp.style.display = 'inline-block';
+  } else if (sp) {
+    sp.style.display = 'none';
+  }
 }
 
 async function deletePhoto(e, photoId, idx) {
@@ -2108,7 +2147,10 @@ async function deletePhoto(e, photoId, idx) {
 
 function setPhotoStatus(msg) {
   const el = document.getElementById('photoStatus');
-  if (el) el.textContent = msg;
+  if (!el) return;
+  el.textContent = msg;
+  el.style.fontWeight = '600';
+  el.style.color = msg.startsWith('✓') ? '#2d8653' : (msg.toLowerCase().includes('fail') || msg.toLowerCase().includes('error') ? '#e05c3a' : 'var(--text)');
 }
 
 /* ── LIGHTBOX ── */
