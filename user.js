@@ -52,6 +52,9 @@ async function initUserPage() {
 
   USER_ID  = me.id;
   IS_ADMIN = me.email?.toLowerCase().includes("dropisso");
+
+  // TBATag: load or offer claim, plus share-my-map button
+  initTbaTag(me);
   if (IS_ADMIN) {
     const hero = document.querySelector(".user-hero");
     if (hero && !document.getElementById("adminLinkBtn")) {
@@ -757,3 +760,61 @@ async function deletePhoto(photoId, storagePath, btn) {
 }
 
 
+
+
+/* ══ TBATag claim + share ══ */
+async function initTbaTag(me) {
+  const hero = document.querySelector('.user-hero');
+  if (!hero || document.getElementById('tbaTagRow')) return;
+
+  let username = null;
+  try {
+    const { data } = await sb.from('profiles').select('username').eq('user_id', me.id).maybeSingle();
+    username = data?.username || null;
+  } catch(e) { return; } // profiles table not created yet — do nothing
+
+  const row = document.createElement('div');
+  row.id = 'tbaTagRow';
+  row.style.cssText = 'display:flex;align-items:center;gap:10px;justify-content:center;padding:10px 0 0;flex-wrap:wrap;';
+
+  if (username) {
+    row.innerHTML = `
+      <span style="font-size:13px;color:var(--muted);font-weight:600;">@${username}</span>
+      <a class="tba-btn tba-btn-primary" style="border-radius:20px;font-size:12px;padding:7px 16px;"
+         href="foodies.html?u=${username}">Ver mi página pública</a>
+      <button class="tba-btn" style="border-radius:20px;font-size:12px;padding:7px 16px;"
+         onclick="shareMyMap('${username}')">Compartir mi mapa ↗</button>`;
+  } else {
+    row.innerHTML = `
+      <input id="tagClaimInput" placeholder="elige tu @tag (a-z, 0-9)" maxlength="20"
+        style="border:1.5px solid var(--border);border-radius:20px;padding:7px 14px;font-size:13px;width:190px;font-family:inherit;" />
+      <button class="tba-btn tba-btn-primary" style="border-radius:20px;font-size:12px;padding:7px 16px;"
+        onclick="claimTag()">Reservar mi TBATag</button>
+      <span id="tagClaimStatus" style="font-size:12px;color:var(--muted);"></span>`;
+  }
+  hero.appendChild(row);
+}
+
+async function claimTag() {
+  const input = document.getElementById('tagClaimInput');
+  const st = document.getElementById('tagClaimStatus');
+  const tag = (input.value || '').trim().toLowerCase();
+  if (!/^[a-z0-9_]{3,20}$/.test(tag)) { st.textContent = '3-20 caracteres: a-z, 0-9, _'; return; }
+  st.textContent = 'Comprobando…';
+  const me = await maybeUser();
+  if (!me) return;
+  const { data: taken } = await sb.from('profiles').select('user_id').eq('username', tag).maybeSingle();
+  if (taken) { st.textContent = '@' + tag + ' ya está cogido'; return; }
+  const displayName = me.user_metadata?.display_name || tag;
+  const { error } = await sb.from('profiles').insert([{ user_id: me.id, username: tag, display_name: displayName }]);
+  if (error) { st.textContent = 'Error: ' + error.message; return; }
+  st.textContent = '✓ @' + tag + ' es tuyo';
+  setTimeout(() => location.reload(), 900);
+}
+
+function shareMyMap(tag) {
+  const url = location.origin + '/foodies.html?u=' + tag;
+  const text = 'Mi mapa foodie de Barcelona 🍕 — ' + url;
+  if (navigator.share) navigator.share({ text, url }).catch(() => {});
+  else { navigator.clipboard.writeText(url); alert('Link copiado: ' + url); }
+}

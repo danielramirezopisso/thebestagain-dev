@@ -31,14 +31,21 @@ async function initFoodie() {
   const tag = (qp.get('u') || '').toLowerCase();
   const catParam = qp.get('cat');
 
-  const uid = FOODIE_TAGS[tag];
+  // Look up TBATag in profiles table; fallback to hardcoded map
+  let uid = null, name = null;
+  try {
+    const { data: prof } = await sb.from('profiles')
+      .select('user_id, display_name').eq('username', tag).maybeSingle();
+    if (prof) { uid = prof.user_id; name = prof.display_name || tag; }
+  } catch(e) {}
+  if (!uid) { uid = FOODIE_TAGS[tag]; name = FOODIE_NAMES[tag] || tag; }
+
   if (!uid) {
     document.getElementById('fName').textContent = 'Foodie not found';
     document.getElementById('fSub').textContent = 'This profile does not exist (yet).';
     return;
   }
-
-  const name = FOODIE_NAMES[tag] || tag;
+  window._F_TAG = tag; window._F_NAME = name;
   document.getElementById('fName').textContent = name;
   document.getElementById('fAvatar').textContent = name.charAt(0).toUpperCase();
   document.title = `${name}'s food map — The Best Again`;
@@ -177,4 +184,105 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initFoodie);
 } else {
   initFoodie();
+}
+
+
+/* ══ SHARE — canvas poster ══ */
+async function shareFoodie() {
+  const votes = F_ACTIVE_CAT ? F_VOTES.filter(v => v.category_id === F_ACTIVE_CAT) : F_VOTES;
+  const sorted = [...votes].sort((a, b) => b.vote - a.vote).slice(0, 5);
+  if (!sorted.length) return;
+  if (typeof gtag !== 'undefined') gtag('event', 'share_clicked', { content_type: 'foodie_profile' });
+
+  const catName = F_ACTIVE_CAT ? (F_CATS.find(c => c.id === F_ACTIVE_CAT)?.name || '') : '';
+  const title = catName ? 'Top ' + catName : 'Mi mapa foodie';
+  const name = window._F_NAME || 'foodie';
+  const tag = window._F_TAG || '';
+
+  const W = 1080, H = 1350;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+
+  ctx.fillStyle = '#f4f1ec'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#1a1714'; ctx.fillRect(0, 0, W, 12);
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#7a7672';
+  ctx.font = '700 30px Georgia';
+  ctx.fillText('THE BEST AGAIN', W/2, 100);
+
+  ctx.fillStyle = '#1a1714';
+  ctx.font = 'italic 900 88px Georgia';
+  wrapTextF(ctx, title, W/2, 210, W - 140, 96);
+
+  ctx.fillStyle = '#7a7672';
+  ctx.font = 'italic 600 40px Georgia';
+  ctx.fillText('Barcelona · según @' + tag, W/2, 330);
+
+  // Rows
+  const startY = 430, rowH = 150;
+  sorted.forEach((v, i) => {
+    const y = startY + i * rowH;
+    // position
+    ctx.textAlign = 'left';
+    ctx.fillStyle = i === 0 ? '#2d4a8a' : '#b5b0aa';
+    ctx.font = '900 ' + (i === 0 ? 72 : 56) + 'px Georgia';
+    ctx.fillText(String(i + 1), 80, y + 55);
+    // name
+    ctx.fillStyle = '#1a1714';
+    ctx.font = (i === 0 ? '900 52px' : '700 44px') + ' Georgia';
+    let nm = v.title;
+    while (ctx.measureText(nm).width > W - 420 && nm.length > 3) nm = nm.slice(0, -1);
+    if (nm !== v.title) nm += '…';
+    ctx.fillText(nm, 170, y + 55);
+    // score pill
+    const scoreColor = F_COLORS(v.vote);
+    const px = W - 210, py = y + 12;
+    ctx.fillStyle = scoreColor;
+    ctx.beginPath();
+    ctx.roundRect(px, py, 130, 62, 31);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.font = '900 38px Georgia';
+    ctx.fillText(v.vote.toFixed(1), px + 65, y + 55);
+    // divider
+    ctx.strokeStyle = 'rgba(0,0,0,0.08)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(80, y + 95); ctx.lineTo(W - 80, y + 95); ctx.stroke();
+  });
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#1a1714';
+  ctx.font = 'italic 700 44px Georgia';
+  ctx.fillText('¿No estás de acuerdo?', W/2, H - 130);
+  ctx.fillStyle = '#2d4a8a';
+  ctx.font = '700 38px Georgia';
+  ctx.fillText('thebestagain.com/foodies.html?u=' + tag, W/2, H - 70);
+
+  cv.toBlob(async blob => {
+    if (!blob) return;
+    const file = new File([blob], 'tba-ranking.png', { type: 'image/png' });
+    const shareUrl = location.origin + '/foodies.html?u=' + tag + (F_ACTIVE_CAT ? '&cat=' + F_ACTIVE_CAT : '');
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], text: title + ' de Barcelona según @' + tag + ' — ' + shareUrl }).catch(() => {});
+    } else {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'tba-ranking.png';
+      a.click();
+    }
+  }, 'image/png');
+}
+
+function wrapTextF(ctx, text, cx, y, maxW, lineH) {
+  const words = String(text || '').split(' ');
+  let line = '', lines = [];
+  words.forEach(w => {
+    const t = line ? line + ' ' + w : w;
+    if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; }
+    else line = t;
+  });
+  if (line) lines.push(line);
+  lines.forEach((l, i) => ctx.fillText(l, cx, y + i * lineH));
 }
