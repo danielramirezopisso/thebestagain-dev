@@ -769,7 +769,7 @@ async function initTbaTag(me) {
 
   let username = null;
   try {
-    const { data } = await sb.from('profiles').select('username').eq('user_id', me.id).maybeSingle();
+    const { data } = await sb.from('profiles').select('username').eq('id', me.id).maybeSingle();
     username = data?.username || null;
   } catch(e) { return; } // profiles table not created yet — do nothing
 
@@ -803,10 +803,10 @@ async function claimTag() {
   st.textContent = 'Comprobando…';
   const me = await maybeUser();
   if (!me) return;
-  const { data: taken } = await sb.from('profiles').select('user_id').eq('username', tag).maybeSingle();
+  const { data: taken } = await sb.from('profiles').select('id').eq('username', tag).maybeSingle();
   if (taken) { st.textContent = '@' + tag + ' ya está cogido'; return; }
   const displayName = me.user_metadata?.display_name || tag;
-  const { error } = await sb.from('profiles').insert([{ user_id: me.id, username: tag, display_name: displayName }]);
+  const { error } = await sb.from('profiles').upsert([{ id: me.id, username: tag, display_name: displayName }]);
   if (error) { st.textContent = 'Error: ' + error.message; return; }
   st.textContent = '✓ @' + tag + ' es tuyo';
   setTimeout(() => location.reload(), 900);

@@ -35,8 +35,8 @@ async function initFoodie() {
   let uid = null, name = null;
   try {
     const { data: prof } = await sb.from('profiles')
-      .select('user_id, display_name').eq('username', tag).maybeSingle();
-    if (prof) { uid = prof.user_id; name = prof.display_name || tag; }
+      .select('id, display_name').eq('username', tag).maybeSingle();
+    if (prof) { uid = prof.id; name = prof.display_name || tag; }
   } catch(e) {}
   if (!uid) { uid = FOODIE_TAGS[tag]; name = FOODIE_NAMES[tag] || tag; }
 
