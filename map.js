@@ -2,6 +2,8 @@
 
 let MAP;
 let ADD_MODE = false;
+const CITY_CENTERS = { BCN: [41.3889, 2.1618], MAD: [40.4168, -3.7038] };
+let CITY = localStorage.getItem('tba_city') || 'BCN';
 let LAST_CLICK = null;
 let LAYER_GROUP;
 let PREVIEW_MARKER = null;
@@ -558,7 +560,8 @@ async function initMap() {
   if (user) await refreshMyVotes(user.id);
   initRatingDropdown("m_rating", 7);
   renderRatingButtons();
-  MAP = L.map("map", { zoomControl: false, doubleClickZoom: true }).setView([41.3889, 2.1618], 15);
+  MAP = L.map("map", { zoomControl: false, doubleClickZoom: true }).setView(CITY_CENTERS[CITY] || CITY_CENTERS.BCN, 15);
+  markCityToggle();
   L.control.zoom({ position: "topright" }).addTo(MAP);
   // Standard OSM tiles (show business POIs) with muted filter — HurryUp style
   const _tl = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "&copy; OpenStreetMap" }).addTo(MAP);
@@ -700,8 +703,8 @@ async function reloadMarkers() {
     }
   }
 
-  let q = sb.from("markers").select("id,title,rating_avg,rating_count,lat,lon,group_type,is_active,category_id,chain_id")
-    .eq("is_active", true).eq("group_type", "place");
+  let q = sb.from("markers").select("id,title,rating_avg,rating_count,lat,lon,group_type,is_active,category_id,chain_id,city")
+    .eq("is_active", true).eq("city", CITY).eq("group_type", "place");
   if (markerIds) q = q.in("id", markerIds);
   q = applyRatingBucket(q);
 
@@ -1088,3 +1091,45 @@ function locateMe() {
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
   );
 }
+
+
+/* ══ CITY ══ */
+function setCity(city) {
+  if (city === CITY) return;
+  CITY = city;
+  localStorage.setItem('tba_city', city);
+  markCityToggle();
+  MAP.setView(CITY_CENTERS[city] || CITY_CENTERS.BCN, 15);
+  reloadMarkers();
+}
+function markCityToggle() {
+  document.querySelectorAll('.map-city-opt').forEach(b => {
+    b.classList.toggle('city-on', b.dataset.city === CITY);
+  });
+}
+
+/* ══ SHARE FROM MAP ══ */
+let _MY_TAG = null;
+async function initMapShare() {
+  const user = await maybeUser();
+  if (!user) return;
+  try {
+    const { data } = await sb.from('profiles').select('username').eq('id', user.id).maybeSingle();
+    _MY_TAG = data?.username || null;
+  } catch(e) {}
+  const pill = document.getElementById('mapSharePill');
+  if (pill) pill.style.display = 'flex';
+}
+function shareFromMap() {
+  if (typeof gtag !== 'undefined') gtag('event', 'share_clicked', { content_type: 'map' });
+  if (!_MY_TAG) {
+    // No tag yet — send to claim
+    window.location.href = 'user.html';
+    return;
+  }
+  const url = location.origin + '/foodies.html?u=' + _MY_TAG + (FILTER_CATEGORY ? '&cat=' + FILTER_CATEGORY : '');
+  const text = (FILTER_CATEGORY ? 'Mi ranking en TBA 🥇 — ' : 'Mi mapa foodie 🍕 — ') + url;
+  if (navigator.share) navigator.share({ text, url }).catch(() => {});
+  else { navigator.clipboard.writeText(url); alert('Link copiado'); }
+}
+initMapShare();
