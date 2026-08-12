@@ -20,7 +20,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
   <link rel="stylesheet" href="base.css?v=1779265061" />
-  <link rel="stylesheet" href="map.css?v=14" />
+  <link rel="stylesheet" href="map.css?v=16" />
   <link rel="stylesheet" href="traction.css" />
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -92,6 +92,21 @@
 
       <!-- Share my map pill -->
       <button class="map-share-pill" id="mapSharePill" onclick="shareFromMap()" title="Compartir mi mapa" style="display:none;">↗</button>
+
+      <!-- Zone top chip -->
+      <button class="zone-top-chip" id="zoneTopChip" onclick="openZonePanel()">🏆 Top de esta zona</button>
+
+      <!-- Zone panel -->
+      <div class="zone-panel" id="zonePanel" style="display:none;">
+        <div class="zone-panel-head">
+          <span class="zone-panel-title" id="zonePanelTitle">Top de esta zona</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button class="zone-share-btn" onclick="shareZoneTop()">Compartir ↗</button>
+            <button class="zone-close-btn" onclick="closeZonePanel()">✕</button>
+          </div>
+        </div>
+        <div class="zone-panel-list" id="zonePanelList"></div>
+      </div>
 
       <!-- Floating filter pill — inside the map -->
       <button class="map-filter-pill" id="mapFilterPill" onclick="openFilterDrawer(event)">
@@ -268,7 +283,7 @@
   <script>renderAuthHeader();</script>
 
   <script src="wishlist-btn.js"></script>
-  <script src="map.js?v=15"></script>
+  <script src="map.js?v=16"></script>
   <script src="traction.js?v=204"></script>
 
   <!-- ── TRACTION POPUP ── -->

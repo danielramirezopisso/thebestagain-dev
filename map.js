@@ -1142,3 +1142,148 @@ function shareFromMap() {
   else { navigator.clipboard.writeText(url); alert('Link copiado'); }
 }
 initMapShare();
+
+
+/* ══ TOP DE ESTA ZONA ══ */
+let ZONE_OPEN = false;
+const ZONE_COLOR = v => {
+  const x = Number(v);
+  if (x >= 9) return '#2d8653';
+  if (x >= 7) return '#6aab7e';
+  if (x >= 5) return '#e8b84b';
+  if (x >= 3) return '#f0906e';
+  return '#e05c3a';
+};
+
+function computeZoneTop() {
+  const b = MAP.getBounds();
+  return Object.values(MARKER_DATA_BY_ID)
+    .filter(m => m.lat && m.lon && b.contains([m.lat, m.lon]) && Number(m.rating_count || 0) > 0)
+    .sort((a, x) => Number(x.rating_avg) - Number(a.rating_avg))
+    .slice(0, 10);
+}
+
+function zoneCatName() {
+  if (!FILTER_CATEGORY) return null;
+  const cat = (CATEGORIES || []).find(cc => cc.id === parseInt(FILTER_CATEGORY));
+  return cat ? cat.name : null;
+}
+
+function openZonePanel() {
+  ZONE_OPEN = true;
+  document.getElementById('zonePanel').style.display = 'flex';
+  document.getElementById('zoneTopChip').style.display = 'none';
+  renderZonePanel();
+  if (typeof gtag !== 'undefined') gtag('event', 'zone_top_opened');
+}
+
+function closeZonePanel() {
+  ZONE_OPEN = false;
+  document.getElementById('zonePanel').style.display = 'none';
+  document.getElementById('zoneTopChip').style.display = 'block';
+}
+
+function renderZonePanel() {
+  const top = computeZoneTop();
+  const cat = zoneCatName();
+  document.getElementById('zonePanelTitle').textContent = cat ? ('Top ' + cat + ' · esta zona') : 'Top de esta zona';
+  const list = document.getElementById('zonePanelList');
+  if (!top.length) {
+    list.innerHTML = '<div class="zone-empty">No hay sitios valorados en esta zona.</div>';
+    return;
+  }
+  list.innerHTML = top.map((m, i) => `
+    <a class="zone-row" href="marker.html?id=${m.id}${FILTER_CATEGORY ? '&cat=' + FILTER_CATEGORY : ''}">
+      <span class="zone-row-pos">${i + 1}</span>
+      <span class="zone-row-name">${escapeHtml(m.title)}</span>
+      <span class="zone-row-score" style="background:${ZONE_COLOR(m.rating_avg)}">${Number(m.rating_avg).toFixed(1)}</span>
+    </a>`).join('');
+}
+
+// Safety: live refresh while panel is open — sharing always reflects current viewport
+(function() {
+  const hook = () => { if (ZONE_OPEN) renderZonePanel(); };
+  const t = setInterval(() => {
+    if (typeof MAP !== 'undefined' && MAP) { MAP.on('moveend zoomend', hook); clearInterval(t); }
+  }, 500);
+})();
+
+async function shareZoneTop() {
+  // Always recompute at share time — guaranteed current viewport
+  const top = computeZoneTop().slice(0, 5);
+  if (!top.length) return;
+  if (typeof gtag !== 'undefined') gtag('event', 'share_clicked', { content_type: 'zone_top' });
+  const cat = zoneCatName();
+  const title = cat ? ('Top ' + cat) : 'Top de esta zona';
+
+  const b = MAP.getBounds();
+  const bbox = [b.getSouth().toFixed(5), b.getWest().toFixed(5), b.getNorth().toFixed(5), b.getEast().toFixed(5)].join(',');
+  const shareUrl = location.origin + '/map.html?' + (FILTER_CATEGORY ? 'category=' + FILTER_CATEGORY + '&' : '') + 'bbox=' + bbox;
+
+  const W = 1080, H = 1350;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#f4f1ec'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#1a1714'; ctx.fillRect(0, 0, W, 12);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#7a7672'; ctx.font = '700 30px Georgia';
+  ctx.fillText('THE BEST AGAIN', W / 2, 100);
+  ctx.fillStyle = '#1a1714'; ctx.font = 'italic 900 84px Georgia';
+  ctx.fillText(title, W / 2, 210);
+  ctx.fillStyle = '#7a7672'; ctx.font = 'italic 600 40px Georgia';
+  ctx.fillText('en mi zona', W / 2, 280);
+
+  const startY = 400, rowH = 150;
+  top.forEach((m, i) => {
+    const y = startY + i * rowH;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = i === 0 ? '#2d4a8a' : '#b5b0aa';
+    ctx.font = '900 ' + (i === 0 ? 72 : 56) + 'px Georgia';
+    ctx.fillText(String(i + 1), 80, y + 55);
+    ctx.fillStyle = '#1a1714';
+    ctx.font = (i === 0 ? '900 52px' : '700 44px') + ' Georgia';
+    let nm = m.title;
+    while (ctx.measureText(nm).width > W - 420 && nm.length > 3) nm = nm.slice(0, -1);
+    if (nm !== m.title) nm += '…';
+    ctx.fillText(nm, 170, y + 55);
+    const sc = ZONE_COLOR(m.rating_avg);
+    ctx.fillStyle = sc;
+    ctx.beginPath(); ctx.roundRect(W - 210, y + 12, 130, 62, 31); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.font = '900 38px Georgia';
+    ctx.fillText(Number(m.rating_avg).toFixed(1), W - 145, y + 55);
+    ctx.strokeStyle = 'rgba(0,0,0,0.08)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(80, y + 95); ctx.lineTo(W - 80, y + 95); ctx.stroke();
+  });
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#2d4a8a'; ctx.font = '700 36px Georgia';
+  ctx.fillText('Descúbrelo en thebestagain.com', W / 2, H - 70);
+
+  cv.toBlob(async blob => {
+    if (!blob) return;
+    const file = new File([blob], 'tba-zona.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], text: title + ' — ' + shareUrl }).catch(() => {});
+    } else {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'tba-zona.png';
+      a.click();
+    }
+  }, 'image/png');
+}
+
+// Receiver: open shared viewport via ?bbox=s,w,n,e
+(function() {
+  const bb = new URLSearchParams(location.search).get('bbox');
+  if (!bb) return;
+  const p = bb.split(',').map(Number);
+  if (p.length !== 4 || p.some(isNaN)) return;
+  const t = setInterval(() => {
+    if (typeof MAP !== 'undefined' && MAP) {
+      clearInterval(t);
+      setTimeout(() => MAP.fitBounds([[p[0], p[1]], [p[2], p[3]]]), 400);
+    }
+  }, 300);
+})();

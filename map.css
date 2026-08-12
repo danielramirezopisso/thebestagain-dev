@@ -1097,3 +1097,64 @@ body.map-page{
   padding: 0;
 }
 .map-share-pill:hover { border-color: var(--accent); transform: none; box-shadow: 0 2px 10px rgba(0,0,0,0.12); }
+
+
+/* ── Zone top ── */
+.zone-top-chip {
+  position: absolute;
+  bottom: 18px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 800;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 9px 18px;
+  font-size: 13px; font-weight: 800;
+  color: var(--text);
+  cursor: pointer;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.18);
+}
+.zone-top-chip:hover { border-color: var(--accent); transform: translateX(-50%); box-shadow: 0 3px 14px rgba(0,0,0,0.18); }
+
+.zone-panel {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  z-index: 900;
+  background: var(--card);
+  border-top: 2px solid var(--line);
+  border-radius: 16px 16px 0 0;
+  max-height: 55%;
+  display: flex; flex-direction: column;
+  box-shadow: 0 -6px 24px rgba(0,0,0,0.18);
+  animation: zoneUp 0.22s ease;
+}
+@keyframes zoneUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.zone-panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-bottom: 1px solid var(--rule);
+}
+.zone-panel-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700; font-size: 17px;
+}
+.zone-share-btn {
+  background: var(--accent); color: #fff;
+  border: none; border-radius: 20px;
+  padding: 6px 14px; font-size: 12px; font-weight: 700;
+  cursor: pointer; box-shadow: none;
+}
+.zone-close-btn {
+  background: none; border: none; box-shadow: none;
+  font-size: 15px; color: var(--muted); cursor: pointer; padding: 4px;
+}
+.zone-panel-list { overflow-y: auto; padding: 4px 16px 16px; }
+.zone-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid var(--rule);
+  text-decoration: none; color: var(--text);
+}
+.zone-row:last-child { border-bottom: none; }
+.zone-row-pos { font-weight: 800; font-size: 13px; color: var(--muted); width: 20px; text-align: right; }
+.zone-row-name { flex: 1; font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.zone-row-score { color: #fff; font-size: 12px; font-weight: 800; padding: 4px 9px; border-radius: 20px; }
+.zone-empty { padding: 24px; text-align: center; color: var(--muted); font-style: italic; }
