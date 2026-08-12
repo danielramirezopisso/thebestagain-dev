@@ -785,11 +785,16 @@ async function initTbaTag(me) {
       <button class="tba-btn" style="border-radius:20px;font-size:12px;padding:7px 16px;"
          onclick="shareMyMap('${username}')">Compartir mi mapa ↗</button>`;
   } else {
+    row.style.cssText += 'flex-direction:column;background:rgba(45,74,138,0.05);border:1.5px solid rgba(45,74,138,0.25);border-radius:14px;padding:16px;margin-top:12px;';
     row.innerHTML = `
-      <input id="tagClaimInput" placeholder="elige tu @tag (a-z, 0-9)" maxlength="20"
-        style="border:1.5px solid var(--border);border-radius:20px;padding:7px 14px;font-size:13px;width:190px;font-family:inherit;" />
-      <button class="tba-btn tba-btn-primary" style="border-radius:20px;font-size:12px;padding:7px 16px;"
-        onclick="claimTag()">Reservar mi TBATag</button>
+      <div style="font-weight:800;font-size:14px;color:var(--text);">🎯 Consigue tu página pública</div>
+      <div style="font-size:12px;color:var(--muted);text-align:center;">Tu mapa y tus rankings, con tu propio link para compartir.</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;">
+        <input id="tagClaimInput" placeholder="elige tu @tag" maxlength="20"
+          style="border:1.5px solid var(--border);border-radius:20px;padding:8px 14px;font-size:16px;width:170px;font-family:inherit;" />
+        <button class="tba-btn tba-btn-primary" style="border-radius:20px;font-size:12px;padding:8px 16px;"
+          onclick="claimTag()">Reservar</button>
+      </div>
       <span id="tagClaimStatus" style="font-size:12px;color:var(--muted);"></span>`;
   }
   hero.appendChild(row);
@@ -808,8 +813,9 @@ async function claimTag() {
   const displayName = me.user_metadata?.display_name || tag;
   const { error } = await sb.from('profiles').upsert([{ id: me.id, username: tag, display_name: displayName }]);
   if (error) { st.textContent = 'Error: ' + error.message; return; }
-  st.textContent = '✓ @' + tag + ' es tuyo';
-  setTimeout(() => location.reload(), 900);
+  st.textContent = '✓ @' + tag + ' es tuyo — abriendo tu página…';
+  if (typeof gtag !== 'undefined') gtag('event', 'tag_claimed');
+  setTimeout(() => { window.location.href = 'foodies.html?u=' + tag; }, 900);
 }
 
 function shareMyMap(tag) {

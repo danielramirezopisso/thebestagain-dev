@@ -160,6 +160,20 @@ function render() {
     </a>
   `).join('');
 
+  // Contextual CTA
+  const ctaBtn = document.querySelector('.foodie-cta a');
+  const ctaP = document.querySelector('.foodie-cta p');
+  if (ctaBtn) {
+    if (F_ACTIVE_CAT) {
+      ctaBtn.textContent = 'Haz TU ranking de ' + (catName || 'esto') + ' →';
+      ctaBtn.href = 'map.html?category=' + F_ACTIVE_CAT;
+    } else {
+      ctaBtn.textContent = 'Explora el mapa y vota →';
+      ctaBtn.href = 'map.html';
+    }
+    if (ctaP) ctaP.textContent = F_ACTIVE_CAT ? '¿No estás de acuerdo?' : '¿Te falta tu opinión aquí?';
+  }
+
   // Map markers
   F_LAYER.clearLayers();
   const pts = [];
