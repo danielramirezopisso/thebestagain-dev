@@ -1146,6 +1146,7 @@ initMapShare();
 
 /* ══ TOP DE ESTA ZONA ══ */
 let ZONE_OPEN = false;
+let ZONE_MINE = false; // false = community ranking, true = my ranking
 const ZONE_COLOR = v => {
   const x = Number(v);
   if (x >= 9) return '#2d8653';
@@ -1157,9 +1158,18 @@ const ZONE_COLOR = v => {
 
 function computeZoneTop() {
   const b = MAP.getBounds();
+  if (ZONE_MINE) {
+    const scores = window.MY_VOTE_SCORES_MAP || {};
+    return Object.values(MARKER_DATA_BY_ID)
+      .filter(m => m.lat && m.lon && b.contains([m.lat, m.lon]) && scores[m.id] != null)
+      .map(m => ({ ...m, _score: Number(scores[m.id]) }))
+      .sort((a, x) => x._score - a._score)
+      .slice(0, 10);
+  }
   return Object.values(MARKER_DATA_BY_ID)
     .filter(m => m.lat && m.lon && b.contains([m.lat, m.lon]) && Number(m.rating_count || 0) > 0)
-    .sort((a, x) => Number(x.rating_avg) - Number(a.rating_avg))
+    .map(m => ({ ...m, _score: Number(m.rating_avg) }))
+    .sort((a, x) => x._score - a._score)
     .slice(0, 10);
 }
 
@@ -1171,10 +1181,16 @@ function zoneCatName() {
 
 function openZonePanel() {
   ZONE_OPEN = true;
+  ZONE_MINE = !!JOURNEY_MODE && !!(window.MY_VOTE_SCORES_MAP && Object.keys(window.MY_VOTE_SCORES_MAP).length);
   document.getElementById('zonePanel').style.display = 'flex';
   document.getElementById('zoneTopChip').style.display = 'none';
   renderZonePanel();
   if (typeof gtag !== 'undefined') gtag('event', 'zone_top_opened');
+}
+
+function setZoneMode(mine) {
+  ZONE_MINE = mine;
+  renderZonePanel();
 }
 
 function closeZonePanel() {
@@ -1188,15 +1204,23 @@ function renderZonePanel() {
   const cat = zoneCatName();
   document.getElementById('zonePanelTitle').textContent = cat ? ('Top ' + cat + ' · esta zona') : 'Top de esta zona';
   const list = document.getElementById('zonePanelList');
+
+  const hasMyVotes = !!(window.MY_VOTE_SCORES_MAP && Object.keys(window.MY_VOTE_SCORES_MAP).length);
+  const toggle = hasMyVotes ? `
+    <div class="zone-mode-toggle">
+      <button class="zone-mode-opt ${!ZONE_MINE ? 'zone-mode-on' : ''}" onclick="setZoneMode(false)">Comunidad</button>
+      <button class="zone-mode-opt ${ZONE_MINE ? 'zone-mode-on' : ''}" onclick="setZoneMode(true)">Mi ranking</button>
+    </div>` : '';
+
   if (!top.length) {
-    list.innerHTML = '<div class="zone-empty">No hay sitios valorados en esta zona.</div>';
+    list.innerHTML = toggle + '<div class="zone-empty">' + (ZONE_MINE ? 'No has votado nada en esta zona.' : 'No hay sitios valorados en esta zona.') + '</div>';
     return;
   }
-  list.innerHTML = top.map((m, i) => `
+  list.innerHTML = toggle + top.map((m, i) => `
     <a class="zone-row" href="marker.html?id=${m.id}${FILTER_CATEGORY ? '&cat=' + FILTER_CATEGORY : ''}">
       <span class="zone-row-pos">${i + 1}</span>
       <span class="zone-row-name">${escapeHtml(m.title)}</span>
-      <span class="zone-row-score" style="background:${ZONE_COLOR(m.rating_avg)}">${Number(m.rating_avg).toFixed(1)}</span>
+      <span class="zone-row-score" style="background:${ZONE_COLOR(m._score)}">${m._score.toFixed(1)}</span>
     </a>`).join('');
 }
 
@@ -1216,7 +1240,8 @@ async function shareZoneTop() {
   const cat = zoneCatName();
   const cityLabel = CITY === 'BCN' ? 'Barcelona' : CITY === 'MAD' ? 'Madrid' : '';
   const title = cat ? ('Top ' + cat) : 'Lo mejor de la zona';
-  const subtitle = (cat ? 'en esta zona' : 'todas las categorías') + (cityLabel ? ' · ' + cityLabel : '');
+  const whose = ZONE_MINE ? 'mi ranking' : 'según la comunidad';
+  const subtitle = whose + (cat ? '' : ' · todas las categorías') + (cityLabel ? ' · ' + cityLabel : '');
 
   const b = MAP.getBounds();
   const bbox = [b.getSouth().toFixed(5), b.getWest().toFixed(5), b.getNorth().toFixed(5), b.getEast().toFixed(5)].join(',');
@@ -1249,11 +1274,11 @@ async function shareZoneTop() {
     while (ctx.measureText(nm).width > W - 420 && nm.length > 3) nm = nm.slice(0, -1);
     if (nm !== m.title) nm += '…';
     ctx.fillText(nm, 170, y + 55);
-    const sc = ZONE_COLOR(m.rating_avg);
+    const sc = ZONE_COLOR(m._score);
     ctx.fillStyle = sc;
     ctx.beginPath(); ctx.roundRect(W - 210, y + 12, 130, 62, 31); ctx.fill();
     ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.font = '900 38px Georgia';
-    ctx.fillText(Number(m.rating_avg).toFixed(1), W - 145, y + 55);
+    ctx.fillText(m._score.toFixed(1), W - 145, y + 55);
     ctx.strokeStyle = 'rgba(0,0,0,0.08)'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(80, y + 95); ctx.lineTo(W - 80, y + 95); ctx.stroke();
   });

@@ -1158,3 +1158,18 @@ body.map-page{
 .zone-row-name { flex: 1; font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .zone-row-score { color: #fff; font-size: 12px; font-weight: 800; padding: 4px 9px; border-radius: 20px; }
 .zone-empty { padding: 24px; text-align: center; color: var(--muted); font-style: italic; }
+
+.zone-mode-toggle {
+  display: flex; gap: 0;
+  margin: 10px 0 6px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  width: fit-content;
+}
+.zone-mode-opt {
+  background: none; border: none; box-shadow: none;
+  padding: 6px 16px; font-size: 12px; font-weight: 700;
+  color: var(--muted); cursor: pointer;
+}
+.zone-mode-on { background: var(--accent); color: #fff; }
