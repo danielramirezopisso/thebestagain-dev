@@ -1137,7 +1137,7 @@ function shareFromMap() {
     return;
   }
   const url = location.origin + '/foodies.html?u=' + _MY_TAG + (FILTER_CATEGORY ? '&cat=' + FILTER_CATEGORY : '');
-  const text = (FILTER_CATEGORY ? 'Mi ranking en TBA 🥇 — ' : 'Mi mapa foodie 🍕 — ') + url;
+  const text = FILTER_CATEGORY ? 'Mi ranking en TBA 🥇' : 'Mi mapa foodie 🍕';
   if (navigator.share) navigator.share({ text, url }).catch(() => {});
   else { navigator.clipboard.writeText(url); alert('Link copiado'); }
 }
@@ -1264,7 +1264,7 @@ async function shareZoneTop() {
     if (!blob) return;
     const file = new File([blob], 'tba-zona.png', { type: 'image/png' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({ files: [file], text: title + ' — ' + shareUrl }).catch(() => {});
+      navigator.share({ files: [file], text: title + ' en mi zona 🏆', url: shareUrl }).catch(() => {});
     } else {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);

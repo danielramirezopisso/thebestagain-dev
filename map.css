@@ -660,8 +660,8 @@ body.map-page{
 /* Floating pill button */
 .map-filter-pill {
   position: absolute;
-  top: 14px;
-  left: 14px;
+  top: 58px;
+  left: 12px;
   z-index: 700; /* inside map-area, above markers (400) but below panels */
   display: inline-flex;
   align-items: center;
@@ -1083,7 +1083,7 @@ body.map-page{
 /* ── Share pill ── */
 .map-share-pill {
   position: absolute;
-  top: 12px; left: 132px;
+  top: 12px; left: 168px;
   z-index: 800;
   width: 34px; height: 34px;
   border-radius: 50%;
