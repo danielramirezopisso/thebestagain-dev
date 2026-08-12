@@ -1214,7 +1214,9 @@ async function shareZoneTop() {
   if (!top.length) return;
   if (typeof gtag !== 'undefined') gtag('event', 'share_clicked', { content_type: 'zone_top' });
   const cat = zoneCatName();
-  const title = cat ? ('Top ' + cat) : 'Top de esta zona';
+  const cityLabel = CITY === 'BCN' ? 'Barcelona' : CITY === 'MAD' ? 'Madrid' : '';
+  const title = cat ? ('Top ' + cat) : 'Lo mejor de la zona';
+  const subtitle = (cat ? 'en esta zona' : 'todas las categorías') + (cityLabel ? ' · ' + cityLabel : '');
 
   const b = MAP.getBounds();
   const bbox = [b.getSouth().toFixed(5), b.getWest().toFixed(5), b.getNorth().toFixed(5), b.getEast().toFixed(5)].join(',');
@@ -1232,7 +1234,7 @@ async function shareZoneTop() {
   ctx.fillStyle = '#1a1714'; ctx.font = 'italic 900 84px Georgia';
   ctx.fillText(title, W / 2, 210);
   ctx.fillStyle = '#7a7672'; ctx.font = 'italic 600 40px Georgia';
-  ctx.fillText('en mi zona', W / 2, 280);
+  ctx.fillText(subtitle, W / 2, 280);
 
   const startY = 400, rowH = 150;
   top.forEach((m, i) => {
@@ -1264,7 +1266,7 @@ async function shareZoneTop() {
     if (!blob) return;
     const file = new File([blob], 'tba-zona.png', { type: 'image/png' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({ files: [file], text: title + ' en mi zona 🏆', url: shareUrl }).catch(() => {});
+      navigator.share({ files: [file], text: title + (cat ? ' de mi zona' : '') + ' 🏆', url: shareUrl }).catch(() => {});
     } else {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
