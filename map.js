@@ -704,7 +704,8 @@ async function reloadMarkers() {
   }
 
   let q = sb.from("markers").select("id,title,rating_avg,rating_count,lat,lon,group_type,is_active,category_id,chain_id,city")
-    .eq("is_active", true).eq("city", CITY).eq("group_type", "place");
+    .eq("is_active", true).eq("group_type", "place");
+  if (CITY !== "ALL") q = q.eq("city", CITY);
   if (markerIds) q = q.in("id", markerIds);
   q = applyRatingBucket(q);
 
@@ -1094,13 +1095,21 @@ function locateMe() {
 
 
 /* ══ CITY ══ */
-function setCity(city) {
+async function setCity(city) {
   if (city === CITY) return;
   CITY = city;
   localStorage.setItem('tba_city', city);
   markCityToggle();
-  MAP.setView(CITY_CENTERS[city] || CITY_CENTERS.BCN, 15);
-  reloadMarkers();
+  if (city === 'ALL') {
+    await reloadMarkers();
+    try {
+      const pts = Object.values(MARKER_DATA_BY_ID).filter(m => m.lat && m.lon).map(m => [m.lat, m.lon]);
+      if (pts.length) MAP.fitBounds(pts, { padding: [40, 40] });
+    } catch(e) {}
+  } else {
+    MAP.setView(CITY_CENTERS[city] || CITY_CENTERS.BCN, 15);
+    reloadMarkers();
+  }
 }
 function markCityToggle() {
   document.querySelectorAll('.map-city-opt').forEach(b => {
