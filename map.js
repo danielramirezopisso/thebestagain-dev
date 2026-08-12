@@ -560,8 +560,13 @@ async function initMap() {
   if (user) await refreshMyVotes(user.id);
   initRatingDropdown("m_rating", 7);
   renderRatingButtons();
-  MAP = L.map("map", { zoomControl: false, doubleClickZoom: true }).setView(CITY_CENTERS[CITY] || CITY_CENTERS.BCN, 15);
-  markCityToggle();
+  let _iv = null;
+  try { _iv = JSON.parse(localStorage.getItem('tba_map_view') || 'null'); } catch(e) {}
+  MAP = L.map("map", { zoomControl: false, doubleClickZoom: true })
+    .setView(_iv?.c || CITY_CENTERS.BCN, _iv?.z || 15);
+  MAP.on('moveend zoomend', () => {
+    try { localStorage.setItem('tba_map_view', JSON.stringify({ c: [MAP.getCenter().lat, MAP.getCenter().lng], z: MAP.getZoom() })); } catch(e) {}
+  });
   L.control.zoom({ position: "topright" }).addTo(MAP);
   // Standard OSM tiles (show business POIs) with muted filter — HurryUp style
   const _tl = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "&copy; OpenStreetMap" }).addTo(MAP);
@@ -684,6 +689,7 @@ async function toggleJourneyMode() {
   const user = await maybeUser();
   if (!user) { showJourneyLoginPrompt(); return; }
   JOURNEY_MODE = !JOURNEY_MODE;
+  if (ZONE_OPEN) { ZONE_MINE = JOURNEY_MODE; renderZonePanel(); }
   updateJourneyToggleUI();
   reloadMarkers();
 }
@@ -705,7 +711,6 @@ async function reloadMarkers() {
 
   let q = sb.from("markers").select("id,title,rating_avg,rating_count,lat,lon,group_type,is_active,category_id,chain_id,city")
     .eq("is_active", true).eq("group_type", "place");
-  if (CITY !== "ALL") q = q.eq("city", CITY);
   if (markerIds) q = q.in("id", markerIds);
   q = applyRatingBucket(q);
 
@@ -1094,54 +1099,8 @@ function locateMe() {
 }
 
 
-/* ══ CITY ══ */
-async function setCity(city) {
-  if (city === CITY) return;
-  CITY = city;
-  localStorage.setItem('tba_city', city);
-  markCityToggle();
-  if (city === 'ALL') {
-    await reloadMarkers();
-    try {
-      const pts = Object.values(MARKER_DATA_BY_ID).filter(m => m.lat && m.lon).map(m => [m.lat, m.lon]);
-      if (pts.length) MAP.fitBounds(pts, { padding: [40, 40] });
-    } catch(e) {}
-  } else {
-    MAP.setView(CITY_CENTERS[city] || CITY_CENTERS.BCN, 15);
-    reloadMarkers();
-  }
-}
-function markCityToggle() {
-  document.querySelectorAll('.map-city-opt').forEach(b => {
-    b.classList.toggle('city-on', b.dataset.city === CITY);
-  });
-}
 
-/* ══ SHARE FROM MAP ══ */
-let _MY_TAG = null;
-async function initMapShare() {
-  const user = await maybeUser();
-  if (!user) return;
-  try {
-    const { data } = await sb.from('profiles').select('username').eq('id', user.id).maybeSingle();
-    _MY_TAG = data?.username || null;
-  } catch(e) {}
-  const pill = document.getElementById('mapSharePill');
-  if (pill) pill.style.display = 'flex';
-}
-function shareFromMap() {
-  if (typeof gtag !== 'undefined') gtag('event', 'share_clicked', { content_type: 'map' });
-  if (!_MY_TAG) {
-    // No tag yet — send to claim
-    window.location.href = 'user.html';
-    return;
-  }
-  const url = location.origin + '/foodies.html?u=' + _MY_TAG + (FILTER_CATEGORY ? '&cat=' + FILTER_CATEGORY : '');
-  const text = FILTER_CATEGORY ? 'Mi ranking en TBA 🥇' : 'Mi mapa foodie 🍕';
-  if (navigator.share) navigator.share({ text, url }).catch(() => {});
-  else { navigator.clipboard.writeText(url); alert('Link copiado'); }
-}
-initMapShare();
+
 
 
 /* ══ TOP DE ESTA ZONA ══ */
@@ -1181,17 +1140,13 @@ function zoneCatName() {
 
 function openZonePanel() {
   ZONE_OPEN = true;
-  ZONE_MINE = !!JOURNEY_MODE && !!(window.MY_VOTE_SCORES_MAP && Object.keys(window.MY_VOTE_SCORES_MAP).length);
+  ZONE_MINE = !!JOURNEY_MODE;
   document.getElementById('zonePanel').style.display = 'flex';
   document.getElementById('zoneTopChip').style.display = 'none';
   renderZonePanel();
   if (typeof gtag !== 'undefined') gtag('event', 'zone_top_opened');
 }
 
-function setZoneMode(mine) {
-  ZONE_MINE = mine;
-  renderZonePanel();
-}
 
 function closeZonePanel() {
   ZONE_OPEN = false;
@@ -1202,21 +1157,14 @@ function closeZonePanel() {
 function renderZonePanel() {
   const top = computeZoneTop();
   const cat = zoneCatName();
-  document.getElementById('zonePanelTitle').textContent = cat ? ('Top ' + cat + ' · esta zona') : 'Top de esta zona';
+  document.getElementById('zonePanelTitle').textContent = (cat ? 'Top ' + cat : 'Top de esta zona') + (ZONE_MINE ? ' · mi ranking' : ' · comunidad');
   const list = document.getElementById('zonePanelList');
 
-  const hasMyVotes = !!(window.MY_VOTE_SCORES_MAP && Object.keys(window.MY_VOTE_SCORES_MAP).length);
-  const toggle = hasMyVotes ? `
-    <div class="zone-mode-toggle">
-      <button class="zone-mode-opt ${!ZONE_MINE ? 'zone-mode-on' : ''}" onclick="setZoneMode(false)">Comunidad</button>
-      <button class="zone-mode-opt ${ZONE_MINE ? 'zone-mode-on' : ''}" onclick="setZoneMode(true)">Mi ranking</button>
-    </div>` : '';
-
   if (!top.length) {
-    list.innerHTML = toggle + '<div class="zone-empty">' + (ZONE_MINE ? 'No has votado nada en esta zona.' : 'No hay sitios valorados en esta zona.') + '</div>';
+    list.innerHTML = '<div class="zone-empty">' + (ZONE_MINE ? 'No has votado nada en esta zona.' : 'No hay sitios valorados en esta zona.') + '</div>';
     return;
   }
-  list.innerHTML = toggle + top.map((m, i) => `
+  list.innerHTML = top.map((m, i) => `
     <a class="zone-row" href="marker.html?id=${m.id}${FILTER_CATEGORY ? '&cat=' + FILTER_CATEGORY : ''}">
       <span class="zone-row-pos">${i + 1}</span>
       <span class="zone-row-name">${escapeHtml(m.title)}</span>
@@ -1238,7 +1186,8 @@ async function shareZoneTop() {
   if (!top.length) return;
   if (typeof gtag !== 'undefined') gtag('event', 'share_clicked', { content_type: 'zone_top' });
   const cat = zoneCatName();
-  const cityLabel = CITY === 'BCN' ? 'Barcelona' : CITY === 'MAD' ? 'Madrid' : '';
+  const ctr = MAP.getCenter();
+  const cityLabel = (Math.abs(ctr.lat-41.39)<0.35 && Math.abs(ctr.lng-2.16)<0.45) ? 'Barcelona' : (Math.abs(ctr.lat-40.42)<0.35 && Math.abs(ctr.lng+3.70)<0.45) ? 'Madrid' : '';
   const title = cat ? ('Top ' + cat) : 'Lo mejor de la zona';
   const whose = ZONE_MINE ? 'mi ranking' : 'según la comunidad';
   const subtitle = whose + (cat ? '' : ' · todas las categorías') + (cityLabel ? ' · ' + cityLabel : '');
