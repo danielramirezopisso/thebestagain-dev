@@ -140,9 +140,9 @@ function refreshAllMarkerIcons() {
     const iconUrl = FILTER_CATEGORY
       ? getIconUrlForCategory(parseInt(FILTER_CATEGORY))
       : getIconUrlForCategory(m.primary_category_id || m.category_id);
-    const greyed = JOURNEY_MODE && !MY_VOTED_IDS.has(id);
-    const displayAvg = (JOURNEY_MODE && window.MY_VOTE_SCORES_MAP?.[id])
-      ? Number(window.MY_VOTE_SCORES_MAP[id]) : avg;
+    const greyed = JOURNEY_MODE && (FILTER_CATEGORY ? myScoreFor(id) == null : !MY_VOTED_IDS.has(id));
+    const _my = JOURNEY_MODE ? myScoreFor(id) : null;
+    const displayAvg = _my != null ? _my : avg;
     mk.setIcon(makeMarkerIcon(iconUrl, displayAvg, cnt, greyed, false));
   });
 }
@@ -659,9 +659,29 @@ async function refreshMyVotes(userId) {
   if (!userId) return;
   const { data } = await sb.from("votes").select("marker_id,vote,category_id").eq("user_id", userId).eq("is_active", true);
   MY_VOTED_IDS = new Set((data || []).map(v => v.marker_id));
-  // Store personal scores for journey mode colors
+  // Personal scores per (marker, category) + flat average fallback
+  window.MY_VOTE_SCORES_BY_CAT = {};
   window.MY_VOTE_SCORES_MAP = {};
-  (data || []).forEach(v => { window.MY_VOTE_SCORES_MAP[v.marker_id] = v.vote; });
+  const sums = {};
+  (data || []).forEach(v => {
+    if (!window.MY_VOTE_SCORES_BY_CAT[v.marker_id]) window.MY_VOTE_SCORES_BY_CAT[v.marker_id] = {};
+    window.MY_VOTE_SCORES_BY_CAT[v.marker_id][v.category_id] = v.vote;
+    if (!sums[v.marker_id]) sums[v.marker_id] = { s: 0, n: 0 };
+    sums[v.marker_id].s += Number(v.vote); sums[v.marker_id].n++;
+  });
+  Object.keys(sums).forEach(id => { window.MY_VOTE_SCORES_MAP[id] = sums[id].s / sums[id].n; });
+}
+
+// My score for a marker honoring the active category filter.
+// Returns null if (filtered and) I haven't voted that marker in that category.
+function myScoreFor(markerId) {
+  if (FILTER_CATEGORY) {
+    const byCat = window.MY_VOTE_SCORES_BY_CAT?.[markerId];
+    const v = byCat ? byCat[parseInt(FILTER_CATEGORY)] : undefined;
+    return v != null ? Number(v) : null;
+  }
+  const v = window.MY_VOTE_SCORES_MAP?.[markerId];
+  return v != null ? Number(v) : null;
 }
 
 function showJourneyLoginPrompt() {
@@ -763,9 +783,9 @@ async function reloadMarkers() {
     const primaryRating = m.cat_ratings[m.primary_category_id] || {};
     const avg = Number(primaryRating.avg ?? m.rating_avg ?? 0);
     const cnt = Number(primaryRating.count ?? m.rating_count ?? 0);
-    const greyed = JOURNEY_MODE && !MY_VOTED_IDS.has(m.id);
-    const displayAvg = (JOURNEY_MODE && window.MY_VOTE_SCORES_MAP?.[m.id])
-      ? Number(window.MY_VOTE_SCORES_MAP[m.id]) : avg;
+    const greyed = JOURNEY_MODE && (FILTER_CATEGORY ? myScoreFor(m.id) == null : !MY_VOTED_IDS.has(m.id));
+    const _my = JOURNEY_MODE ? myScoreFor(m.id) : null;
+    const displayAvg = _my != null ? _my : avg;
     const icon = makeMarkerIcon(iconUrl, displayAvg, cnt, greyed, useSparkle);
     const mk = L.marker([m.lat, m.lon], { icon }).addTo(LAYER_GROUP);
     LEAFLET_MARKERS_BY_ID[m.id] = mk;
@@ -1118,10 +1138,9 @@ const ZONE_COLOR = v => {
 function computeZoneTop() {
   const b = MAP.getBounds();
   if (ZONE_MINE) {
-    const scores = window.MY_VOTE_SCORES_MAP || {};
     return Object.values(MARKER_DATA_BY_ID)
-      .filter(m => m.lat && m.lon && b.contains([m.lat, m.lon]) && scores[m.id] != null)
-      .map(m => ({ ...m, _score: Number(scores[m.id]) }))
+      .filter(m => m.lat && m.lon && b.contains([m.lat, m.lon]) && myScoreFor(m.id) != null)
+      .map(m => ({ ...m, _score: myScoreFor(m.id) }))
       .sort((a, x) => x._score - a._score)
       .slice(0, 10);
   }
